@@ -5,12 +5,13 @@
 
 using namespace GamesEngineeringBase;
 
-
+// vector 2d class to handle all vector operations
 class Vector2
 {
 public:
 	float x, y;
 
+	// predefined static vectors
 	static Vector2 zero;
 	static Vector2 one;
 	static Vector2 up;
@@ -18,59 +19,67 @@ public:
 	static Vector2 left;
 	static Vector2 right;
 
-	Vector2()
+	// constructors
+	Vector2() // default Constructor
 	{
 		set(0, 0);
 	}
 
-	Vector2(float value)
+	Vector2(float value) // single parameter Constructor
 	{
 		set(value, value);
 	}
 
-	Vector2(float _x, float _y)
+	Vector2(float _x, float _y) // double parameter Constructor
 	{
 		set(_x, _y);
 	}
 
+	// setter Method
 	inline void set(float _x, float _y)
 	{
 		x = _x;
 		y = _y;
 	}
 
+	// returns magnitude of this vector
 	inline float magnitude()
 	{
 		return sqrtf(x * x + y * y);
 	}
 
+	// returns normalized value of this vector
 	inline Vector2 normalize()
 	{
 		float mag = magnitude();
 		return mag > 0 ? *this / mag : *this;
 	}
 
+	// converts and return this vector into int
 	inline Vector2 to_int()
 	{
 		return Vector2(static_cast<int>(x), static_cast<int>(y));
 	}
 
+	// returnd float distance between this vector and v2
 	inline float distance(Vector2 v2)
 	{
 		return (*this - v2).magnitude();
 	}
 
+	// returns clamped value of this vector between max and min vectors
 	inline Vector2 clamp(Vector2 min, Vector2 max)
 	{
 		return Vector2(x < min.x ? min.x : x > max.x ? max.x : x, y < min.y ? min.y : y > max.y ? max.y : y);
 	}
 
+	// method to prints this Vector (Subjected to change and replace it with operator overloading)
 	void print()
 	{
 		std::cout << "( " << x << " , " << y << " )\n";
 	}
 
-#pragma region Operators
+#pragma region Operator Overloading
 
 	inline Vector2 operator+(Vector2 v2) const
 	{
@@ -135,6 +144,7 @@ public:
 #pragma endregion
 };
 
+// defining static Vectors
 Vector2 Vector2::zero(0, 0);
 Vector2 Vector2::one(1, 1);
 Vector2 Vector2::up(0, -1);
@@ -142,12 +152,14 @@ Vector2 Vector2::down(0, 1);
 Vector2 Vector2::left(-1, 0);
 Vector2 Vector2::right(0, 1);
 
+// class to handle rect for drawing and collision (subjected to change)
 class Rect
 {
-	Vector2 size;
+	Vector2 size; // size of the rectangle
 public:
-	Vector2 center;
+	Vector2 center; // center of rect
 
+	// constructors
 	Rect()
 	{
 
@@ -159,37 +171,44 @@ public:
 		center = _center;
 	}
 
+	// setter method
 	void set(Vector2 _size, Vector2 _center)
 	{
 		size = _size;
 		center = _center;
 	}
 
+	// getter for size
 	Vector2 get_size() const
 	{
 		return size;
 	}
 
+	// returns top left position of rect (subjected to change and replace it with bounds)
 	Vector2 get_topleft() const
 	{
 		return center - size / 2;
 	}
 
+	// returns bottom right position of rect (subjected to change and replace it with bounds)
 	Vector2 get_botmright() const
 	{
 		return center + size / 2;
 	}
 
+	// setter for topleft
 	void set_topleft(Vector2 value)
 	{
 		center = value + size / 2;
 	}
 
+	// setter for bottomright
 	void set_botmright(Vector2 value)
 	{
 		center = value - size / 2;
 	}
 
+	// method to print rect (subjected to change and replace it with operator overloading)
 	void print()
 	{
 		Vector2 topLeft = get_topleft();
@@ -199,13 +218,15 @@ public:
 	}
 };
 
-
 #pragma region Colors
 
+// Color struct to strore color values
 struct Color
 {
 	unsigned int r, g, b, a;
-	Color()
+
+	// constructors
+	Color() // default constructor
 	{
 		r = 0;
 		g = 0;
@@ -213,6 +234,7 @@ struct Color
 		a = 0;
 	}
 
+	// parameterized controctor with default value for alpha
 	Color(unsigned int _r, unsigned int _g, unsigned int _b, unsigned int _a = 255)
 	{
 		r = _r > 255 ? 255 : _r;
@@ -222,6 +244,7 @@ struct Color
 	}
 };
 
+// predefined constant colors
 const Color BLACK(0, 0, 0);
 const Color SILVER(192, 192, 192);
 const Color GRAY(128, 128, 128);
@@ -243,12 +266,15 @@ const Color AQUA(0, 255, 255);
 
 #pragma region Primitive Shapes
 
-class Shape
+// class to handle primitive shape creation
+static class Shape
 {
+	// private constructor for static class
 	Shape();
 
 public:
 
+	// method creates rectangle shape with given size and color and return it in out parameter
 	inline static void rectangle(Vector2 _size, Color _color, Color*& out)
 	{
 		int len = _size.x * _size.y;
@@ -257,6 +283,7 @@ public:
 			out[i] = _color;
 	}
 
+	// method creates circle shape with given radii and color and return it in out parameter
 	inline static void circle(unsigned int _rad, Color _color, Color*& out)
 	{
 		int diam = _rad * 2, len = diam * diam;
@@ -273,6 +300,8 @@ public:
 	}
 };
 
+
+// method to fill background of the window
 void fill_window(Window& win, Color color)
 {
 	Vector2 size(win.getWidth(), win.getHeight());
@@ -282,24 +311,27 @@ void fill_window(Window& win, Color color)
 
 #pragma endregion
 
-
+// class to handle sprites 
 class Sprite
 {
 protected:
 
-	Color* image;
+	Color* image; // sprite image as array of colors (sbjected to change and replace with Image object)
 
-	Sprite()
+	// constructors
+	Sprite() // default constructor
 	{
 		image = nullptr;
 	}
 
+	// constructor creates rectangle shape
 	Sprite(Vector2 _size, Vector2 _pos, Color _color)
 	{
 		Shape::rectangle(_size, _color, image);
 		rect.set(_size, _pos);
 	}
 
+	// constructor creates circle shape
 	Sprite(float _rad, Vector2 _pos, Color _color)
 	{
 		Shape::circle(_rad, _color, image);
@@ -308,20 +340,23 @@ protected:
 
 public:
 
-	Rect rect;
+	Rect rect; // rect for the sprite to draw and collide
 
+	// method to draw sprite on window
 	void draw(Window& win)
 	{
-		if (image == nullptr)
+		if (image == nullptr) // returns if no image
 			return;
 
-		Vector2 winSize = Vector2(win.getWidth(), win.getHeight());
-		Vector2 pos = rect.get_topleft();
-		Vector2 size = rect.get_size();
+		Vector2 winSize = Vector2(win.getWidth(), win.getHeight()); // windows bounds
+		Vector2 pos = rect.get_topleft(); // start point to draw image
+		Vector2 size = rect.get_size(); // size of the image or rect
 
 		for (unsigned int y = 0; y < size.y; y++)
 		{
-			int posY = pos.y + y;
+			int posY = pos.y + y; // y position of image pixel on window
+
+			//bound check for y
 			if (posY < 0)
 				continue;
 			if (posY > winSize.y)
@@ -329,13 +364,17 @@ public:
 
 			for (unsigned int x = 0; x < size.x; x++)
 			{
-				int posX = pos.x + x;
+				int posX = pos.x + x; // x position of image pixel on window
+
+				//x bound check
 				if (posX < 0)
 					continue;
 				if (posX > winSize.x)
 					break;
 
-				Color color = image[static_cast<int>(size.x) * y + x];
+				Color color = image[static_cast<int>(size.x) * y + x]; // getting color values of pixel
+
+				//draw pixel if alpha is greater than 0
 				if (color.a > 0)
 					win.draw(posX, posY, color.r, color.g, color.b);
 			}
@@ -344,49 +383,54 @@ public:
 
 	~Sprite()
 	{
-		if (image != nullptr)
+		if (image != nullptr) // free memory of image if assigned
 			delete[] image;
 	}
 };
 
+// class handles inputs 
 static class Inputs
 {
-	static Window* win;
+	static Window* win; // canvas to get inputs
 
-	Inputs();
-	~Inputs();
+	// constructors
+	Inputs() {}; // private constructor for static class
 
 public:
+	// initializes value of window
 	static void Init(Window& _win)
 	{
 		if (win == nullptr)
 			Inputs::win = &_win;
 	}
 
+	// deinitializes value of window
 	static void free()
 	{
 		Inputs::win = nullptr;
 	}
 
+	// returns vector2 axis for player input
 	static Vector2 get_axis()
 	{
-		Vector2 dir;
+		Vector2 axis;
 
-		if (win == nullptr)
-			return dir;
+		if (win == nullptr) // return (0,0) if win is nor assigned
+			return axis;
 
 		if (win->keyPressed('W') || win->keyPressed(VK_UP))
-			dir.y--;
+			axis.y--;
 		if (win->keyPressed('S') || win->keyPressed(VK_DOWN))
-			dir.y++;
+			axis.y++;
 		if (win->keyPressed('A') || win->keyPressed(VK_LEFT))
-			dir.x--;
+			axis.x--;
 		if (win->keyPressed('D') || win->keyPressed(VK_RIGHT))
-			dir.x++;
+			axis.x++;
 
-		return dir.normalize();
+		return axis.normalize();
 	}
 
+	// checks if given key is pressed or not
 	static bool key_pressed(int key)
 	{
 		if (win == nullptr)
@@ -394,6 +438,7 @@ public:
 		return win->keyPressed(key);
 	}
 
+	// checks if backspace or escape is pressed for UI inputs
 	static bool ui_back()
 	{
 		if (win == nullptr)
@@ -402,4 +447,5 @@ public:
 	}
 };
 
+// defining static variables of Input
 Window* Inputs::win = nullptr;
