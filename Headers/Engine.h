@@ -7,7 +7,6 @@ using namespace GamesEngineeringBase;
 
 namespace Engine
 {
-
 #pragma region Math
 
 	// vector 2d class to handle all vector operations
@@ -220,6 +219,91 @@ namespace Engine
 			Vector2 botmRight = get_botmright();
 			std::cout << "[ " << topLeft.x << " , " << topLeft.y << " , ";
 			std::cout << botmRight.x << " , " << botmRight.y << " ]\n";
+		}
+	};
+
+#pragma endregion
+
+#pragma region Inputs and Debugging
+
+	// class handles inputs 
+	class Inputs
+	{
+		static Window* win; // canvas to get inputs
+
+		// constructors
+		Inputs() {}; // private constructor for static class
+
+	public:
+		// initializes value of window
+		static void Init(Window& _win)
+		{
+			if (win == nullptr)
+				Inputs::win = &_win;
+		}
+
+		// deinitializes value of window
+		static void free()
+		{
+			Inputs::win = nullptr;
+		}
+
+		// returns vector2 axis for player input
+		static Vector2 get_axis()
+		{
+			Vector2 axis;
+
+			if (win == nullptr) // return (0,0) if win is nor assigned
+				return axis;
+
+			if (win->keyPressed('W') || win->keyPressed(VK_UP))
+				axis.y--;
+			if (win->keyPressed('S') || win->keyPressed(VK_DOWN))
+				axis.y++;
+			if (win->keyPressed('A') || win->keyPressed(VK_LEFT))
+				axis.x--;
+			if (win->keyPressed('D') || win->keyPressed(VK_RIGHT))
+				axis.x++;
+
+			return axis.normalize();
+		}
+
+		// checks if given key is pressed or not
+		static bool key_pressed(int key)
+		{
+			if (win == nullptr)
+				return false;
+			return win->keyPressed(key);
+		}
+
+		// checks if backspace or escape is pressed for UI inputs
+		static bool ui_back()
+		{
+			if (win == nullptr)
+				return false;
+			return win->keyPressed(VK_ESCAPE) || win->keyPressed(VK_BACK);
+		}
+	};
+
+	// defining static variables of Input
+	Window* Inputs::win = nullptr;
+
+	// Debug class to make debugging easy
+	static class Debug
+	{
+		Debug() {};
+	public:
+
+		//method prints error on terminal
+		static void print_error(std::string msg)
+		{
+			std::cout << " ERROR : " << msg << std::endl;
+		}
+
+		//method warning error on terminal
+		static void print_warning(std::string msg)
+		{
+			std::cout << " WARNING : " << msg << std::endl;
 		}
 	};
 
@@ -446,7 +530,10 @@ namespace Engine
 		void draw(Window& win)
 		{
 			if (group == nullptr)
-				return Debug::print_warning("Sprite Group is destroyed or not initialize");
+			{
+				Debug::print_warning("Sprite Group is destroyed or not initialize");
+				return;
+			}
 
 			for (int i = 0; i < curIndex; i++)
 				group[i]->draw(win);
@@ -478,91 +565,6 @@ namespace Engine
 		~SpriteGroup()
 		{
 			destroy();
-		}
-	};
-
-#pragma endregion
-
-#pragma region Inputs and Debugging
-
-	// class handles inputs 
-	class Inputs
-	{
-		static Window* win; // canvas to get inputs
-
-		// constructors
-		Inputs() {}; // private constructor for static class
-
-	public:
-		// initializes value of window
-		static void Init(Window& _win)
-		{
-			if (win == nullptr)
-				Inputs::win = &_win;
-		}
-
-		// deinitializes value of window
-		static void free()
-		{
-			Inputs::win = nullptr;
-		}
-
-		// returns vector2 axis for player input
-		static Vector2 get_axis()
-		{
-			Vector2 axis;
-
-			if (win == nullptr) // return (0,0) if win is nor assigned
-				return axis;
-
-			if (win->keyPressed('W') || win->keyPressed(VK_UP))
-				axis.y--;
-			if (win->keyPressed('S') || win->keyPressed(VK_DOWN))
-				axis.y++;
-			if (win->keyPressed('A') || win->keyPressed(VK_LEFT))
-				axis.x--;
-			if (win->keyPressed('D') || win->keyPressed(VK_RIGHT))
-				axis.x++;
-
-			return axis.normalize();
-		}
-
-		// checks if given key is pressed or not
-		static bool key_pressed(int key)
-		{
-			if (win == nullptr)
-				return false;
-			return win->keyPressed(key);
-		}
-
-		// checks if backspace or escape is pressed for UI inputs
-		static bool ui_back()
-		{
-			if (win == nullptr)
-				return false;
-			return win->keyPressed(VK_ESCAPE) || win->keyPressed(VK_BACK);
-		}
-	};
-
-	// defining static variables of Input
-	Window* Inputs::win = nullptr;
-
-	// Debug class to make debugging easy
-	static class Debug
-	{
-		Debug() {};
-	public:
-
-		//method prints error on terminal
-		static void print_error(std::string msg)
-		{
-			std::cout << " ERROR : " << msg << std::endl;
-		}
-
-		//method warning error on terminal
-		static void print_warning(std::string msg)
-		{
-			std::cout << " WARNING : " << msg << std::endl;
 		}
 	};
 
