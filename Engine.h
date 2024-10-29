@@ -268,11 +268,13 @@ namespace Engine
 	class Inputs
 	{
 		static Window* win; // canvas to get inputs
+		static Vector2 mousePos; // save mouse pos per frame
 
 		// constructors
 		Inputs() {}; // private constructor for static class
 
 	public:
+
 		// default destructure
 		~Inputs() {};
 
@@ -289,24 +291,57 @@ namespace Engine
 			Inputs::win = nullptr;
 		}
 
+		static void refresh()
+		{
+			if (win == nullptr)
+				return;
+
+			win->checkInput();
+			mousePos.set(win->getMouseInWindowX(), win->getMouseInWindowY());
+		}
+
+		// returns horizontal axis input
+		static int get_h_axis()
+		{
+			if (win == nullptr)
+				return 0;
+
+			int axis = 0;
+
+			if (win->keyPressed('A') || win->keyPressed(VK_LEFT))
+				axis--;
+			if (win->keyPressed('D') || win->keyPressed(VK_RIGHT))
+				axis++;
+
+			return axis;
+		}
+
+		// returns vertical axis input
+		static int get_v_axis()
+		{
+			if (win == nullptr)
+				return 0;
+
+			int axis = 0;
+
+			if (win->keyPressed('W') || win->keyPressed(VK_LEFT))
+				axis--;
+			if (win->keyPressed('S') || win->keyPressed(VK_RIGHT))
+				axis++;
+
+			return axis;
+		}
+
 		// returns vector2 axis for player input
 		static Vector2 get_axis()
 		{
-			Vector2 axis;
+			return Vector2(get_h_axis(), get_v_axis()).normalize();
+		}
 
-			if (win == nullptr) // return (0,0) if win is nor assigned
-				return axis;
-
-			if (win->keyPressed('W') || win->keyPressed(VK_UP))
-				axis.y--;
-			if (win->keyPressed('S') || win->keyPressed(VK_DOWN))
-				axis.y++;
-			if (win->keyPressed('A') || win->keyPressed(VK_LEFT))
-				axis.x--;
-			if (win->keyPressed('D') || win->keyPressed(VK_RIGHT))
-				axis.x++;
-
-			return axis.normalize();
+		// returns mouse position on window
+		static Vector2 get_mouse_pos()
+		{
+			return mousePos;
 		}
 
 		// checks if given key is pressed or not
@@ -328,6 +363,7 @@ namespace Engine
 
 	// defining static variables of Input
 	Window* Inputs::win = nullptr;
+	Vector2 Inputs::mousePos(0, 0);
 
 	// Debug class to make debugging easy
 	static class Debug
@@ -425,74 +461,78 @@ namespace Engine
 #pragma region Camera and Rendering
 
 	// camera class to handle camera movement and rendering 
-	class Camera
+	static class Camera
 	{
-		Window win; // canvas to print on (canvas size is cameras size)
-		Rect* followTarget = nullptr; // follow target for camera
-		Vector2 offset; // offset value to keep (0,0) in center of canvas
+		static Window win; // canvas to print on (canvas size is cameras size)
+		static Rect* followTarget; // follow target for camera
+		static Vector2 offset; // offset value to keep (0,0) in center of canvas
 
+		Camera() {};
 	public:
-		Rect camRect; // camera rect 
+		static bool notNull; // to check if camera is not created
+		static Rect camRect; // camera rect 
 
-		// constructor to initialize camera
-		Camera(std::string _name, Vector2 _size, Vector2 _pos = Vector2::zero)
+		// create new camera
+		static void create(std::string _name, Vector2 _size, Vector2 _pos = Vector2::zero)
 		{
+			notNull = true;
 			win.create(_size.x, _size.y, _name);
 			camRect.set(_size, _pos);
 			offset = _size / 2;
 		}
 
-		// default destructor
-		~Camera()
+		// destroy camera
+		static void free()
 		{
 			followTarget = nullptr;
 		}
 
-		// getter for canvas
-		Window& get_window()
+		// get referance to window
+		static Window& get_window()
 		{
 			return win;
 		}
 
 		// returns relative position to camera
-		Vector2 get_rel_pos(Vector2 _pos) const
+		static Vector2 get_rel_pos(Vector2 _pos)
 		{
 			return offset + _pos - camRect.center;
 		}
 
 		// check if follow target is assigned or not
-		bool has_follow_target()
+		static bool has_follow_target()
 		{
 			return followTarget != nullptr;
 		}
 
 		// setter for follow target
-		void set_follow_target(Rect& rect)
+		static void set_follow_target(Rect& rect)
 		{
 			followTarget = &rect;
 		}
 
 		// resets follow target
-		void reset_follow_target()
+		static void reset_follow_target()
 		{
 			followTarget = nullptr;
 		}
 
 		// updates cameras if follow follow target set
-		void update(float dt)
+		static void update(float dt)
 		{
-			if (followTarget != nullptr)
+			if (followTarget != nullptr && notNull)
 				camRect.center = followTarget->center;
 		}
 
 		// clear canvas
-		void clear()
+		static void clear()
 		{
-			win.clear();
+			if (notNull)
+				win.clear();
 		}
 
 		// draw object on canvas if in view
-		void draw(Rect& _rect, Image& _image)
+		static void draw(Rect& _rect, Image& _image)
 		{
 			if (!Collision::rect_collide(camRect, _rect)) // return if object is not in view
 				return;
@@ -528,11 +568,17 @@ namespace Engine
 		}
 
 		// present canvas
-		void present()
+		static void present()
 		{
 			win.present();
 		}
 	};
+
+	bool Camera::notNull = true;
+	Window Camera::win;
+	Rect* Camera::followTarget = nullptr;
+	Vector2 Camera::offset;
+	Rect Camera::camRect;
 
 #pragma endregion
 
@@ -636,12 +682,13 @@ namespace Engine
 		virtual void update(float dt) {}
 
 		// method to draw sprite on window
-		void draw(Camera& cam)
+		void draw()
 		{
 			if (image.data == NULL) // returns if no image
 				return;
 
-			cam.draw(rect, image);
+			if (Camera::notNull) // check if camera is created
+				Camera::draw(rect, image);
 		}
 
 		~Sprite()
@@ -694,7 +741,7 @@ namespace Engine
 		}
 
 		// method to draw all sprites of this group
-		void draw(Camera& cam)
+		void draw()
 		{
 			if (group == nullptr)
 			{
@@ -703,7 +750,16 @@ namespace Engine
 			}
 
 			for (int i = 0; i < curIndex; i++)
-				group[i]->draw(cam);
+				group[i]->draw();
+		}
+
+		// checks collision of given sprite with all sprites
+		bool is_colliding(Rect& rect)
+		{
+			for (int i = 0; i < curIndex; i++)
+				if (Collision::rect_collide(rect, group[i]->rect))
+					return true;
+			return false;
 		}
 
 		// method to destroy all sprites and this group
