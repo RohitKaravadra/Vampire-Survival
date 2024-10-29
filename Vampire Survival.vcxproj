@@ -72,7 +72,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival\Headers;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,8 +134,8 @@
     <ClCompile Include="Source\Game.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Headers\Engine.h" />
-    <ClInclude Include="Headers\GamesEngineeringBase.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="GamesEngineeringBase.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\L.png" />

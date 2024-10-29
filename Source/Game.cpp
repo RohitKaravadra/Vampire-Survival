@@ -10,7 +10,11 @@ class Enemy : public Sprite
 {
 public:
 	Enemy(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
+	Enemy(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
 };
+
+
+Sprite* enemy;
 
 //class Sworm
 //{
@@ -103,10 +107,8 @@ public:
 class Player : public Sprite
 {
 public:
-	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color)
-	{
-
-	}
+	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
+	Player(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
 
 	void update(float dt) {
 		move(dt);
@@ -115,7 +117,15 @@ public:
 	void move(float dt)
 	{
 		Vector2 delta = Inputs::get_axis() * 200 * dt;
-		rect.center = (rect.center + delta).clamp(minBound, maxBound);
+
+		rect.center += Vector2(delta.x, 0);
+		if (Collision::rect_collide(rect, enemy->rect))
+			rect.center -= Vector2(delta.x, 0);
+		rect.center += Vector2(0, delta.y);
+		if (Collision::rect_collide(rect, enemy->rect))
+			rect.center -= Vector2(0, delta.y);
+
+		rect.center = rect.center.clamp(minBound, maxBound);
 	}
 };
 
@@ -125,28 +135,21 @@ class App
 	Window win;
 	Timer timer;
 	float deltaTime;
-	SpriteGroup* Objects;
+
+	Sprite* player;
+
+	//SpriteGroup* objects;
 public:
 
 	App()
 	{
 		isRunning = false;
-		deltaTime = 1;
-
 		win.create(1280, 720, "Vampire Survival");
+		deltaTime = 1;
+		player = nullptr;
+
 		Inputs::Init(win);
-		Objects = new SpriteGroup(10);
-	}
-
-	void start()
-	{
-		srand(static_cast<unsigned int>(time(NULL)));
-
-		Objects->add(new Enemy(25.f, Vector2(500, 400), RED));
-		Objects->add(new Player(25.0f, Vector2(600, 700), GREEN));
-
-		isRunning = true;
-		update_loop();
+		//objects = new SpriteGroup(10);
 	}
 
 	~App()
@@ -154,10 +157,26 @@ public:
 		destroy();
 	}
 
+	void start()
+	{
+		srand(static_cast<unsigned int>(time(NULL)));
+
+		/*objects->add(new Enemy(Vector2(50), Vector2(500, 400), RED));
+		objects->add(new Player(Vector2(50), Vector2(600, 700), GREEN));*/
+
+		enemy = new Enemy(50.f, Vector2(500, 400), RED);
+		player = new Player(25.f, Vector2(600, 700), GREEN);
+
+		isRunning = true;
+		update_loop();
+	}
+
+
 	void destroy()
 	{
 		Inputs::free();
-		delete Objects;
+		delete player, enemy;
+		//delete objects;
 	}
 
 	void update_loop()
@@ -166,17 +185,20 @@ public:
 		{
 			deltaTime = static_cast<float>(timer.dt());
 
-			Objects->update(deltaTime);
+			//objects->update(deltaTime);
+			player->update(deltaTime);
 
 			win.clear();
 
-			fill_window(win, WHITE);
+			//fill_window(win, WHITE);
 
-			Objects->draw(win);
+			//objects->draw(win);
+			player->draw(win);
+			enemy->draw(win);
 
 			win.present();
 
-			if (win.keyPressed(VK_ESCAPE))
+			if (Inputs::ui_back())
 				isRunning = false;
 
 			//std::cout << deltaTime << std::endl;

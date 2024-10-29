@@ -1,9 +1,11 @@
 #pragma once
 #include <iostream>
+#include <ostream>
 #include <math.h>
 #include "GamesEngineeringBase.h"
 
 using namespace GamesEngineeringBase;
+using std::ostream;
 
 namespace Engine
 {
@@ -56,7 +58,7 @@ namespace Engine
 		inline Vector2 normalize()
 		{
 			float mag = magnitude();
-			return mag > 0 ? *this / mag : *this;
+			return mag > 0 ? *this / mag : Vector2::zero;
 		}
 
 		// converts and return this vector into int
@@ -66,7 +68,7 @@ namespace Engine
 		}
 
 		// returnd float distance between this vector and v2
-		inline float distance(Vector2 v2)
+		inline float distance(Vector2& v2) const
 		{
 			return (*this - v2).magnitude();
 		}
@@ -77,72 +79,96 @@ namespace Engine
 			return Vector2(x < min.x ? min.x : x > max.x ? max.x : x, y < min.y ? min.y : y > max.y ? max.y : y);
 		}
 
-		// method to prints this Vector (Subjected to change and replace it with operator overloading)
-		void print()
+		// returns distance between given vector
+		static float distance(const Vector2& v1, const Vector2& v2)
 		{
-			std::cout << "( " << x << " , " << y << " )\n";
+			return (v1 - v2).magnitude();
 		}
-
 #pragma region Operator Overloading
 
-		inline Vector2 operator+(Vector2 v2) const
+		inline Vector2 operator+(const Vector2& v2) const
 		{
 			return Vector2(x + v2.x, y + v2.y);
 		}
 
-		inline Vector2 operator-(Vector2 v2) const
+		inline Vector2 operator-(const Vector2& v2) const
 		{
 			return Vector2(x - v2.x, y - v2.y);
 		}
 
-		inline Vector2 operator*(float value) const
+		inline Vector2 operator*(const float& value) const
 		{
 			return Vector2(x * value, y * value);
 		}
 
-		inline Vector2 operator/(float value) const
+		inline Vector2 operator/(const float& value) const
 		{
 			return Vector2(x / value, y / value);
 		}
 
-		inline void operator+=(Vector2 v2)
+
+		Vector2& operator+=(const Vector2& v2)
 		{
-			*this = *this + v2;
+			this->x += v2.x;
+			this->y += v2.y;
+			return *this;
 		}
 
-		inline void operator-=(Vector2 v2)
+		Vector2& operator-=(const Vector2& v2)
 		{
-			*this = *this - v2;
+			this->x -= v2.x;
+			this->y -= v2.y;
+			return *this;
 		}
 
-		inline bool operator==(Vector2 v2) const
+		Vector2& operator*=(const float& value)
+		{
+			this->x *= value;
+			this->y *= value;
+			return *this;
+		}
+
+		Vector2& operator/=(const float& value)
+		{
+			this->x /= value;
+			this->y /= value;
+			return *this;
+		}
+
+
+		inline bool operator==(const Vector2& v2) const
 		{
 			return x == v2.x && y == v2.y;
 		}
 
-		inline bool operator>(Vector2 v2) const
+		inline bool operator>(const Vector2& v2) const
 		{
 			return x > v2.x && y > v2.y;
 		}
 
-		inline bool operator<(Vector2 v2) const
+		inline bool operator<(const Vector2& v2) const
 		{
 			return x < v2.x && y < v2.y;
 		}
 
-		inline bool operator>=(Vector2 v2) const
+		inline bool operator>=(const Vector2& v2) const
 		{
 			return x >= v2.x && y >= v2.y;
 		}
 
-		inline bool operator<=(Vector2 v2) const
+		inline bool operator<=(const Vector2& v2) const
 		{
 			return x <= v2.x && y <= v2.y;
 		}
 
-		inline bool operator!=(Vector2 v2) const
+		inline bool operator!=(const Vector2& v2) const
 		{
 			return x != v2.x || y != v2.y;
+		}
+
+		friend ostream& operator<<(ostream& os, Vector2& v)
+		{
+			return os << " (" << v.x << "," << v.y << ") ";
 		}
 
 #pragma endregion
@@ -159,8 +185,8 @@ namespace Engine
 	// class to handle rect for drawing and collision (subjected to change)
 	class Rect
 	{
-		Vector2 size; // size of the rectangle
 	public:
+		Vector2 size; // size of the rectangle
 		Vector2 center; // center of rect
 
 		// constructors
@@ -182,12 +208,6 @@ namespace Engine
 			center = _center;
 		}
 
-		// getter for size
-		Vector2 get_size() const
-		{
-			return size;
-		}
-
 		// returns top left position of rect (subjected to change and replace it with bounds)
 		Vector2 get_topleft() const
 		{
@@ -201,24 +221,22 @@ namespace Engine
 		}
 
 		// setter for topleft
-		void set_topleft(Vector2 value)
+		void set_topleft(Vector2& value)
 		{
 			center = value + size / 2;
 		}
 
 		// setter for bottomright
-		void set_botmright(Vector2 value)
+		void set_botmright(Vector2& value)
 		{
 			center = value - size / 2;
 		}
 
-		// method to print rect (subjected to change and replace it with operator overloading)
-		void print()
+		friend ostream& operator<<(ostream& os, Rect& rect)
 		{
-			Vector2 topLeft = get_topleft();
-			Vector2 botmRight = get_botmright();
-			std::cout << "[ " << topLeft.x << " , " << topLeft.y << " , ";
-			std::cout << botmRight.x << " , " << botmRight.y << " ]\n";
+			Vector2 topLeft = rect.get_topleft();
+			Vector2 botmRight = rect.get_botmright();
+			return os << "[ " << topLeft.x << " , " << topLeft.y << " , " << botmRight.x << " , " << botmRight.y << " ] ";
 		}
 	};
 
@@ -235,6 +253,9 @@ namespace Engine
 		Inputs() {}; // private constructor for static class
 
 	public:
+		// default destructure
+		~Inputs() {};
+
 		// initializes value of window
 		static void Init(Window& _win)
 		{
@@ -300,8 +321,14 @@ namespace Engine
 			std::cout << " ERROR : " << msg << std::endl;
 		}
 
-		//method warning error on terminal
+		//method print warning on terminal
 		static void print_warning(std::string msg)
+		{
+			std::cout << " WARNING : " << msg << std::endl;
+		}
+
+		//method print message on terminal
+		static void print_message(std::string msg)
 		{
 			std::cout << " WARNING : " << msg << std::endl;
 		}
@@ -314,24 +341,18 @@ namespace Engine
 	// Color struct to strore color values
 	struct Color
 	{
-		unsigned int r, g, b, a;
+		unsigned char value[4]{ 0 };
 
 		// constructors
-		Color() // default constructor
-		{
-			r = 0;
-			g = 0;
-			b = 0;
-			a = 0;
-		}
+		Color() {} // default constructor
 
 		// parameterized controctor with default value for alpha
 		Color(unsigned int _r, unsigned int _g, unsigned int _b, unsigned int _a = 255)
 		{
-			r = _r > 255 ? 255 : _r;
-			g = _g > 255 ? 255 : _g;
-			b = _b > 255 ? 255 : _b;
-			a = _a > 255 ? 255 : _a;
+			value[0] = _r > 255 ? 255 : _r;
+			value[1] = _g > 255 ? 255 : _g;
+			value[2] = _b > 255 ? 255 : _b;
+			value[3] = _a > 255 ? 255 : _a;
 		}
 	};
 
@@ -366,27 +387,29 @@ namespace Engine
 	public:
 
 		// method creates rectangle shape with given size and color and return it in out parameter
-		inline static void rectangle(Vector2 _size, Color _color, Color*& out)
+		inline static void rectangle(Vector2 _size, Color _color, Image& outImage)
 		{
-			int len = _size.x * _size.y;
-			out = new Color[len]();
-			for (int i = 0; i < len; i++)
-				out[i] = _color;
+			outImage.width = _size.x;
+			outImage.height = _size.y;
+			outImage.channels = 4;
+			outImage.data = new unsigned char[_size.x * _size.y * 4];
+			for (unsigned int i = 0; i < _size.x * _size.y; i++)
+				memcpy(&outImage.data[i * 4], _color.value, 4);
 		}
 
 		// method creates circle shape with given radii and color and return it in out parameter
-		inline static void circle(unsigned int _rad, Color _color, Color*& out)
+		inline static void circle(unsigned int _rad, Color _color, Image& outImage)
 		{
 			int diam = _rad * 2, len = diam * diam;
+			outImage.width = outImage.height = diam;
+			outImage.channels = 4;
+			outImage.data = new unsigned char[diam * diam * 4] {0};
 			Vector2 center = Vector2(_rad - 1);
-			out = new Color[len]();
 			for (int i = 0; i < len; i++)
 			{
 				float dist = Vector2(i % diam, i / diam).distance(center);
 				if (dist < _rad)
-					out[i] = _color;
-				/*else
-					out[i] = Color(0, 0, 0, 0);*/
+					memcpy(&outImage.data[i * 4], _color.value, 4);
 			}
 		}
 	};
@@ -397,7 +420,7 @@ namespace Engine
 	{
 		Vector2 size(win.getWidth(), win.getHeight());
 		for (unsigned int i = 0; i < size.y * size.x; i++)
-			win.draw(i % (int)size.x, i / size.x, color.r, color.g, color.b);
+			win.draw(i % (int)size.x, i / size.x, color.value);
 	}
 
 #pragma endregion
@@ -409,15 +432,14 @@ namespace Engine
 	{
 	protected:
 
-		Color* image; // sprite image as array of colors (sbjected to change and replace with Image object)
+		Image image; // sprite image as array of colors (sbjected to change and replace with Image object)
 
 		// constructors
 		Sprite() // default constructor
 		{
-			image = nullptr;
 		}
 
-		// constructor creates rectangle shape
+		//// constructor creates rectangle shape
 		Sprite(Vector2 _size, Vector2 _pos, Color _color)
 		{
 			Shape::rectangle(_size, _color, image);
@@ -431,6 +453,21 @@ namespace Engine
 			rect.set(Vector2(_rad * 2), _pos);
 		}
 
+		// constructor creates image 
+		Sprite(Vector2 _pos, std::string _location, bool _center = true)
+		{
+			if (image.load(_location))
+			{
+				Vector2 size = Vector2(image.width, image.height);
+				rect.set(size, _center ? _pos : _pos + size / 2);
+			}
+			else
+			{
+				Shape::rectangle(Vector2(10), RED, image);
+				rect.set(Vector2(10), _pos);
+			}
+		}
+
 	public:
 
 		Rect rect; // rect for the sprite to draw and collide
@@ -441,12 +478,12 @@ namespace Engine
 		// method to draw sprite on window
 		void draw(Window& win)
 		{
-			if (image == nullptr) // returns if no image
+			if (image.data == NULL) // returns if no image
 				return;
 
 			Vector2 winSize = Vector2(win.getWidth(), win.getHeight()); // windows bounds
 			Vector2 pos = rect.get_topleft(); // start point to draw image
-			Vector2 size = rect.get_size(); // size of the image or rect
+			Vector2 size = rect.size; // size of the image or rect
 
 			for (unsigned int y = 0; y < size.y; y++)
 			{
@@ -468,19 +505,17 @@ namespace Engine
 					if (posX > winSize.x)
 						break;
 
-					Color color = image[static_cast<int>(size.x) * y + x]; // getting color values of pixel
-
 					//draw pixel if alpha is greater than 0
-					if (color.a > 0)
-						win.draw(posX, posY, color.r, color.g, color.b);
+					if (image.alphaAt(x, y) > 0)
+						win.draw(posX, posY, image.at(x, y));
 				}
 			}
 		}
 
 		~Sprite()
 		{
-			if (image != nullptr) // free memory of image if assigned
-				delete[] image;
+			if (image.data != NULL) // free memory of image if assigned
+				image.free();
 		}
 	};
 
@@ -506,7 +541,7 @@ namespace Engine
 			if (group == nullptr)
 				return Debug::print_warning("Sprite Group is destroyed or not initialize");
 
-			if (curIndex < maxSize - 1)
+			if (curIndex < maxSize)
 				group[curIndex++] = sprite;
 			else
 			{
@@ -565,6 +600,32 @@ namespace Engine
 		~SpriteGroup()
 		{
 			destroy();
+		}
+	};
+
+#pragma endregion
+
+#pragma region Collisions
+
+	class Collision
+	{
+	public:
+		static bool circle_collide(const Rect& a, const Rect& b)
+		{
+			return Vector2::distance(a.center, b.center) < (a.size.x + b.size.x) / 2;
+		}
+
+		static bool rect_collide(const Rect& a, const Rect& b)
+		{
+			Vector2 atl = a.get_topleft();
+			Vector2 btl = b.get_topleft();
+			Vector2 abr = a.get_botmright();
+			Vector2 bbr = b.get_botmright();
+
+			return atl.x < bbr.x &&
+				btl.x < abr.x &&
+				atl.y < bbr.y &&
+				btl.y < abr.y;
 		}
 	};
 
