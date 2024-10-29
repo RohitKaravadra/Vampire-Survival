@@ -3,8 +3,7 @@
 
 using namespace Engine;
 
-Vector2 minBound = Vector2(25, 25);
-Vector2 maxBound = Vector2(1255, 695);
+const Vector2 winSize(1280, 720);
 
 class Enemy : public Sprite
 {
@@ -107,6 +106,7 @@ Sprite* enemy;
 class Player : public Sprite
 {
 public:
+	Player(Vector2 _pos, std::string location) :Sprite(_pos, location) {}
 	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
 	Player(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
 
@@ -118,38 +118,39 @@ public:
 	{
 		Vector2 delta = Inputs::get_axis() * 200 * dt;
 
+		// check and resolve x axis collision
 		rect.center += Vector2(delta.x, 0);
 		if (Collision::rect_collide(rect, enemy->rect))
 			rect.center -= Vector2(delta.x, 0);
+
+		// check and resolve y axis collision
 		rect.center += Vector2(0, delta.y);
 		if (Collision::rect_collide(rect, enemy->rect))
 			rect.center -= Vector2(0, delta.y);
-
-		rect.center = rect.center.clamp(minBound, maxBound);
 	}
 };
 
 class App
 {
 	bool isRunning;
-	Window win;
+	Camera* cam;
 	Timer timer;
-	float deltaTime;
+	float dt;
 
 	Sprite* player;
 
-	//SpriteGroup* objects;
+	SpriteGroup* objects;
 public:
 
 	App()
 	{
 		isRunning = false;
-		win.create(1280, 720, "Vampire Survival");
-		deltaTime = 1;
-		player = nullptr;
+		dt = 1;
 
-		Inputs::Init(win);
-		//objects = new SpriteGroup(10);
+		cam = new Camera("Vampire Survival", winSize, Vector2::zero);
+		objects = new SpriteGroup(2);
+
+		Inputs::Init(cam->get_window());
 	}
 
 	~App()
@@ -161,11 +162,13 @@ public:
 	{
 		srand(static_cast<unsigned int>(time(NULL)));
 
-		/*objects->add(new Enemy(Vector2(50), Vector2(500, 400), RED));
-		objects->add(new Player(Vector2(50), Vector2(600, 700), GREEN));*/
+		enemy = new Enemy(Vector2(20), Vector2(300, 300), RED);
+		player = new Player(Vector2(0, 0), "Resources/L.png");
 
-		enemy = new Enemy(50.f, Vector2(500, 400), RED);
-		player = new Player(25.f, Vector2(600, 700), GREEN);
+		objects->add(enemy);
+		objects->add(player);
+
+		cam->set_follow_target(player->rect);
 
 		isRunning = true;
 		update_loop();
@@ -175,31 +178,36 @@ public:
 	void destroy()
 	{
 		Inputs::free();
-		delete player, enemy;
-		//delete objects;
+		delete objects, cam;
 	}
 
 	void update_loop()
 	{
 		while (isRunning)
 		{
-			deltaTime = static_cast<float>(timer.dt());
+			dt = static_cast<float>(timer.dt());
 
-			//objects->update(deltaTime);
-			player->update(deltaTime);
+			objects->update(dt);
+			cam->update(dt);
 
-			win.clear();
+			cam->clear();
 
-			//fill_window(win, WHITE);
+			fill_window(cam->get_window(), WHITE);
 
-			//objects->draw(win);
-			player->draw(win);
-			enemy->draw(win);
+			objects->draw(*cam);
 
-			win.present();
+			cam->present();
 
 			if (Inputs::ui_back())
 				isRunning = false;
+
+			if (Inputs::key_pressed(VK_SPACE))
+			{
+				if (cam->has_follow_target())
+					cam->reset_follow_target();
+				else
+					cam->set_follow_target(player->rect);
+			}
 
 			//std::cout << deltaTime << std::endl;
 		}

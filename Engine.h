@@ -42,39 +42,45 @@ namespace Engine
 		}
 
 		// setter Method
-		inline void set(float _x, float _y)
+		void set(float _x, float _y)
 		{
 			x = _x;
 			y = _y;
 		}
 
 		// returns magnitude of this vector
-		inline float magnitude()
+		float magnitude()
 		{
 			return sqrtf(x * x + y * y);
 		}
 
 		// returns normalized value of this vector
-		inline Vector2 normalize()
+		Vector2 normalize()
 		{
 			float mag = magnitude();
 			return mag > 0 ? *this / mag : Vector2::zero;
 		}
 
 		// converts and return this vector into int
-		inline Vector2 to_int()
+		Vector2 to_int()
 		{
 			return Vector2(static_cast<int>(x), static_cast<int>(y));
 		}
 
-		// returnd float distance between this vector and v2
-		inline float distance(Vector2& v2) const
+		// returns float distance between this vector and v2
+		float distance(Vector2& v2) const
 		{
 			return (*this - v2).magnitude();
 		}
 
+		// returns direct vector to target vector
+		Vector2 direction(Vector2& v2) const
+		{
+			return (v2 - *this).normalize();
+		}
+
 		// returns clamped value of this vector between max and min vectors
-		inline Vector2 clamp(Vector2 min, Vector2 max)
+		Vector2 clamp(Vector2 min, Vector2 max)
 		{
 			return Vector2(x < min.x ? min.x : x > max.x ? max.x : x, y < min.y ? min.y : y > max.y ? max.y : y);
 		}
@@ -84,6 +90,13 @@ namespace Engine
 		{
 			return (v1 - v2).magnitude();
 		}
+
+		// returns moved vector towards given vector with speed
+		Vector2 move_towards(Vector2& v2, const float steps)
+		{
+			return *this + direction(v2) * steps;
+		}
+
 #pragma region Operator Overloading
 
 		inline Vector2 operator+(const Vector2& v2) const
@@ -232,6 +245,13 @@ namespace Engine
 			center = value - size / 2;
 		}
 
+		// clamps the rect in max and min bounds
+		void clamp(const Vector2& min, const Vector2& max)
+		{
+			center = center.clamp(min + size / 2, max - size / 2);
+		}
+
+		// override outstreasm operator for output
 		friend ostream& operator<<(ostream& os, Rect& rect)
 		{
 			Vector2 topLeft = rect.get_topleft();
@@ -336,9 +356,35 @@ namespace Engine
 
 #pragma endregion
 
+#pragma region Collisions
+
+	class Collision
+	{
+	public:
+		static bool circle_collide(const Rect& a, const Rect& b)
+		{
+			return Vector2::distance(a.center, b.center) < (a.size.x + b.size.x) / 2;
+		}
+
+		static bool rect_collide(const Rect& a, const Rect& b)
+		{
+			Vector2 atl = a.get_topleft();
+			Vector2 btl = b.get_topleft();
+			Vector2 abr = a.get_botmright();
+			Vector2 bbr = b.get_botmright();
+
+			return atl.x < bbr.x &&
+				btl.x < abr.x &&
+				atl.y < bbr.y &&
+				btl.y < abr.y;
+		}
+	};
+
+#pragma endregion
+
 #pragma region Colors
 
-	// Color struct to strore color values
+	// Color struct to strore color values with alpha (4 channels)
 	struct Color
 	{
 		unsigned char value[4]{ 0 };
@@ -376,6 +422,120 @@ namespace Engine
 
 #pragma endregion 
 
+#pragma region Camera and Rendering
+
+	// camera class to handle camera movement and rendering 
+	class Camera
+	{
+		Window win; // canvas to print on (canvas size is cameras size)
+		Rect* followTarget = nullptr; // follow target for camera
+		Vector2 offset; // offset value to keep (0,0) in center of canvas
+
+	public:
+		Rect camRect; // camera rect 
+
+		// constructor to initialize camera
+		Camera(std::string _name, Vector2 _size, Vector2 _pos = Vector2::zero)
+		{
+			win.create(_size.x, _size.y, _name);
+			camRect.set(_size, _pos);
+			offset = _size / 2;
+		}
+
+		// default destructor
+		~Camera()
+		{
+			followTarget = nullptr;
+		}
+
+		// getter for canvas
+		Window& get_window()
+		{
+			return win;
+		}
+
+		// returns relative position to camera
+		Vector2 get_rel_pos(Vector2 _pos) const
+		{
+			return offset + _pos - camRect.center;
+		}
+
+		// check if follow target is assigned or not
+		bool has_follow_target()
+		{
+			return followTarget != nullptr;
+		}
+
+		// setter for follow target
+		void set_follow_target(Rect& rect)
+		{
+			followTarget = &rect;
+		}
+
+		// resets follow target
+		void reset_follow_target()
+		{
+			followTarget = nullptr;
+		}
+
+		// updates cameras if follow follow target set
+		void update(float dt)
+		{
+			if (followTarget != nullptr)
+				camRect.center = followTarget->center;
+		}
+
+		// clear canvas
+		void clear()
+		{
+			win.clear();
+		}
+
+		// draw object on canvas if in view
+		void draw(Rect& _rect, Image& _image)
+		{
+			if (!Collision::rect_collide(camRect, _rect)) // return if object is not in view
+				return;
+
+			Vector2 relPos = get_rel_pos(_rect.get_topleft()); // relative position of object to camera
+
+			for (unsigned int y = 0; y < _image.height; y++)
+			{
+				int posY = relPos.y + y; // y position of image pixel on window
+
+				//bound check for y
+				if (posY < 0)
+					continue;
+				if (posY > camRect.size.y)
+					break;
+
+				for (unsigned int x = 0; x < _image.width; x++)
+				{
+					int posX = relPos.x + x; // x position of image pixel on window
+
+					//x bound check for x
+					if (posX < 0)
+						continue;
+					if (posX > camRect.size.x)
+						break;
+
+					//draw pixel if alpha is greater than 0
+					if (_image.alphaAt(x, y) > 0)
+						win.draw(posX, posY, _image.at(x, y));
+				}
+			}
+
+		}
+
+		// present canvas
+		void present()
+		{
+			win.present();
+		}
+	};
+
+#pragma endregion
+
 #pragma region Primitive Shapes
 
 	// class to handle primitive shape creation
@@ -392,9 +552,9 @@ namespace Engine
 			outImage.width = _size.x;
 			outImage.height = _size.y;
 			outImage.channels = 4;
-			outImage.data = new unsigned char[_size.x * _size.y * 4];
+			outImage.data = new unsigned char[_size.x * _size.y * outImage.channels];
 			for (unsigned int i = 0; i < _size.x * _size.y; i++)
-				memcpy(&outImage.data[i * 4], _color.value, 4);
+				memcpy(&outImage.data[i * outImage.channels], _color.value, outImage.channels);
 		}
 
 		// method creates circle shape with given radii and color and return it in out parameter
@@ -403,13 +563,13 @@ namespace Engine
 			int diam = _rad * 2, len = diam * diam;
 			outImage.width = outImage.height = diam;
 			outImage.channels = 4;
-			outImage.data = new unsigned char[diam * diam * 4] {0};
+			outImage.data = new unsigned char[diam * diam * outImage.channels] {0};
 			Vector2 center = Vector2(_rad - 1);
 			for (int i = 0; i < len; i++)
 			{
 				float dist = Vector2(i % diam, i / diam).distance(center);
 				if (dist < _rad)
-					memcpy(&outImage.data[i * 4], _color.value, 4);
+					memcpy(&outImage.data[i * outImage.channels], _color.value, outImage.channels);
 			}
 		}
 	};
@@ -476,40 +636,12 @@ namespace Engine
 		virtual void update(float dt) {}
 
 		// method to draw sprite on window
-		void draw(Window& win)
+		void draw(Camera& cam)
 		{
 			if (image.data == NULL) // returns if no image
 				return;
 
-			Vector2 winSize = Vector2(win.getWidth(), win.getHeight()); // windows bounds
-			Vector2 pos = rect.get_topleft(); // start point to draw image
-			Vector2 size = rect.size; // size of the image or rect
-
-			for (unsigned int y = 0; y < size.y; y++)
-			{
-				int posY = pos.y + y; // y position of image pixel on window
-
-				//bound check for y
-				if (posY < 0)
-					continue;
-				if (posY > winSize.y)
-					break;
-
-				for (unsigned int x = 0; x < size.x; x++)
-				{
-					int posX = pos.x + x; // x position of image pixel on window
-
-					//x bound check
-					if (posX < 0)
-						continue;
-					if (posX > winSize.x)
-						break;
-
-					//draw pixel if alpha is greater than 0
-					if (image.alphaAt(x, y) > 0)
-						win.draw(posX, posY, image.at(x, y));
-				}
-			}
+			cam.draw(rect, image);
 		}
 
 		~Sprite()
@@ -562,7 +694,7 @@ namespace Engine
 		}
 
 		// method to draw all sprites of this group
-		void draw(Window& win)
+		void draw(Camera& cam)
 		{
 			if (group == nullptr)
 			{
@@ -571,7 +703,7 @@ namespace Engine
 			}
 
 			for (int i = 0; i < curIndex; i++)
-				group[i]->draw(win);
+				group[i]->draw(cam);
 		}
 
 		// method to destroy all sprites and this group
@@ -600,32 +732,6 @@ namespace Engine
 		~SpriteGroup()
 		{
 			destroy();
-		}
-	};
-
-#pragma endregion
-
-#pragma region Collisions
-
-	class Collision
-	{
-	public:
-		static bool circle_collide(const Rect& a, const Rect& b)
-		{
-			return Vector2::distance(a.center, b.center) < (a.size.x + b.size.x) / 2;
-		}
-
-		static bool rect_collide(const Rect& a, const Rect& b)
-		{
-			Vector2 atl = a.get_topleft();
-			Vector2 btl = b.get_topleft();
-			Vector2 abr = a.get_botmright();
-			Vector2 bbr = b.get_botmright();
-
-			return atl.x < bbr.x &&
-				btl.x < abr.x &&
-				atl.y < bbr.y &&
-				btl.y < abr.y;
 		}
 	};
 
