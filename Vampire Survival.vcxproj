@@ -131,8 +131,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Source\App.cpp" />
     <ClCompile Include="Engine\Source\Camera.cpp" />
-    <ClCompile Include="Engine\Source\Collisions.cpp" />
     <ClCompile Include="Engine\Source\GameMath.cpp" />
     <ClCompile Include="Engine\Source\InputAndDebug.cpp" />
     <ClCompile Include="Engine\Source\Colors.cpp" />

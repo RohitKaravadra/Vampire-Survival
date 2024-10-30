@@ -47,6 +47,26 @@ Sprite::~Sprite()
 		image.free();
 }
 
+bool Sprite::operator==(Sprite& other) const
+{
+	return id == other.id;
+}
+
+bool Sprite::operator==(Sprite* other) const
+{
+	return id == other->id;
+}
+
+bool Sprite::operator!=(Sprite& other) const
+{
+	return id != other.id;
+}
+
+bool Sprite::operator!=(Sprite* other) const
+{
+	return id != other->id;
+}
+
 #pragma endregion
 
 #pragma region SpritesGroup Methods
@@ -123,7 +143,7 @@ void SpriteGroup::draw()
 bool SpriteGroup::is_colliding(Rect& rect)
 {
 	for (int i = 0; i < curIndex; i++)
-		if (Collision::rect_collide(rect, group[i]->rect))
+		if (rect.collide_as_rect(group[i]->rect))
 			return true;
 	return false;
 }
@@ -149,5 +169,37 @@ void SpriteGroup::destroy()
 	}
 }
 
-#pragma endregion
+bool SpriteGroup::remove(Sprite& _sprite)
+{
+	for (unsigned int i = 0; i < curIndex; i++)
+	{
+		if (_sprite == group[i])
+		{
+			group[i] = group[--curIndex];
+			group[curIndex] = nullptr;
+			return true;
+		}
+	}
+	return false;
+}
 
+int SpriteGroup::remove(SpriteGroup& _group)
+{
+	int _size = _group.get_size();
+	int removed = 0;
+	for (unsigned int i = 0; i < curIndex; i++)
+	{
+		for (unsigned int j = 0; j < _size; j++)
+		{
+			if (_group.get_sprite(j) == group[i])
+			{
+				group[i] = group[--curIndex];
+				group[curIndex] = nullptr;
+				removed++;
+			}
+		}
+	}
+	return removed;
+}
+
+#pragma endregion

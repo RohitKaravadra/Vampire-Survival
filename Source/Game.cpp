@@ -56,89 +56,30 @@ public:
 	}
 };
 
-class App
-{
-	bool isRunning;
-	Timer timer;
-	float dt;
-
-	Sprite* player;
-public:
-
-	App()
-	{
-		isRunning = false;
-		dt = 1;
-
-		player = nullptr;
-		platforms = new SpriteGroup(5);
-
-		Camera::create("Vampire Survival", WIN_SIZE, Vector2::zero, Color::OLIVE);
-		Inputs::Init(Camera::get_window());
-	}
-
-	~App()
-	{
-		destroy();
-	}
-
-	void start()
-	{
-		srand(static_cast<unsigned int>(time(NULL)));
-
-		player = new Player(Vector2(0, 0), "Resources/L.png");
-
-		platforms->add(new Enemy(Vector2(WIN_SIZE.x, 30), Vector2(0, WIN_SIZE.y / 2), Color::RED));
-		platforms->add(new Enemy(Vector2(400, 30), Vector2(-300, 200), Color::RED));
-		platforms->add(new Enemy(Vector2(400, 30), Vector2(300, 200), Color::RED));
-
-		Camera::set_follow_target(player->rect);
-
-		isRunning = true;
-		update_loop();
-	}
-
-	void destroy()
-	{
-		Inputs::free();
-		delete platforms, player;
-	}
-
-	void update_loop()
-	{
-		while (isRunning)
-		{
-			Inputs::refresh();
-			dt = static_cast<float>(timer.dt());
-
-			platforms->update(dt);
-			player->update(dt);
-
-			Camera::update(dt);
-			Camera::clear();
-
-			platforms->draw();
-			player->draw();
-
-			Camera::present();
-
-			if (Inputs::ui_back())
-				isRunning = false;
-
-			/*Vector2 mouse(Camera::screen_to_world(Inputs::get_mouse_pos()));
-			std::cout << mouse << std::endl;
-
-			std::cout << dt << std::endl;*/
-		}
-	}
-};
-
 int main()
 {
 	srand(static_cast<unsigned int>(time(NULL)));
-	App* app = new App();
-	app->start();
-	delete app;
+	App app("Vampire Survival", WIN_SIZE, Vector2::zero, Color::OLIVE);
+
+	Player* player = new Player(Vector2(0, 0), "Resources/L.png");
+
+	platforms = new SpriteGroup(3);
+	platforms->add(new Enemy(Vector2(WIN_SIZE.x, 30), Vector2(0, WIN_SIZE.y / 2), Color::RED));
+	platforms->add(new Enemy(Vector2(400, 30), Vector2(-300, 200), Color::RED));
+	platforms->add(new Enemy(Vector2(400, 30), Vector2(300, 200), Color::RED));
+
+	app.gameObjects = new SpriteGroup(10);
+
+	app.gameObjects->add(platforms);
+	app.gameObjects->add(player);
+
+	//Camera::set_follow_target(player->rect);
+
+	app.gameObjects->remove(*player);
+
+	app.start();
+
+	delete platforms, player;
 
 	return 0;
 }

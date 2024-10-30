@@ -210,5 +210,21 @@ void Rect::clamp(const Vector2& min, const Vector2& max)
 	center = center.clamp(min + size / 2, max - size / 2);
 }
 
-#pragma endregion
+bool Rect::collide_as_rect(Rect& _rect)
+{
+	Vector2 atl = get_topleft();
+	Vector2 btl = _rect.get_topleft();
+	Vector2 abr = get_botmright();
+	Vector2 bbr = _rect.get_botmright();
 
+	return atl.x < bbr.x &&
+		btl.x < abr.x &&
+		atl.y < bbr.y &&
+		btl.y < abr.y;
+}
+
+bool Rect::collide_as_circle(Rect& _rect)
+{
+	return Vector2::distance(center, _rect.center) < (size.x + _rect.size.x) / 2;
+}
+#pragma endregion

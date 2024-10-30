@@ -24,38 +24,38 @@ namespace Engine
 	public:
 		float x, y;
 
-		// predefined static vectors
-		static Vector2 zero;
-		static Vector2 one;
-		static Vector2 up;
-		static Vector2 down;
-		static Vector2 left;
-		static Vector2 right;
+		static Vector2 zero; // (0,0)
+		static Vector2 one; // (1,1)
+		static Vector2 up; // (0,-1)
+		static Vector2 down; // (0,1)
+		static Vector2 left; // (-1,0)
+		static Vector2 right; // (1,0)
 
 		// constructors
 		Vector2();
 		Vector2(float value);
 		Vector2(float _x, float _y);
 
-		void set(float _x, float _y);
 		// setter Method
+		void set(float _x, float _y);
+		// returns magnitude of this vector
+		float magnitude();
+		// returns normalized value of this vector
+		Vector2 normalize();
+		// converts and return this vector into int
+		Vector2 to_int();
+		// returns float distance between this vector and v2
+		float distance(Vector2& v2) const;
+		// returns direct vector to target vector
+		Vector2 direction(Vector2& v2) const;
+		// returns clamped value of this vector between max and min vectors
+		Vector2 clamp(Vector2 min, Vector2 max);
+		// returns distance between given vector
+		static float distance(const Vector2& v1, const Vector2& v2);
+		// returns moved vector towards given vector with speed
+		Vector2 move_towards(Vector2& v2, const float steps);
 
-		float magnitude();// returns magnitude of this vector
-
-		Vector2 normalize();// returns normalized value of this vector
-
-		Vector2 to_int();// converts and return this vector into int
-
-		float distance(Vector2& v2) const;// returns float distance between this vector and v2
-
-		Vector2 direction(Vector2& v2) const;// returns direct vector to target vector
-
-		Vector2 clamp(Vector2 min, Vector2 max);// returns clamped value of this vector between max and min vectors
-
-		static float distance(const Vector2& v1, const Vector2& v2);// returns distance between given vector
-
-		Vector2 move_towards(Vector2& v2, const float steps);// returns moved vector towards given vector with speed
-
+		inline Vector2 operator-();
 		inline Vector2 operator+(const Vector2& v2) const;
 		inline Vector2 operator-(const Vector2& v2) const;
 		inline Vector2 operator*(const float& value) const;
@@ -89,18 +89,22 @@ namespace Engine
 		// constructors
 		Rect();
 		Rect(Vector2 _size, Vector2 _center);
-
-		void set(Vector2 _size, Vector2 _center);// setter method
-
-		Vector2 get_topleft() const;// returns top left position of rect (subjected to change and replace it with bounds)
-
-		Vector2 get_botmright() const;// returns bottom right position of rect (subjected to change and replace it with bounds)
-
-		void set_topleft(Vector2& value);// setter for topleft
-
-		void set_botmright(Vector2& value);// setter for bottomright
-
-		void clamp(const Vector2& min, const Vector2& max);// clamps the rect in max and min bounds
+		// setter method
+		void set(Vector2 _size, Vector2 _center);
+		// returns top left position of rect (subjected to change and replace it with bounds)
+		Vector2 get_topleft() const;
+		// returns bottom right position of rect (subjected to change and replace it with bounds)
+		Vector2 get_botmright() const;
+		// setter for topleft
+		void set_topleft(Vector2& value);
+		// setter for bottomright
+		void set_botmright(Vector2& value);
+		// clamps the rect in max and min bounds
+		void clamp(const Vector2& min, const Vector2& max);
+		// collide with other rect
+		bool collide_as_rect(Rect& _rect);
+		// collide this rect as circle with other rect
+		bool collide_as_circle(Rect& _rect);
 
 		// override outstreasm operator for output
 		friend ostream& operator<<(ostream& os, Rect& rect)
@@ -124,24 +128,24 @@ namespace Engine
 
 		// default destructure
 		~Inputs() {};
-
-		static void Init(Window& _win);// initializes value of window
-
-		static void free();// deinitializes value of window
-
+		// initializes value of window
+		static void Init(Window& _win);
+		// deinitializes value of window
+		static void free();
+		// refresh inputs to store values
 		static void refresh();
-
-		static int get_h_axis();// returns horizontal axis input
-
-		static int get_v_axis();// returns vertical axis input
-
-		static Vector2 get_axis();// returns vector2 axis for player input
-
-		static Vector2 get_mouse_pos();// returns mouse position on window
-
-		static bool key_pressed(int key);// checks if given key is pressed or not
-
-		static bool ui_back();// checks if backspace or escape is pressed for UI inputs
+		// returns horizontal axis input
+		static int get_h_axis();
+		// returns vertical axis input
+		static int get_v_axis();
+		// returns vector2 axis for player input
+		static Vector2 get_axis();
+		// returns mouse position on window
+		static Vector2 get_mouse_pos();
+		// checks if given key is pressed or not
+		static bool key_pressed(int key);
+		// checks if backspace or escape is pressed for UI inputs
+		static bool ui_back();
 	};
 
 	// Debug class to make debugging easy
@@ -167,13 +171,6 @@ namespace Engine
 		{
 			std::cout << " WARNING : " << msg << std::endl;
 		}
-	};
-
-	class Collision
-	{
-	public:
-		static bool circle_collide(const Rect& a, const Rect& b);
-		static bool rect_collide(const Rect& a, const Rect& b);
 	};
 
 	// Color struct to strore color values with alpha (4 channels)
@@ -276,6 +273,11 @@ namespace Engine
 		void draw();
 		// destructor
 		~Sprite();
+
+		bool operator==(Sprite& other) const;
+		bool operator==(Sprite* other) const;
+		bool operator!=(Sprite& other) const;
+		bool operator!=(Sprite* other) const;
 	};
 
 	// class allows to group Sprites together
@@ -295,6 +297,10 @@ namespace Engine
 		void add(Sprite* sprite);
 		// method to add sprites of given group to this group
 		void add(SpriteGroup* _group);
+		// remove sprite from group
+		bool remove(Sprite& _sprite);
+		// remove sprite from group
+		int remove(SpriteGroup& _group);
 		// method to update all sprites in this group
 		void update(float dt);
 		// method to draw all sprites of this group
@@ -311,4 +317,27 @@ namespace Engine
 		}
 	};
 
+	// Sample App class for easy build up
+	class App
+	{
+		bool isRunning;
+		Timer timer;
+		float dt;
+		float eTime;
+
+		// destroy app
+		void destroy();
+		// update loop for app
+		void update_loop();
+
+	public:
+		SpriteGroup* gameObjects = nullptr;
+
+		// constructor to create an app
+		App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero, Color _bg = Color::BLACK);
+		// destructor to destroy app
+		~App();
+		// start app loop
+		void start();
+	};
 }

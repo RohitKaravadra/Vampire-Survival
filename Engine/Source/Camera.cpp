@@ -87,7 +87,7 @@ void Camera::clear()
 
 void Camera::draw(Rect& _rect, Image& _image)
 {
-	if (!Collision::rect_collide(camRect, _rect)) // return if object is not in view
+	if (!camRect.collide_as_rect(_rect)) // return if object is not in view
 		return;
 
 	Vector2 relPos = world_to_screen(_rect.get_topleft()); // relative position of object to camera
