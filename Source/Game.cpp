@@ -73,7 +73,7 @@ public:
 		player = nullptr;
 		platforms = new SpriteGroup(5);
 
-		Camera::create("Vampire Survival", WIN_SIZE, Vector2::zero);
+		Camera::create("Vampire Survival", WIN_SIZE, Vector2::zero, Color::OLIVE);
 		Inputs::Init(Camera::get_window());
 	}
 
@@ -86,11 +86,11 @@ public:
 	{
 		srand(static_cast<unsigned int>(time(NULL)));
 
-		player = new Player(Vector2(30, 50), Vector2(0, 0), GREEN);
+		player = new Player(Vector2(0, 0), "Resources/L.png");
 
-		platforms->add(new Enemy(Vector2(WIN_SIZE.x, 30), Vector2(0, WIN_SIZE.y / 2), RED));
-		platforms->add(new Enemy(Vector2(400, 30), Vector2(-300, 200), RED));
-		platforms->add(new Enemy(Vector2(400, 30), Vector2(300, 200), RED));
+		platforms->add(new Enemy(Vector2(WIN_SIZE.x, 30), Vector2(0, WIN_SIZE.y / 2), Color::RED));
+		platforms->add(new Enemy(Vector2(400, 30), Vector2(-300, 200), Color::RED));
+		platforms->add(new Enemy(Vector2(400, 30), Vector2(300, 200), Color::RED));
 
 		Camera::set_follow_target(player->rect);
 
@@ -108,7 +108,7 @@ public:
 	{
 		while (isRunning)
 		{
-			//Inputs::refresh();
+			Inputs::refresh();
 			dt = static_cast<float>(timer.dt());
 
 			platforms->update(dt);
@@ -125,7 +125,10 @@ public:
 			if (Inputs::ui_back())
 				isRunning = false;
 
-			//std::cout << deltaTime << std::endl;
+			/*Vector2 mouse(Camera::screen_to_world(Inputs::get_mouse_pos()));
+			std::cout << mouse << std::endl;
+
+			std::cout << dt << std::endl;*/
 		}
 	}
 };

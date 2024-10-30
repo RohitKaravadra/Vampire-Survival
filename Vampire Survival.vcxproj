@@ -72,7 +72,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival\Engine\Headers;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -131,11 +131,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Source\Camera.cpp" />
+    <ClCompile Include="Engine\Source\Collisions.cpp" />
+    <ClCompile Include="Engine\Source\GameMath.cpp" />
+    <ClCompile Include="Engine\Source\InputAndDebug.cpp" />
+    <ClCompile Include="Engine\Source\Colors.cpp" />
+    <ClCompile Include="Engine\Source\Sprites.cpp" />
+    <ClCompile Include="ResourceLoader.cpp" />
     <ClCompile Include="Source\Game.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine.h" />
-    <ClInclude Include="GamesEngineeringBase.h" />
+    <ClInclude Include="Engine\Headers\Engine.h" />
+    <ClInclude Include="Engine\Headers\GamesEngineeringBase.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\L.png" />
