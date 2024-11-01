@@ -37,8 +37,12 @@ void Sprite::draw()
 	if (image.data == NULL) // returns if no image
 		return;
 
-	if (Camera::notNull) // check if camera is created
-		Camera::draw(rect, image);
+	Camera::draw(rect, image);
+}
+
+void Sprite::debug()
+{
+	rect.debug();
 }
 
 Sprite::~Sprite()
@@ -138,6 +142,18 @@ void SpriteGroup::draw()
 
 	for (int i = 0; i < curIndex; i++)
 		group[i]->draw();
+}
+
+void SpriteGroup::debug()
+{
+	if (group == nullptr)
+	{
+		Debug::print_warning("Sprite Group is destroyed or not initialize");
+		return;
+	}
+
+	for (int i = 0; i < curIndex; i++)
+		group[i]->debug();
 }
 
 bool SpriteGroup::is_colliding(Rect& rect)

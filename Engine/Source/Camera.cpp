@@ -87,6 +87,9 @@ void Camera::clear()
 
 void Camera::draw(Rect& _rect, Image& _image)
 {
+	if (!notNull) // return if camera is not initialized
+		return;
+
 	if (!camRect.collide_as_rect(_rect)) // return if object is not in view
 		return;
 

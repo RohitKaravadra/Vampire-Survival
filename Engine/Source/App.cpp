@@ -44,7 +44,12 @@ void App::update_loop()
 		Camera::clear();
 
 		gameObjects->draw();
+		if (DEBUG_MODE)
+			gameObjects->debug();
 
 		Camera::present();
+
+		if (Inputs::ui_back())
+			break;
 	}
 }

@@ -18,6 +18,7 @@ Color Color::NAVY(0, 0, 128);
 Color Color::BLUE(0, 0, 255);
 Color Color::TEAL(0, 128, 128);
 Color Color::AQUA(0, 255, 255);
+Color Color::DEBUG_COLOR = Color::WHITE;
 
 bool Color::equals(Color b) const
 {

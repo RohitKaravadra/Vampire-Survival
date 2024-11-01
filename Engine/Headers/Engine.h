@@ -7,7 +7,9 @@
 using namespace GamesEngineeringBase;
 using std::ostream;
 
-static int OBJECT_ID_COUNTER;
+static int OBJECT_ID_COUNTER = 0;
+
+extern bool DEBUG_MODE;
 
 int generate_id();
 
@@ -82,6 +84,9 @@ namespace Engine
 	// class to handle rect for drawing and collision (subjected to change)
 	class Rect
 	{
+		Image dbgImg;
+
+		void generate_debug_data();
 	public:
 		Vector2 size; // size of the rectangle
 		Vector2 center; // center of rect
@@ -105,6 +110,8 @@ namespace Engine
 		bool collide_as_rect(Rect& _rect);
 		// collide this rect as circle with other rect
 		bool collide_as_circle(Rect& _rect);
+		// debug rect
+		virtual void debug();
 
 		// override outstreasm operator for output
 		friend ostream& operator<<(ostream& os, Rect& rect)
@@ -208,6 +215,7 @@ namespace Engine
 		static Color BLUE;
 		static Color TEAL;
 		static Color AQUA;
+		static Color DEBUG_COLOR;
 	};
 
 	// camera class to handle camera movement and rendering 
@@ -271,6 +279,8 @@ namespace Engine
 		virtual void update(float dt) {}
 		// method to draw sprite on window
 		void draw();
+		// function to debug
+		virtual void debug();
 		// destructor
 		~Sprite();
 
@@ -305,6 +315,8 @@ namespace Engine
 		void update(float dt);
 		// method to draw all sprites of this group
 		void draw();
+		// function to debug
+		void debug();
 		// checks collision of given sprite with all sprites
 		bool is_colliding(Rect& rect);
 		// method to destroy all sprites and this group

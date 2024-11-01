@@ -17,8 +17,6 @@ SpriteGroup* platforms;
 class Player : public Sprite
 {
 	float speed = 400;
-	float gravity = 0;
-	bool isGrounded;
 public:
 	Player(Vector2 _pos, std::string location) :Sprite(_pos, location) {}
 	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
@@ -30,36 +28,25 @@ public:
 
 	void move(float dt)
 	{
-		float delta = Inputs::get_h_axis() * speed * dt;
+		Vector2 delta = Inputs::get_axis() * dt * speed;
 
 		// check and resolve x axis collision
-		rect.center.x += delta;
+		rect.center.x += delta.x;
 		if (platforms->is_colliding(rect))
-			rect.center.x -= delta;
+			rect.center.x -= delta.x;
 
 		// check and resolve y axis collision
-		if (isGrounded && Inputs::key_pressed(VK_SPACE))
-			gravity = -2;
-		else
-			gravity += 9 * dt;
-
-		rect.center.y += gravity;
+		rect.center.y += delta.y;
 		if (platforms->is_colliding(rect))
-		{
-			if (gravity >= 0)
-				isGrounded = true;
-			rect.center.y -= gravity;
-			gravity = 0;
-		}
-		else
-			isGrounded = false;
+			rect.center.y -= delta.y;
 	}
 };
 
 int main()
 {
 	srand(static_cast<unsigned int>(time(NULL)));
-	App app("Vampire Survival", WIN_SIZE, Vector2::zero, Color::OLIVE);
+	DEBUG_MODE = true;
+	App app("Vampire Survival", WIN_SIZE);
 
 	Player* player = new Player(Vector2(0, 0), "Resources/L.png");
 
@@ -69,13 +56,12 @@ int main()
 	platforms->add(new Enemy(Vector2(400, 30), Vector2(300, 200), Color::RED));
 
 	app.gameObjects = new SpriteGroup(10);
-
 	app.gameObjects->add(platforms);
 	app.gameObjects->add(player);
 
-	//Camera::set_follow_target(player->rect);
+	Camera::set_follow_target(player->rect);
 
-	app.gameObjects->remove(*player);
+	//app.gameObjects->remove(*player);
 
 	app.start();
 

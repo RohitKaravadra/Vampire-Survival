@@ -2,6 +2,8 @@
 
 using namespace Engine;
 
+bool DEBUG_MODE = false;
+
 int generate_id()
 {
 	return OBJECT_ID_COUNTER++;
@@ -171,18 +173,46 @@ Rect::Rect()
 {
 	size = Vector2(3, 3);
 	center = Vector2(0, 0);
+	generate_debug_data();
 }
 
 Rect::Rect(Vector2 _size, Vector2 _center)
 {
 	size = _size;
 	center = _center;
+	generate_debug_data();
+}
+
+void Rect::generate_debug_data()
+{
+	if (!DEBUG_MODE)
+		return;
+
+	if (dbgImg.data != NULL)
+		delete[] dbgImg.data;
+	else
+		dbgImg.channels = 4;
+
+	dbgImg.width = size.x;
+	dbgImg.height = size.y;
+	dbgImg.data = new unsigned char[size.x * size.y * dbgImg.channels] {};
+	for (unsigned int i = 0; i < size.x; i++)
+	{
+		memcpy(&dbgImg.data[i * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
+		memcpy(&dbgImg.data[(static_cast<int>((size.y - 1) * size.x) + i) * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
+	}
+	for (unsigned int i = 0; i < size.y; i++)
+	{
+		memcpy(&dbgImg.data[static_cast<int>(size.x * i) * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
+		memcpy(&dbgImg.data[static_cast<int>(size.x * i + size.x - 1) * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
+	}
 }
 
 void Rect::set(Vector2 _size, Vector2 _center)
 {
 	size = _size;
 	center = _center;
+	generate_debug_data();
 }
 
 Vector2 Rect::get_topleft() const
@@ -227,4 +257,11 @@ bool Rect::collide_as_circle(Rect& _rect)
 {
 	return Vector2::distance(center, _rect.center) < (size.x + _rect.size.x) / 2;
 }
+
+void Rect::debug()
+{
+	if (dbgImg.data != NULL)
+		Camera::draw(*this, dbgImg);
+}
+
 #pragma endregion
