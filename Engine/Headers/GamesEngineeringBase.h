@@ -60,15 +60,15 @@ namespace GamesEngineeringBase
 		HINSTANCE hinstance;                     // Handle to the application instance
 		float invZoom;                           // Inverse of the zoom factor
 		std::string name;                        // Window name/title
-		ID3D11Device* dev;                       // Direct3D device
-		ID3D11DeviceContext* devcontext;         // Direct3D device context
-		IDXGISwapChain* sc;                      // Swap chain for double buffering
-		ID3D11RenderTargetView* rtv;             // Render target view
+		ID3D11Device* dev = nullptr;                       // Direct3D device
+		ID3D11DeviceContext* devcontext = nullptr;         // Direct3D device context
+		IDXGISwapChain* sc = nullptr;                      // Swap chain for double buffering
+		ID3D11RenderTargetView* rtv = nullptr;             // Render target view
 		D3D11_VIEWPORT vp;                       // Viewport configuration
-		ID3D11Texture2D* tex;                    // Texture for pixel data
-		ID3D11ShaderResourceView* srv;           // Shader resource view
-		ID3D11PixelShader* ps;                   // Pixel shader
-		ID3D11VertexShader* vs;                  // Vertex shader
+		ID3D11Texture2D* tex = nullptr;                    // Texture for pixel data
+		ID3D11ShaderResourceView* srv = nullptr;           // Shader resource view
+		ID3D11PixelShader* ps = nullptr;                   // Pixel shader
+		ID3D11VertexShader* vs = nullptr;                  // Vertex shader
 		unsigned char* image;                    // Back buffer image data
 		bool keys[256];                          // Keyboard state array
 		int mousex;                              // Mouse X-coordinate
@@ -595,14 +595,22 @@ namespace GamesEngineeringBase
 		// Destructor to release resources
 		~Window()
 		{
-			vs->Release();
-			ps->Release();
-			srv->Release();
-			tex->Release();
-			rtv->Release();
-			sc->Release();
-			devcontext->Release();
-			dev->Release();
+			if (vs != nullptr)
+				vs->Release();
+			if (ps != nullptr)
+				ps->Release();
+			if (srv != nullptr)
+				srv->Release();
+			if (tex != nullptr)
+				tex->Release();
+			if (rtv != nullptr)
+				rtv->Release();
+			if (sc != nullptr)
+				sc->Release();
+			if (devcontext != nullptr)
+				devcontext->Release();
+			if (dev != nullptr)
+				dev->Release();
 			CoUninitialize();
 		}
 	};

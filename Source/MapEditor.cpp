@@ -23,7 +23,7 @@ public:
 		image.width = _size.x;
 		image.height = _size.y;
 		image.channels = 4;
-		create_outline(image, Color::WHITE, 10);
+		create_outline(image, Color::WHITE, 2);
 	}
 
 	void update(float dt)
@@ -74,7 +74,6 @@ public:
 				moveSpeed += 1000 * deltaTime;
 			if (Inputs::key_pressed('Q'))
 				moveSpeed -= 1000 * deltaTime;
-
 
 			Camera::clear();
 
