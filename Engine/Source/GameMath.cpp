@@ -1,7 +1,6 @@
 #include "Engine.h"
 
 using namespace Engine;
-
 // static variables
 
 Vector2 Vector2::zero(0, 0);
@@ -9,7 +8,7 @@ Vector2 Vector2::one(1, 1);
 Vector2 Vector2::up(0, -1);
 Vector2 Vector2::down(0, 1);
 Vector2 Vector2::left(-1, 0);
-Vector2 Vector2::right(0, 1);
+Vector2 Vector2::right(1, 0);
 
 #pragma region Vector2 methods
 
@@ -170,38 +169,11 @@ bool Vector2::operator!=(const Vector2& v2) const
 Rect::Rect()
 {
 	set(Vector2(4), Vector2::zero);
-	generate_debug_data();
 }
 
 Rect::Rect(Vector2 _size, Vector2 _center)
 {
 	set(_size, _center);
-	generate_debug_data();
-}
-
-void Rect::generate_debug_data()
-{
-	if (!DEBUG_MODE)
-		return;
-
-	if (dbgImg.data != NULL)
-		delete[] dbgImg.data;
-	else
-		dbgImg.channels = 4;
-
-	dbgImg.width = size.x;
-	dbgImg.height = size.y;
-	dbgImg.data = new unsigned char[size.x * size.y * dbgImg.channels] {};
-	for (unsigned int i = 0; i < size.x; i++)
-	{
-		memcpy(&dbgImg.data[i * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
-		memcpy(&dbgImg.data[(static_cast<int>((size.y - 1) * size.x) + i) * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
-	}
-	for (unsigned int i = 0; i < size.y; i++)
-	{
-		memcpy(&dbgImg.data[static_cast<int>(size.x * i) * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
-		memcpy(&dbgImg.data[static_cast<int>(size.x * i + size.x - 1) * dbgImg.channels], Color::DEBUG_COLOR.value, dbgImg.channels);
-	}
 }
 
 void Rect::set(Vector2 _size, Vector2 _center)
@@ -212,7 +184,6 @@ void Rect::set(Vector2 _size, Vector2 _center)
 	b = _size.y;
 	size = _size;
 	set_center(_center);
-	generate_debug_data();
 }
 
 Vector2 Rect::get_center() const
@@ -239,16 +210,28 @@ void Rect::set_center(Vector2 center)
 	b = center.y + hSize.y;
 }
 
-void Rect::set_topleft(Vector2& value)
+void Rect::set_top(float _value)
 {
-	l = value.x;
-	t = value.y;
+	t = _value;
+	b = t + size.y;
 }
 
-void Rect::set_botmright(Vector2& value)
+void Rect::set_bottom(float _value)
 {
-	r = value.x;
-	b = value.y;
+	b = _value;
+	t = b - size.y;
+}
+
+void Rect::set_left(float _value)
+{
+	l = _value;
+	r = l + size.x;
+}
+
+void Rect::set_right(float _value)
+{
+	r = _value;
+	l = r - size.x;
 }
 
 void Rect::move_h(float delta)
@@ -285,15 +268,9 @@ bool Rect::collide_as_rect(Rect& _rect) const
 		_rect.t < b;
 }
 
-bool Rect::collide_as_circle(Rect& _rect)
+bool Rect::collide_as_circle(Rect& _rect) const
 {
 	return Vector2::distance(get_center(), _rect.get_center()) < (_rect.size.x + size.x) / 2;
-}
-
-void Rect::debug()
-{
-	if (dbgImg.data != NULL)
-		Camera::draw(*this, dbgImg);
 }
 
 #pragma endregion

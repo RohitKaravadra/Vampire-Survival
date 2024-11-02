@@ -3,6 +3,7 @@
 using namespace std;
 
 void game();
+void map_editor();
 
 enum choice
 {
@@ -20,19 +21,19 @@ void menu()
 		cin >> ch;
 		switch (ch)
 		{
-		case choice::GAME:game();
+		case 1:game();
 			break;
-		case choice::LEVEL_EDITOR:
+		case 2:map_editor();
 			break;
-		case choice::EXIT:return;
+		case 3:return;
 		default: cout << "Enter valid Choice\n";
 		}
-	} while (ch != choice::EXIT);
+	} while (ch != 3);
 }
 
 
 int main()
 {
-	game();
+	menu();
 	return 0;
 }

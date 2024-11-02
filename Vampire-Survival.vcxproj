@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="Engine\Headers\Engine.h" />
     <ClInclude Include="Engine\Headers\GamesEngineeringBase.h" />
+    <ClInclude Include="Engine\Headers\Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Source\Camera.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="ResourceLoader.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\MapEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\L.png" />

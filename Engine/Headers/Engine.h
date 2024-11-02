@@ -1,6 +1,5 @@
 #pragma once
-#include <iostream>
-#include <ostream>
+#include "Utilities.h"
 #include <math.h>
 #include "GamesEngineeringBase.h"
 
@@ -10,14 +9,66 @@ using std::ostream;
 static int OBJECT_ID_COUNTER = 0;
 extern bool DEBUG_MODE;
 
+// generate id for objects created
 int generate_id();
+// loads image from given location relative to project directory
+bool load_image(Image& image, std::string location);
 
 namespace Engine
 {
 	class Color;
 
-	bool load_image(Image& image, std::string location);
-	void fill_window(Window& win, Color color);
+	// create outline in an image
+	void create_outline(Image& _image, Color _color, int _width = 1);
+	// fill image with color
+	void fill_image(Image& _image, Color _color);
+
+	//// class for loading resources
+	//static class Resources
+	//{
+	//	static Dictionary<string, Image> image_collection;
+	//	static int load_image(string location);
+	//public:
+	//	static Image& get_image(string location);
+	//};
+
+	// Color struct to strore color values with alpha (4 channels)
+	struct Color
+	{
+		unsigned char value[4]{ 0 };
+
+		// constructors
+		Color() {} // default constructor
+
+		// parameterized controctor with default value for alpha
+		Color(unsigned int _r, unsigned int _g, unsigned int _b, unsigned int _a = 255)
+		{
+			value[0] = _r > 255 ? 255 : _r;
+			value[1] = _g > 255 ? 255 : _g;
+			value[2] = _b > 255 ? 255 : _b;
+			value[3] = _a > 255 ? 255 : _a;
+		}
+
+		bool equals(Color b) const;
+
+		static Color BLACK;
+		static Color SILVER;
+		static Color GRAY;
+		static Color WHITE;
+		static Color MAROON;
+		static Color RED;
+		static Color PURPLE;
+		static Color MAGENTA;
+		static Color GREEN;
+		static Color LIME;
+		static Color OLIVE;
+		static Color YELLOW;
+		static Color NAVY;
+		static Color BLUE;
+		static Color TEAL;
+		static Color AQUA;
+		static Color DEBUG_COLOR;
+	};
 
 	// vector 2d class to handle all vector operations
 	class Vector2
@@ -85,9 +136,7 @@ namespace Engine
 	// class to handle rect for drawing and collision (subjected to change)
 	class Rect
 	{
-		Image dbgImg;
 		float l, r, t, b;
-		void generate_debug_data();
 	public:
 		Vector2 size; // size of the rectangle
 		//Vector2 center; // center of rect
@@ -106,10 +155,14 @@ namespace Engine
 
 		// set center of rect
 		void set_center(Vector2 center);
-		// setter for topleft
-		void set_topleft(Vector2& value);
-		// setter for bottomright
-		void set_botmright(Vector2& value);
+		// set top of rect
+		void set_top(float _value);
+		// set bottom of rect
+		void set_bottom(float _value);
+		// set right of rect
+		void set_right(float _value);
+		// set left of rect
+		void set_left(float _value);
 		// moves rect in horizontal direction
 		void move_h(float delta);
 		// moves rect in verticle direction
@@ -121,9 +174,7 @@ namespace Engine
 		// collide with other rect
 		bool collide_as_rect(Rect& _rect) const;
 		// collide this rect as circle with other rect
-		bool collide_as_circle(Rect& _rect);
-		// debug rect
-		virtual void debug();
+		bool collide_as_circle(Rect& _rect) const;
 
 		// override outstreasm operator for output
 		friend ostream& operator<<(ostream& os, Rect& rect)
@@ -163,44 +214,6 @@ namespace Engine
 		static bool key_pressed(int key);
 		// checks if backspace or escape is pressed for UI inputs
 		static bool ui_back();
-	};
-
-	// Color struct to strore color values with alpha (4 channels)
-	struct Color
-	{
-		unsigned char value[4]{ 0 };
-
-		// constructors
-		Color() {} // default constructor
-
-		// parameterized controctor with default value for alpha
-		Color(unsigned int _r, unsigned int _g, unsigned int _b, unsigned int _a = 255)
-		{
-			value[0] = _r > 255 ? 255 : _r;
-			value[1] = _g > 255 ? 255 : _g;
-			value[2] = _b > 255 ? 255 : _b;
-			value[3] = _a > 255 ? 255 : _a;
-		}
-
-		bool equals(Color b) const;
-
-		static Color BLACK;
-		static Color SILVER;
-		static Color GRAY;
-		static Color WHITE;
-		static Color MAROON;
-		static Color RED;
-		static Color PURPLE;
-		static Color MAGENTA;
-		static Color GREEN;
-		static Color LIME;
-		static Color OLIVE;
-		static Color YELLOW;
-		static Color NAVY;
-		static Color BLUE;
-		static Color TEAL;
-		static Color AQUA;
-		static Color DEBUG_COLOR;
 	};
 
 	// camera class to handle camera movement and rendering 
@@ -246,12 +259,14 @@ namespace Engine
 		int id; // object id to identify the object
 	protected:
 
-		Image image; // sprite image as array of colors (sbjected to change and replace with Image object)
+		Image image; // sprite image
+		Image dbgImage; // rect image for debugging collider
 
 		// constructors
 		Sprite();
+		Sprite(Vector2 _size, Vector2 _pos);
 		Sprite(Vector2 _size, Vector2 _pos, Color _color);
-		Sprite(Vector2 _pos, std::string _location, bool _center = true);
+		Sprite(string _location, Vector2 _pos, bool _center = true);
 
 	public:
 		// rect for the sprite to draw and collide
@@ -310,27 +325,31 @@ namespace Engine
 		}
 	};
 
-	//// Sample App class for easy build up
-	//class App
-	//{
-	//	bool isRunning;
-	//	Timer timer;
-	//	float dt;
-	//	float eTime;
+	// Sample App class for easy build up
+	class App
+	{
+	protected:
+		Timer timer;
+		float deltaTime;
 
-	//	// destroy app
-	//	void destroy();
-	//	// update loop for app
-	//	void update_loop();
-
-	//public:
-	//	SpriteGroup* gameObjects = nullptr;
-
-	//	// constructor to create an app
-	//	App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero);
-	//	// destructor to destroy app
-	//	~App();
-	//	// start app loop
-	//	void start();
-	//};
+		// constructor to create an app
+		App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero)
+		{
+			Camera::create(_name, _size, _camPos);
+			Inputs::Init(Camera::get_window());
+			deltaTime = 1;
+		}
+		// destructor to destroy app
+		~App()
+		{
+			Inputs::destroy();
+			Camera::destroy();
+		}
+		// update method for app
+		void update()
+		{
+			Inputs::refresh();
+			deltaTime = timer.dt();
+		}
+	};
 }

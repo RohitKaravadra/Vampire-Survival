@@ -25,7 +25,6 @@ void Inputs::refresh()
 	if (win == nullptr)
 		return;
 
-	win->checkInput();
 	mousePos.set(win->getMouseInWindowX(), win->getMouseInWindowY());
 }
 

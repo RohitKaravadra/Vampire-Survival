@@ -10,26 +10,27 @@ Sprite::Sprite()
 	id = generate_id();
 }
 
+Sprite::Sprite(Vector2 _size, Vector2 _pos)
+{
+	rect.set(_size, _pos);
+}
+
 Sprite::Sprite(Vector2 _size, Vector2 _pos, Color _color)
 {
 	id = generate_id();
 	image.width = _size.x;
 	image.height = _size.y;
 	image.channels = 4;
-	image.data = new unsigned char[_size.x * _size.y * image.channels] {};
-	for (unsigned int i = 0; i < _size.x * _size.y; i++)
-		memcpy(&image.data[i * image.channels], _color.value, image.channels);
+	fill_image(image, _color);
 	rect.set(_size, _pos);
 }
 
-Sprite::Sprite(Vector2 _pos, std::string _location, bool _center)
+Sprite::Sprite(string _location, Vector2 _pos, bool _center)
 {
 	id = generate_id();
-	if (load_image(image, _location))
-	{
-		Vector2 size = Vector2(image.width, image.height);
-		rect.set(size, _center ? _pos : _pos + size / 2);
-	}
+	load_image(image, _location);
+	Vector2 size = Vector2(image.width, image.height);
+	rect.set(size, _center ? _pos : _pos + size / 2);
 }
 
 void Sprite::draw()
@@ -42,13 +43,15 @@ void Sprite::draw()
 
 void Sprite::debug()
 {
-	rect.debug();
+	if (DEBUG_MODE)
+	{
+
+	}
 }
 
 Sprite::~Sprite()
 {
-	if (image.data != NULL) // free memory of image if assigned
-		image.free();
+
 }
 
 bool Sprite::operator==(Sprite& other) const

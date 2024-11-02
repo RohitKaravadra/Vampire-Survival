@@ -455,6 +455,13 @@ namespace GamesEngineeringBase
 			pumpLoop();
 		}
 
+		// resets input values -- Rohit
+		void resetInput()
+		{
+			memset(keys, 0, 256 * sizeof(bool));
+			memset(mouseButtons, 0, 3 * sizeof(bool));
+		}
+
 		// Returns a pointer to the back buffer image data
 		unsigned char* backBuffer()
 		{
@@ -486,12 +493,6 @@ namespace GamesEngineeringBase
 			image[index] = pixel[0];
 			image[index + 1] = pixel[1];
 			image[index + 2] = pixel[2];
-		}
-
-		// Draw full image (for background only 3 channels image) --Rohit
-		void draw(int size, unsigned char* _image)
-		{
-			memcpy(image, _image, size);
 		}
 
 		// Clears the back buffer by setting all pixels to black
