@@ -2,13 +2,6 @@
 
 using namespace Engine;
 
-bool DEBUG_MODE = false;
-
-int generate_id()
-{
-	return OBJECT_ID_COUNTER++;
-}
-
 // static variables
 
 Vector2 Vector2::zero(0, 0);
@@ -77,9 +70,14 @@ float Vector2::distance(const Vector2& v1, const Vector2& v2)
 	return (v1 - v2).magnitude();
 }
 
-Vector2 Vector2::move_towards(Vector2& v2, const float steps)
+Vector2 Vector2::move_towards(Vector2& v2, const float speed)
 {
-	return *this + direction(v2) * steps;
+	return distance(v2) > speed ? *this + direction(v2) * speed : v2;
+}
+
+Vector2 Vector2::move_towards(Vector2& v2, const float speed, float minDist)
+{
+	return distance(v2) > minDist ? *this + direction(v2) * speed : v2 - direction(v2) * minDist;
 }
 
 #pragma endregion
@@ -171,15 +169,13 @@ bool Vector2::operator!=(const Vector2& v2) const
 // constructors
 Rect::Rect()
 {
-	size = Vector2(3, 3);
-	center = Vector2(0, 0);
+	set(Vector2(4), Vector2::zero);
 	generate_debug_data();
 }
 
 Rect::Rect(Vector2 _size, Vector2 _center)
 {
-	size = _size;
-	center = _center;
+	set(_size, _center);
 	generate_debug_data();
 }
 
@@ -210,52 +206,88 @@ void Rect::generate_debug_data()
 
 void Rect::set(Vector2 _size, Vector2 _center)
 {
+	l = 0;
+	r = _size.x;
+	t = 0;
+	b = _size.y;
 	size = _size;
-	center = _center;
+	set_center(_center);
 	generate_debug_data();
+}
+
+Vector2 Rect::get_center() const
+{
+	return Vector2(l + (r - l) / 2, t + (b - t) / 2);
 }
 
 Vector2 Rect::get_topleft() const
 {
-	return center - size / 2;
+	return Vector2(l, t);
 }
 
 Vector2 Rect::get_botmright() const
 {
-	return center + size / 2;
+	return Vector2(r, b);
+}
+
+void Rect::set_center(Vector2 center)
+{
+	Vector2 hSize = size / 2;
+	l = center.x - hSize.x;
+	r = center.x + hSize.x;
+	t = center.y - hSize.y;
+	b = center.y + hSize.y;
 }
 
 void Rect::set_topleft(Vector2& value)
 {
-	center = value + size / 2;
+	l = value.x;
+	t = value.y;
 }
 
 void Rect::set_botmright(Vector2& value)
 {
-	center = value - size / 2;
+	r = value.x;
+	b = value.y;
+}
+
+void Rect::move_h(float delta)
+{
+	l += delta;
+	r += delta;
+}
+
+void Rect::move_v(float delta)
+{
+	t += delta;
+	b += delta;
+}
+
+void Rect::move(Vector2 delta)
+{
+	move_h(delta.x);
+	move_v(delta.y);
 }
 
 void Rect::clamp(const Vector2& min, const Vector2& max)
 {
-	center = center.clamp(min + size / 2, max - size / 2);
+	Vector2 center = get_center();
+	Vector2 hSize = size / 2;
+	center = center.clamp(min + hSize, max - hSize);
+	set_center(center);
 }
 
-bool Rect::collide_as_rect(Rect& _rect)
+bool Rect::collide_as_rect(Rect& _rect) const
 {
-	Vector2 atl = get_topleft();
-	Vector2 btl = _rect.get_topleft();
-	Vector2 abr = get_botmright();
-	Vector2 bbr = _rect.get_botmright();
-
-	return atl.x < bbr.x &&
-		btl.x < abr.x &&
-		atl.y < bbr.y &&
-		btl.y < abr.y;
+	return l < _rect.r &&
+		_rect.l < r &&
+		t < _rect.b &&
+		_rect.t < b;
 }
 
 bool Rect::collide_as_circle(Rect& _rect)
 {
-	return Vector2::distance(center, _rect.center) < (size.x + _rect.size.x) / 2;
+	return Vector2::distance(get_center(), _rect.get_center()) < (_rect.size.x + size.x) / 2;
 }
 
 void Rect::debug()

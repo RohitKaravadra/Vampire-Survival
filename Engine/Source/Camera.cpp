@@ -9,18 +9,16 @@ Window Camera::win;
 Rect* Camera::followTarget = nullptr;
 Vector2 Camera::offset;
 Rect Camera::camRect;
-Image Camera::background;
 
-void Camera::create(std::string _name, Vector2 _size, Vector2 _pos, Color _bg)
+void Camera::create(std::string _name, Vector2 _size, Vector2 _pos)
 {
 	notNull = true;
 	win.create(_size.x, _size.y, _name);
 	camRect.set(_size, _pos);
 	offset = _size / 2;
-	set_bg_color(_bg);
 }
 
-void Camera::free()
+void Camera::destroy()
 {
 	followTarget = nullptr;
 }
@@ -32,12 +30,12 @@ Window& Camera::get_window()
 
 Vector2 Camera::world_to_screen(Vector2 _pos)
 {
-	return offset + _pos - camRect.center;
+	return offset + _pos - camRect.get_center();
 }
 
 Vector2 Camera::screen_to_world(Vector2 _pos)
 {
-	return _pos + camRect.center - offset;
+	return _pos + camRect.get_center() - offset;
 }
 
 bool Camera::has_follow_target()
@@ -50,20 +48,6 @@ void Camera::set_follow_target(Rect& rect)
 	followTarget = &rect;
 }
 
-void Camera::set_bg_color(Color& _color)
-{
-	if (background.data == NULL)
-	{
-		background.width = camRect.size.x;
-		background.height = camRect.size.y;
-		background.channels = 3;
-		background.data = new unsigned char[camRect.size.x * camRect.size.y * background.channels] {};
-
-	}
-	for (unsigned int i = 0; i < camRect.size.x * camRect.size.y; i++)
-		memcpy(&background.data[i * background.channels], _color.value, background.channels);
-}
-
 void Camera::reset_follow_target()
 {
 	followTarget = nullptr;
@@ -72,17 +56,13 @@ void Camera::reset_follow_target()
 void Camera::update(float dt)
 {
 	if (followTarget != nullptr && notNull)
-		camRect.center = followTarget->center;
+		camRect.set_center(followTarget->get_center());
 }
 
 void Camera::clear()
 {
 	if (notNull)
-	{
 		win.clear();
-		if (background.data != NULL)
-			win.draw(camRect.size.x * camRect.size.y * background.channels, background.data);
-	}
 }
 
 void Camera::draw(Rect& _rect, Image& _image)
@@ -112,7 +92,7 @@ void Camera::draw(Rect& _rect, Image& _image)
 			//x bound check for x
 			if (posX < 0)
 				continue;
-			if (posX > camRect.size.x)
+			if (posX > camRect.size.x - 1)
 				break;
 
 			//draw pixel if alpha is greater than 0
@@ -120,7 +100,6 @@ void Camera::draw(Rect& _rect, Image& _image)
 				win.draw(posX, posY, _image.at(x, y));
 		}
 	}
-
 }
 
 void Camera::present()

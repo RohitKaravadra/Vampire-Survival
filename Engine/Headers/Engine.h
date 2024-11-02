@@ -8,7 +8,6 @@ using namespace GamesEngineeringBase;
 using std::ostream;
 
 static int OBJECT_ID_COUNTER = 0;
-
 extern bool DEBUG_MODE;
 
 int generate_id();
@@ -55,7 +54,9 @@ namespace Engine
 		// returns distance between given vector
 		static float distance(const Vector2& v1, const Vector2& v2);
 		// returns moved vector towards given vector with speed
-		Vector2 move_towards(Vector2& v2, const float steps);
+		Vector2 move_towards(Vector2& v2, const float speed);
+		// returns moved vector towards given vector with speed keeping minimum distance in check
+		Vector2 move_towards(Vector2& v2, const float speed, float minDist);
 
 		inline Vector2 operator-();
 		inline Vector2 operator+(const Vector2& v2) const;
@@ -85,29 +86,40 @@ namespace Engine
 	class Rect
 	{
 		Image dbgImg;
-
+		float l, r, t, b;
 		void generate_debug_data();
 	public:
 		Vector2 size; // size of the rectangle
-		Vector2 center; // center of rect
+		//Vector2 center; // center of rect
 
 		// constructors
 		Rect();
 		Rect(Vector2 _size, Vector2 _center);
 		// setter method
 		void set(Vector2 _size, Vector2 _center);
-		// returns top left position of rect (subjected to change and replace it with bounds)
+		// returns center position of rect 
+		Vector2 get_center() const;
+		// returns bottom right position of rect 
 		Vector2 get_topleft() const;
-		// returns bottom right position of rect (subjected to change and replace it with bounds)
+		// returns bottom right position of rect
 		Vector2 get_botmright() const;
+
+		// set center of rect
+		void set_center(Vector2 center);
 		// setter for topleft
 		void set_topleft(Vector2& value);
 		// setter for bottomright
 		void set_botmright(Vector2& value);
+		// moves rect in horizontal direction
+		void move_h(float delta);
+		// moves rect in verticle direction
+		void move_v(float delta);
+		// moves rect in given velocity
+		void move(Vector2 delta);
 		// clamps the rect in max and min bounds
 		void clamp(const Vector2& min, const Vector2& max);
 		// collide with other rect
-		bool collide_as_rect(Rect& _rect);
+		bool collide_as_rect(Rect& _rect) const;
 		// collide this rect as circle with other rect
 		bool collide_as_circle(Rect& _rect);
 		// debug rect
@@ -116,9 +128,7 @@ namespace Engine
 		// override outstreasm operator for output
 		friend ostream& operator<<(ostream& os, Rect& rect)
 		{
-			Vector2 topLeft = rect.get_topleft();
-			Vector2 botmRight = rect.get_botmright();
-			return os << "[ " << topLeft.x << " , " << topLeft.y << " , " << botmRight.x << " , " << botmRight.y << " ] ";
+			return os << "[ " << rect.l << " , " << rect.t << " , " << rect.b << " , " << rect.r << " ] ";
 		}
 	};
 
@@ -138,7 +148,7 @@ namespace Engine
 		// initializes value of window
 		static void Init(Window& _win);
 		// deinitializes value of window
-		static void free();
+		static void destroy();
 		// refresh inputs to store values
 		static void refresh();
 		// returns horizontal axis input
@@ -153,31 +163,6 @@ namespace Engine
 		static bool key_pressed(int key);
 		// checks if backspace or escape is pressed for UI inputs
 		static bool ui_back();
-	};
-
-	// Debug class to make debugging easy
-	static class Debug
-	{
-		Debug() {};
-	public:
-
-		//method prints error on terminal
-		static void print_error(std::string msg)
-		{
-			std::cout << " ERROR : " << msg << std::endl;
-		}
-
-		//method print warning on terminal
-		static void print_warning(std::string msg)
-		{
-			std::cout << " WARNING : " << msg << std::endl;
-		}
-
-		//method print message on terminal
-		static void print_message(std::string msg)
-		{
-			std::cout << " WARNING : " << msg << std::endl;
-		}
 	};
 
 	// Color struct to strore color values with alpha (4 channels)
@@ -224,17 +209,15 @@ namespace Engine
 		static Window win; // canvas to print on (canvas size is cameras size)
 		static Rect* followTarget; // follow target for camera
 		static Vector2 offset; // offset value to keep (0,0) in center of canvas
-		static Image background;
-
 		Camera() {};
 	public:
 		static bool notNull; // to check if camera is not created
 		static Rect camRect; // camera rect 
 
 		// create new camera
-		static void create(std::string _name, Vector2 _size, Vector2 _pos = Vector2::zero, Color _bg = Color::BLACK);
+		static void create(std::string _name, Vector2 _size, Vector2 _pos = Vector2::zero);
 		// destroy camera
-		static void free();
+		static void destroy();
 		// get referance to window
 		static Window& get_window();
 		// returns screen position
@@ -245,8 +228,6 @@ namespace Engine
 		static bool has_follow_target();
 		// setter for follow target (does not work if window is changed i.e. zoom value changes)
 		static void set_follow_target(Rect& rect);
-		// setter for gackground color (does not work if window is changed i.e. zoom value changes)
-		static void set_bg_color(Color& _color);
 		// resets follow target
 		static void reset_follow_target();
 		// updates cameras if follow follow target set
@@ -278,7 +259,7 @@ namespace Engine
 		//method to update sprite 
 		virtual void update(float dt) {}
 		// method to draw sprite on window
-		void draw();
+		virtual void draw();
 		// function to debug
 		virtual void debug();
 		// destructor
@@ -294,15 +275,15 @@ namespace Engine
 	class SpriteGroup
 	{
 		Sprite** group = nullptr; // sprite group pointer
-		int curIndex; // index of last element (subjected to change)
-		int maxSize; // max size for the group (subjected to change after changing with dynamic data structure like vector)
+		unsigned int curIndex; // index of last element (subjected to change)
+		unsigned int maxSize; // max size for the group (subjected to change after changing with dynamic data structure like vector)
 	public:
 		// constructor
-		SpriteGroup(int _maxSize);
+		SpriteGroup(unsigned int _maxSize);
 		// getter for curSize
 		int get_size();
 		// getter for i'th element
-		Sprite* get_sprite(int i);
+		Sprite* get_sprite(unsigned int i);
 		// method to add sprite to the group
 		void add(Sprite* sprite);
 		// method to add sprites of given group to this group
@@ -329,27 +310,27 @@ namespace Engine
 		}
 	};
 
-	// Sample App class for easy build up
-	class App
-	{
-		bool isRunning;
-		Timer timer;
-		float dt;
-		float eTime;
+	//// Sample App class for easy build up
+	//class App
+	//{
+	//	bool isRunning;
+	//	Timer timer;
+	//	float dt;
+	//	float eTime;
 
-		// destroy app
-		void destroy();
-		// update loop for app
-		void update_loop();
+	//	// destroy app
+	//	void destroy();
+	//	// update loop for app
+	//	void update_loop();
 
-	public:
-		SpriteGroup* gameObjects = nullptr;
+	//public:
+	//	SpriteGroup* gameObjects = nullptr;
 
-		// constructor to create an app
-		App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero, Color _bg = Color::BLACK);
-		// destructor to destroy app
-		~App();
-		// start app loop
-		void start();
-	};
+	//	// constructor to create an app
+	//	App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero);
+	//	// destructor to destroy app
+	//	~App();
+	//	// start app loop
+	//	void start();
+	//};
 }

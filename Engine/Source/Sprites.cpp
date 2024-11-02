@@ -80,14 +80,14 @@ int SpriteGroup::get_size()
 	return curIndex;
 }
 
-Sprite* SpriteGroup::get_sprite(int i)
+Sprite* SpriteGroup::get_sprite(unsigned int i)
 {
 	if (i < curIndex)
 		return group[i];
 	return nullptr;
 }
 
-SpriteGroup::SpriteGroup(int _maxSize) // (subjected to change)
+SpriteGroup::SpriteGroup(unsigned int _maxSize) // (subjected to change)
 {
 	curIndex = 0;
 	maxSize = _maxSize;
@@ -98,13 +98,12 @@ SpriteGroup::SpriteGroup(int _maxSize) // (subjected to change)
 void SpriteGroup::add(Sprite* sprite)
 {
 	if (group == nullptr)
-		return Debug::print_warning("Sprite Group is destroyed or not initialize");
+		return;
 
 	if (curIndex < maxSize)
 		group[curIndex++] = sprite;
 	else
 	{
-		Debug::print_warning("Max Group limit reached.. Object deleting object..");
 		delete sprite;
 		sprite = nullptr;
 	}
@@ -126,7 +125,7 @@ void SpriteGroup::add(SpriteGroup* _group)
 void SpriteGroup::update(float dt)
 {
 	if (group == nullptr)
-		return Debug::print_warning("Sprite Group is destroyed or not initialize");
+		return;
 
 	for (int i = 0; i < curIndex; i++)
 		group[i]->update(dt);
@@ -135,10 +134,7 @@ void SpriteGroup::update(float dt)
 void SpriteGroup::draw()
 {
 	if (group == nullptr)
-	{
-		Debug::print_warning("Sprite Group is destroyed or not initialize");
 		return;
-	}
 
 	for (int i = 0; i < curIndex; i++)
 		group[i]->draw();
@@ -147,10 +143,7 @@ void SpriteGroup::draw()
 void SpriteGroup::debug()
 {
 	if (group == nullptr)
-	{
-		Debug::print_warning("Sprite Group is destroyed or not initialize");
 		return;
-	}
 
 	for (int i = 0; i < curIndex; i++)
 		group[i]->debug();
