@@ -15,12 +15,14 @@ namespace Engine
 		unsigned int size;
 
 	public:
+		// constructor
 		DArray()
 		{
 			data = nullptr;
 			size = 0;
 		}
 
+		// destructor
 		~DArray()
 		{
 			if (size != 0)
@@ -31,11 +33,13 @@ namespace Engine
 			}
 		}
 
+		// get current size of array
 		int get_size()
 		{
 			return size;
 		}
 
+		// check if element is in the array or not
 		bool has(T value)
 		{
 			for (unsigned int i = 0; i < size; i++)
@@ -44,6 +48,7 @@ namespace Engine
 			return false;
 		}
 
+		// get index of the element if present else return -1
 		int get_index(T value)
 		{
 			for (unsigned int i = 0; i < size; i++)
@@ -52,6 +57,7 @@ namespace Engine
 			return -1;
 		}
 
+		// add new element to the array
 		void add(T value)
 		{
 			if (size == 0)
@@ -71,6 +77,7 @@ namespace Engine
 			}
 		}
 
+		// remove element at given index
 		bool remove_at(unsigned int index)
 		{
 			if (index < size)
@@ -98,10 +105,21 @@ namespace Engine
 			return false;
 		}
 
+		// remove perticular element
 		bool remove(T value)
 		{
 			int index = get_index(value);
 			return  index == -1 ? false : remove_at(index);
+		}
+
+		// clear array
+		void clear()
+		{
+			if (data != nullptr)
+			{
+				delete[] data;
+				size = 0;
+			}
 		}
 
 		T& operator[](int index)
@@ -229,6 +247,13 @@ namespace Engine
 			if (index == -1)
 				return false;
 			return remove(index);
+		}
+
+		// clear all data of dictionary
+		void clear()
+		{
+			data.clear();
+			size = data.get_size();
 		}
 
 		Pair<T1, T2>& operator[](unsigned int index)

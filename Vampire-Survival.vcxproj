@@ -142,6 +142,7 @@
     <ClCompile Include="Engine\Source\General.cpp" />
     <ClCompile Include="Engine\Source\Inputs.cpp" />
     <ClCompile Include="Engine\Source\Sprites.cpp" />
+    <ClCompile Include="Engine\Source\TileMap.cpp" />
     <ClCompile Include="ResourceLoader.cpp" />
     <ClCompile Include="Source\Game.cpp" />
     <ClCompile Include="Source\Main.cpp" />

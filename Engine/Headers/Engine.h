@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameMath.h"
+#include "Utilities.h"
 #include "GamesEngineeringBase.h"
 #include <iostream>
 
@@ -172,6 +172,40 @@ namespace Engine
 		{
 			destroy();
 		}
+	};
+
+	// class to handle tilemaps for level creation
+	static class TileMap
+	{
+	protected:
+		Image* tiles;
+		Image dbgImg;
+
+		Rect collider;
+
+		unsigned int tileSize; // size of tile
+		unsigned int totalTiles; // total variations of tiles
+		unsigned int size; // size of data 
+
+		Dictionary<Vector2, int> data; // data (tile position and variation)
+
+		// constructor
+		TileMap(unsigned int _tileSize);
+
+		// create a debug image for debugging colliders
+		void create_dbgImg();
+
+	public:
+		// update tilemap
+		virtual void update(float dt) {};
+		// check collision with tiles
+		virtual bool is_colliding(Rect& _rect);
+		// draw all tiles
+		virtual void draw();
+		// draw debug image of tiles
+		virtual void debug();
+		// destructor
+		~TileMap();
 	};
 
 	// Sample App class for easy build up

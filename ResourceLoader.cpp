@@ -1,5 +1,5 @@
 #include "Engine.h"
-
+#include<iostream>
 using namespace Engine;
 
 bool load_image(Image& image, std::string location)

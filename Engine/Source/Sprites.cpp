@@ -12,6 +12,7 @@ Sprite::Sprite()
 
 Sprite::Sprite(Vector2 _size, Vector2 _pos)
 {
+	id = generate_id();
 	rect.set(_size, _pos);
 	create_debug_data();
 }

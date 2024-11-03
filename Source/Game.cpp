@@ -1,20 +1,28 @@
 #include "Engine.h" 
+#include "Utilities.h"
 
 using namespace Engine;
 
 extern const Vector2 WIN_SIZE(1280, 720);
 
-class Tile : public Sprite
+void load_level(Dictionary<Vector2, int>& _level);
+
+class Level : public TileMap
 {
 public:
-	Tile(std::string _location, Vector2 _pos) :Sprite(_location, _pos) {}
-	Tile(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
-	Tile(Vector2 _size, Vector2 _pos) :Sprite(_size, _pos) {}
-	Tile(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
+	Level() :TileMap(32)
+	{
+		totalTiles = 24;
+		tiles = new Image[totalTiles];
+		for (unsigned int i = 0; i < totalTiles; i++)
+			load_image(tiles[i], "Resources/Tiles/" + std::to_string(i) + ".png");
+
+		load_level(data);
+		size = data.get_size();
+	}
 };
 
-SpriteGroup* walls;
-SpriteGroup* ground;
+Level* level;
 
 class Player : public Sprite
 {
@@ -45,57 +53,15 @@ public:
 	{
 		// check and resolve x axis collision
 		rect.move_h(delta.x);
-		if (walls->is_colliding(rect))
+		if (level->is_colliding(rect))
 			rect.move_h(-delta.x);
 
 		// check and resolve y axis collision
 		rect.move_v(delta.y);
-		if (walls->is_colliding(rect))
+		if (level->is_colliding(rect))
 			rect.move_v(-delta.y);
 	}
 };
-
-void create_walls(Vector2 size)
-{
-	// create border
-	walls = new SpriteGroup(static_cast<unsigned int>(size.x * (size.y - 1) * 4));
-	Vector2 pos;
-	for (unsigned int y = 1; y < size.y; y++)
-	{
-		// left wall
-		pos.set(0, 128 * y);
-		walls->add(new Tile("Resources/Tiles/Brick/Brick_01-128x128.png", pos));
-		// right wall
-		pos += Vector2::right * 128 * size.x;
-		walls->add(new Tile("Resources/Tiles/Brick/Brick_01-128x128.png", pos));
-	}
-	for (unsigned int x = 0; x < size.x + 1; x++)
-	{
-		// top wall
-		pos.set(128 * x, 0);
-		walls->add(new Tile("Resources/Tiles/Brick/Brick_01-128x128.png", pos));
-		// bottom wall
-		pos += Vector2::down * 128 * size.y;
-		walls->add(new Tile("Resources/Tiles/Brick/Brick_01-128x128.png", pos));
-	}
-}
-
-void fill_ground(Vector2 size)
-{
-	ground = new SpriteGroup(static_cast<unsigned int>((size.x - 1) * (size.y - 1)));
-	for (int y = 1; y < size.y; y++)
-		for (int x = 1; x < size.x; x++)
-			ground->add(new Tile("Resources/Tiles/Dirt/Dirt_05-128x128.png", Vector2(x, y) * 128));
-}
-
-void generate_map()
-{
-	//"Resources/Tiles/Brick/Brick_0" + std::to_string(1 + rand() % 9) + "-128x128.png"
-	Vector2 size(10, 10);
-
-	create_walls(size);
-	fill_ground(size);
-}
 
 class Game :public App
 {
@@ -121,9 +87,9 @@ public:
 	void start()
 	{
 		// creating objects
-		player = new Player(Vector2(50), Vector2(400, 400), Color::GREEN);
+		level = new Level();
+		player = new Player(Vector2(50), Vector2(0), Color::GREEN);
 		Camera::set_follow_target(player->rect);
-		generate_map();
 
 		// starting game loop
 		update_loop();
@@ -132,7 +98,7 @@ public:
 	void destroy()
 	{
 		std::cout << "Average FPS : " << fps << std::endl;
-		delete player, walls, ground;
+		delete player, level;
 	}
 
 	void update_loop()
@@ -145,21 +111,18 @@ public:
 
 			// update all objects
 			player->update(deltaTime);
-			walls->update(deltaTime);
 
 			Camera::update(deltaTime);
 			Camera::clear();
 
 			// draw all objects on screen
-			ground->draw();
-			walls->draw();
+			level->draw();
 			player->draw();
 
 			// only to debug
 			if (DEBUG_MODE)
 			{
-				ground->debug();
-				walls->debug();
+				level->debug();
 				player->debug();
 			}
 
@@ -173,11 +136,7 @@ public:
 
 void game()
 {
-	srand(234);
-
-	DEBUG_MODE = false;
-	Color::DEBUG_COLOR = Color::RED;
-
+	DEBUG_MODE = true;
 	Game app("Vampire Survival", WIN_SIZE);
 	app.start();
 }
