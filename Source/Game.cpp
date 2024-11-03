@@ -85,7 +85,7 @@ void fill_ground(Vector2 size)
 	ground = new SpriteGroup(static_cast<unsigned int>((size.x - 1) * (size.y - 1)));
 	for (int y = 1; y < size.y; y++)
 		for (int x = 1; x < size.x; x++)
-			ground->add(new Tile("Resources/Tiles/Tile/Tile_06-128x128.png", Vector2(x, y) * 128));
+			ground->add(new Tile("Resources/Tiles/Dirt/Dirt_05-128x128.png", Vector2(x, y) * 128));
 }
 
 void generate_map()
@@ -175,7 +175,7 @@ void game()
 {
 	srand(234);
 
-	DEBUG_MODE = true;
+	DEBUG_MODE = false;
 	Color::DEBUG_COLOR = Color::RED;
 
 	Game app("Vampire Survival", WIN_SIZE);

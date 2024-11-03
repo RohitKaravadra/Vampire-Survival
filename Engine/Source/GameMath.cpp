@@ -1,6 +1,7 @@
 #include "Engine.h"
 
 using namespace Engine;
+
 // static variables
 
 Vector2 Vector2::zero(0, 0);

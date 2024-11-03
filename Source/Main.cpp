@@ -34,6 +34,6 @@ void menu()
 
 int main()
 {
-	menu();
+	map_editor();
 	return 0;
 }

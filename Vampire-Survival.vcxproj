@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Headers\Engine.h" />
+    <ClInclude Include="Engine\Headers\GameMath.h" />
     <ClInclude Include="Engine\Headers\GamesEngineeringBase.h" />
     <ClInclude Include="Engine\Headers\Utilities.h" />
   </ItemGroup>

@@ -13,6 +13,7 @@ Sprite::Sprite()
 Sprite::Sprite(Vector2 _size, Vector2 _pos)
 {
 	rect.set(_size, _pos);
+	create_debug_data();
 }
 
 Sprite::Sprite(Vector2 _size, Vector2 _pos, Color _color)
@@ -23,6 +24,7 @@ Sprite::Sprite(Vector2 _size, Vector2 _pos, Color _color)
 	image.channels = 4;
 	fill_image(image, _color);
 	rect.set(_size, _pos);
+	create_debug_data();
 }
 
 Sprite::Sprite(string _location, Vector2 _pos, bool _center)
@@ -31,6 +33,15 @@ Sprite::Sprite(string _location, Vector2 _pos, bool _center)
 	load_image(image, _location);
 	Vector2 size = Vector2(image.width, image.height);
 	rect.set(size, _center ? _pos : _pos + size / 2);
+	create_debug_data();
+}
+
+void Sprite::create_debug_data()
+{
+	dbgImage.width = rect.size.x;
+	dbgImage.height = rect.size.y;
+	dbgImage.channels = 4;
+	create_outline(dbgImage, Color::DEBUG_COLOR);
 }
 
 void Sprite::draw()
@@ -44,9 +55,7 @@ void Sprite::draw()
 void Sprite::debug()
 {
 	if (DEBUG_MODE)
-	{
-
-	}
+		Camera::draw(rect, dbgImage);
 }
 
 Sprite::~Sprite()
