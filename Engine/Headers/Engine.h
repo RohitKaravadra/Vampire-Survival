@@ -5,7 +5,6 @@
 #include <iostream>
 
 using namespace GamesEngineeringBase;
-using namespace std;
 
 static int OBJECT_ID_COUNTER = 0;
 extern bool DEBUG_MODE;
@@ -114,7 +113,7 @@ namespace Engine
 		Sprite();
 		Sprite(Vector2 _size, Vector2 _pos);
 		Sprite(Vector2 _size, Vector2 _pos, Color _color);
-		Sprite(string _location, Vector2 _pos, bool _center = true);
+		Sprite(std::string _location, Vector2 _pos, bool _center = true);
 
 		// create an outline rect for debugging
 		void create_debug_data();

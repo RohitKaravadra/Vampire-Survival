@@ -7,7 +7,7 @@ extern const Vector2 WIN_SIZE(1280, 720);
 class Tile : public Sprite
 {
 public:
-	Tile(string _location, Vector2 _pos) :Sprite(_location, _pos) {}
+	Tile(std::string _location, Vector2 _pos) :Sprite(_location, _pos) {}
 	Tile(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
 	Tile(Vector2 _size, Vector2 _pos) :Sprite(_size, _pos) {}
 	Tile(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
@@ -20,7 +20,7 @@ class Player : public Sprite
 {
 	float speed = 400;
 public:
-	Player(string _location, Vector2 _pos) :Sprite(_location, _pos) {}
+	Player(std::string _location, Vector2 _pos) :Sprite(_location, _pos) {}
 	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
 	Player(Vector2 _size, Vector2 _pos) :Sprite(_size, _pos) {}
 	Player(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
@@ -105,7 +105,7 @@ class Game :public App
 
 public:
 	// constructor to create app and camera
-	Game(string _name, Vector2 _size, Vector2 _camPos = Vector2::zero) :App(_name, _size, _camPos)
+	Game(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero) :App(_name, _size, _camPos)
 	{
 		isRunning = false;
 		fps = 0;

@@ -1033,6 +1033,19 @@ namespace GamesEngineeringBase
 			return channels == 4;
 		}
 
+		// copy data of given image to this image  -- Rohit
+		void copy(Image& _image)
+		{
+			if (data != NULL)
+				delete[] data;
+
+			width = _image.width;
+			height = _image.height;
+			channels = _image.channels;
+			data = new unsigned char[width * height * channels];
+			memcpy(data, _image.data, width * height * channels);
+		}
+
 		// Frees the allocated image data
 		void free()
 		{

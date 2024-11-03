@@ -1,12 +1,128 @@
 #pragma once
 #include "GameMath.h"
 
-#pragma region Dictionary
-
 using namespace std;
 
 namespace Engine
 {
+
+#pragma region Dynamic Array
+
+	template<typename T>
+	class DArray
+	{
+		T* data;
+		unsigned int size;
+
+	public:
+		DArray()
+		{
+			data = nullptr;
+			size = 0;
+		}
+
+		~DArray()
+		{
+			if (size != 0)
+			{
+				delete[] data;
+				data = nullptr;
+				size = 0;
+			}
+		}
+
+		int get_size()
+		{
+			return size;
+		}
+
+		bool has(T value)
+		{
+			for (unsigned int i = 0; i < size; i++)
+				if (data[i] == value)
+					return true;
+			return false;
+		}
+
+		int get_index(T value)
+		{
+			for (unsigned int i = 0; i < size; i++)
+				if (data[i] == value)
+					return i;
+			return -1;
+		}
+
+		void add(T value)
+		{
+			if (size == 0)
+			{
+				size += 1;
+				data = new T[size];
+				data[size - 1] = value;
+			}
+			else
+			{
+				T* newData = new T[size + 1];
+				memcpy(newData, data, size * sizeof(T));
+				newData[size++] = value;
+				delete[] data;
+				data = newData;
+				newData = nullptr;
+			}
+		}
+
+		bool remove_at(unsigned int index)
+		{
+			if (index < size)
+			{
+				if (size == 1)
+				{
+					delete[] data;
+					size = 0;
+				}
+				else
+				{
+					T* newData = new T[--size];
+					memcpy(newData, data, index * sizeof(T));
+
+					if (index < size)
+						memcpy(&newData[index], &data[index + 1], (size - index) * sizeof(T));
+
+					delete[] data;
+					data = newData;
+					newData = nullptr;
+				}
+
+				return true;
+			}
+			return false;
+		}
+
+		bool remove(T value)
+		{
+			int index = get_index(value);
+			return  index == -1 ? false : remove_at(index);
+		}
+
+		T& operator[](int index)
+		{
+			return data[index];
+		}
+
+		friend ostream& operator<<(ostream& os, DArray& value)
+		{
+			os << "[ ";
+			for (unsigned int i = 0; i < value.size; i++)
+				os << value.data[i] << " ";
+			os << "] ";
+			return os;
+		}
+	};
+
+#pragma endregion
+
+#pragma region Dictionary
+
 	template<typename T1, typename T2>
 	struct Pair
 	{
@@ -25,35 +141,20 @@ namespace Engine
 	template<typename T1, typename T2>
 	class Dictionary
 	{
-		Pair<T1, T2>* data;
-		unsigned int maxSize;
-		unsigned int curIndex;
+		DArray<Pair<T1, T2>> data;
+		unsigned int size = 0;
 	public:
-		// constructor
-		Dictionary(unsigned int _maxSize = 1)
-		{
-			_maxSize = _maxSize > 0 ? _maxSize : 1; // makesure dict always have a size > 0
-			curIndex = 0;
-			maxSize = _maxSize;
-			data = new Pair<T1, T2>[_maxSize];
-		}
-
-		// destructor
-		~Dictionary()
-		{
-			delete[] data;
-		}
 
 		// returns current size of data
 		unsigned int get_size()
 		{
-			return curIndex;
+			return size;
 		}
 
 		// checks if data has given key or not
 		bool has(T1 _key)
 		{
-			for (unsigned int i = 0; i < curIndex; i++)
+			for (unsigned int i = 0; i < size; i++)
 				if (data[i].key == _key)
 					return true;
 			return false;
@@ -62,7 +163,7 @@ namespace Engine
 		// returns index of the key (if not present returns -1)
 		int index_of(T1 _key)
 		{
-			for (unsigned int i = 0; i < curIndex; i++)
+			for (unsigned int i = 0; i < size; i++)
 				if (data[i].key == _key)
 					return i;
 			return -1;
@@ -80,7 +181,9 @@ namespace Engine
 		// get value at index
 		T1 get_key(unsigned int index)
 		{
-			return data[index].key;
+			if (index < size)
+				return data[index].key;
+			return data[0].key;
 		}
 
 		// adds pair to data
@@ -92,29 +195,28 @@ namespace Engine
 			{
 				if (_override)
 				{
-					data[index].value = _pair.value;
-					return true;
+					if (data[index].value != _pair.value)
+					{
+						data[index].value = _pair.value;
+						return true;
+					}
 				}
-				return false;
 			}
-
-			if (curIndex < maxSize)
+			else
 			{
-				data[curIndex++] = _pair;
+				data.add(_pair);
+				size = data.get_size();
 				return true;
 			}
-
 			return false;
 		}
 
 		// remove pair at index
 		bool remove(unsigned int index)
 		{
-			if (index < curIndex)
+			if (data.remove_at(index))
 			{
-				curIndex--;
-				if (index != curIndex)
-					memcpy(&data[index], &data[index + 1], sizeof(Pair<T1, T2>) * (curIndex - index));
+				size = data.get_size();
 				return true;
 			}
 			return false;
@@ -131,7 +233,7 @@ namespace Engine
 
 		Pair<T1, T2>& operator[](unsigned int index)
 		{
-			if (index < curIndex)
+			if (index < size)
 				return data[index];
 			return data[0];
 		}
@@ -140,101 +242,11 @@ namespace Engine
 		{
 			Pair<T1, T2> pair;
 			os << " [";
-			for (unsigned int i = 0; i < _dict.curIndex; i++)
+			for (unsigned int i = 0; i < _dict.size; i++)
 			{
 				pair = _dict[i];
 				os << " (" << pair.key << "," << pair.value << ") ";
 			}
-			os << "] ";
-			return os;
-		}
-	};
-
-#pragma endregion
-
-#pragma region Dynamic Array
-
-	template<typename T>
-	class DArray
-	{
-		T* data;
-		unsigned int curIndex;
-		unsigned int maxSize;
-
-	public:
-		DArray(int _maxSize)
-		{
-			data = new T[_maxSize];
-			maxSize = _maxSize;
-			curIndex = 0;
-		}
-
-		~DArray()
-		{
-			delete[] data;
-			data = nullptr;
-			curIndex = 0;
-			maxSize = 0;
-		}
-
-		int get_size()
-		{
-			return curIndex;
-		}
-
-		bool has(T* value)
-		{
-			for (unsigned int i = 0; i < curIndex; i++)
-				if (data[i] == &value)
-					return true;
-			return false;
-		}
-
-		int get_index(T* value)
-		{
-			for (unsigned int i = 0; i < curIndex; i++)
-				if (data[i] == *value)
-					return i;
-			return -1;
-		}
-
-		bool add(T* value)
-		{
-			if (curIndex < maxSize)
-			{
-				data[curIndex++] = *value;
-				return true;
-			}
-			return false;
-		}
-
-		bool remove_at(int index)
-		{
-			if (index < curIndex)
-			{
-				delete data[index];
-				if (index != --curIndex)
-					data[index] = data[curIndex];
-			}
-			return false;
-		}
-
-		bool remove(T* value)
-		{
-			int index = get_index(value);
-			return  index == -1 ? false : remove_at(index);
-		}
-
-		T operator[](int index)
-		{
-			return data[index];
-		}
-
-		friend ostream& operator<<(ostream& os, DArray& value)
-		{
-			os << "[ ";
-			for (unsigned int i = 0; i < value.curIndex; i++)
-				os << value.data[i] << ",";
 			os << "] ";
 			return os;
 		}

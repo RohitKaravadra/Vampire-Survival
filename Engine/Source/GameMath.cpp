@@ -275,3 +275,15 @@ bool Rect::collide_as_circle(Rect& _rect) const
 }
 
 #pragma endregion
+
+Vector2 Engine::get_grid_pos(Vector2 _pos, int _size, int _space)
+{
+	float tSize = _size + _space;
+	Vector2 gPos = (_pos / tSize).to_int();
+
+	gPos.x += _pos.x < 0 ? -0.5f : 0.5f;
+	gPos.y += _pos.y < 0 ? -0.5f : 0.5f;
+
+	return gPos;
+}
+

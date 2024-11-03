@@ -157,4 +157,7 @@ namespace Engine
 			return os << "[ " << rect.l << " , " << rect.t << " , " << rect.b << " , " << rect.r << " ] ";
 		}
 	};
+
+	// converts given position into grid position
+	Vector2 get_grid_pos(Vector2 _pos, int _size, int _space = 0);
 }

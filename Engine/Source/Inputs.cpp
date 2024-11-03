@@ -50,9 +50,9 @@ int Inputs::get_v_axis()
 
 	int axis = 0;
 
-	if (win->keyPressed('W') || win->keyPressed(VK_LEFT))
+	if (win->keyPressed('W') || win->keyPressed(VK_UP))
 		axis--;
-	if (win->keyPressed('S') || win->keyPressed(VK_RIGHT))
+	if (win->keyPressed('S') || win->keyPressed(VK_DOWN))
 		axis++;
 
 	return axis;

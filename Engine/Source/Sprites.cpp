@@ -27,7 +27,7 @@ Sprite::Sprite(Vector2 _size, Vector2 _pos, Color _color)
 	create_debug_data();
 }
 
-Sprite::Sprite(string _location, Vector2 _pos, bool _center)
+Sprite::Sprite(std::string _location, Vector2 _pos, bool _center)
 {
 	id = generate_id();
 	load_image(image, _location);
@@ -38,6 +38,9 @@ Sprite::Sprite(string _location, Vector2 _pos, bool _center)
 
 void Sprite::create_debug_data()
 {
+	if (!DEBUG_MODE)
+		return;
+
 	dbgImage.width = rect.size.x;
 	dbgImage.height = rect.size.y;
 	dbgImage.channels = 4;
