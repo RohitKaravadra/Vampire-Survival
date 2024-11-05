@@ -27,6 +27,12 @@
     <ClInclude Include="Engine\Headers\GameMath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Resources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Headers\SceneManagement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Source\Camera.cpp">
@@ -41,10 +47,10 @@
     <ClCompile Include="Engine\Source\Sprites.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game.cpp">
+    <ClCompile Include="Source\GameScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceLoader.cpp">
+    <ClCompile Include="Resources.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\General.cpp">
@@ -53,13 +59,16 @@
     <ClCompile Include="Engine\Source\Inputs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Main.cpp">
+    <ClCompile Include="Source\VampireSurvival.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\MapEditor.cpp">
+    <ClCompile Include="Source\MapEditorScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\TileMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\SceneManagement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

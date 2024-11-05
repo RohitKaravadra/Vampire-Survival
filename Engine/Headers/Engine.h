@@ -1,10 +1,12 @@
 #pragma once
 
 #include "Utilities.h"
+#include "GameMath.h"
 #include "GamesEngineeringBase.h"
 #include <iostream>
 
 using namespace GamesEngineeringBase;
+using Utilities::Dictionary;
 
 static int OBJECT_ID_COUNTER = 0;
 extern bool DEBUG_MODE;
@@ -59,6 +61,8 @@ namespace Engine
 		static Vector2 get_mouse_pos();
 		// checks if given key is pressed or not
 		static bool key_pressed(int key);
+		// check if accept is precced
+		static bool ui_accept();
 		// checks if backspace or escape is pressed for UI inputs
 		static bool ui_back();
 	};
@@ -110,7 +114,7 @@ namespace Engine
 		Image dbgImage; // rect image for debugging collider
 
 		// constructors
-		Sprite();
+		Sprite() = default;
 		Sprite(Vector2 _size, Vector2 _pos);
 		Sprite(Vector2 _size, Vector2 _pos, Color _color);
 		Sprite(std::string _location, Vector2 _pos, bool _center = true);
@@ -127,7 +131,7 @@ namespace Engine
 		// function to debug
 		virtual void debug();
 		// destructor
-		~Sprite();
+		virtual ~Sprite();
 
 		bool operator==(Sprite& other) const;
 		bool operator==(Sprite* other) const;
@@ -187,7 +191,7 @@ namespace Engine
 		unsigned int totalTiles; // total variations of tiles
 		unsigned int size; // size of data 
 
-		Dictionary<Vector2, int> data; // data (tile position and variation)
+		Dictionary<Vector2, unsigned int> data; // data (tile position and variation)
 
 		// constructor
 		TileMap(unsigned int _tileSize);
@@ -205,22 +209,22 @@ namespace Engine
 		// draw debug image of tiles
 		virtual void debug();
 		// destructor
-		~TileMap();
+		virtual ~TileMap();
 	};
 
-	// Sample App class for easy build up
+	// sample App class for easy build up
 	class App
 	{
 	protected:
 		Timer timer;
-		float deltaTime;
+		float dt;
 
 		// constructor to create an app
 		App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero)
 		{
 			Camera::create(_name, _size, _camPos);
 			Inputs::Init(Camera::get_window());
-			deltaTime = 1;
+			dt = 1;
 		}
 		// destructor to destroy app
 		~App()
@@ -232,7 +236,7 @@ namespace Engine
 		void update()
 		{
 			Inputs::refresh();
-			deltaTime = timer.dt();
+			dt = timer.dt();
 		}
 	};
 }

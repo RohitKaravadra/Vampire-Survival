@@ -1,11 +1,8 @@
 #include "Engine.h" 
-#include "Utilities.h"
+#include "Resources.h"
+#include "SceneManagement.h"
 
 using namespace Engine;
-
-extern const Vector2 WIN_SIZE(1280, 720);
-
-void load_level(Dictionary<Vector2, int>& _level);
 
 class Level : public TileMap
 {
@@ -28,6 +25,7 @@ class Player : public Sprite
 {
 	float speed = 400;
 public:
+	Player() = default;
 	Player(std::string _location, Vector2 _pos) :Sprite(_location, _pos) {}
 	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
 	Player(Vector2 _size, Vector2 _pos) :Sprite(_size, _pos) {}
@@ -41,7 +39,7 @@ public:
 			speed -= 1000 * dt;
 
 		Vector2 delta = Inputs::get_axis() * dt * speed;
-		move_and_collide(delta);
+		move(delta);
 	}
 
 	void move(Vector2 delta)
@@ -63,23 +61,19 @@ public:
 	}
 };
 
-class Game :public App
+class GameScene :public Scene
 {
-	bool isRunning;
-	float fps;
 	Player* player;
 
 public:
-	// constructor to create app and camera
-	Game(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero) :App(_name, _size, _camPos)
+	GameScene()
 	{
-		isRunning = false;
-		fps = 0;
+		name = "Game";
 	}
 
-	// destructor
-	~Game()
+	~GameScene()
 	{
+		std::cout << name << " destroyed" << std::endl;
 		destroy();
 	}
 
@@ -87,56 +81,49 @@ public:
 	void start()
 	{
 		// creating objects
+		isActive = true;
 		level = new Level();
-		player = new Player(Vector2(50), Vector2(0), Color::GREEN);
+		player = new Player("Resources/L.png", Vector2(0));
 		Camera::set_follow_target(player->rect);
-
-		// starting game loop
-		update_loop();
+		std::cout << name << " started" << std::endl;
 	}
 
 	void destroy()
 	{
-		std::cout << "Average FPS : " << fps << std::endl;
+		isActive = false;
+
 		delete player, level;
+		player = nullptr;
+		level = nullptr;
+
+		std::cout << name << " destroyed" << std::endl;
 	}
 
-	void update_loop()
+	bool update(float dt)
 	{
-		isRunning = true;
-		while (isRunning)
-		{
-			App::update();
-			fps = (fps + 1 / deltaTime) / 2;
+		// update all objects
+		player->update(dt);
+		Camera::update(dt);
 
-			// update all objects
-			player->update(deltaTime);
+		if (Inputs::ui_back())
+			return true;
+		return false;
+	}
 
-			Camera::update(deltaTime);
-			Camera::clear();
+	void draw()
+	{
+		level->draw();
+		player->draw();
+	}
 
-			// draw all objects on screen
-			level->draw();
-			player->draw();
-
-			// only to debug
-			if (DEBUG_MODE)
-			{
-				level->debug();
-				player->debug();
-			}
-
-			Camera::present();
-
-			if (Inputs::ui_back())
-				isRunning = false;
-		}
+	void debug()
+	{
+		level->debug();
+		player->debug();
 	}
 };
 
-void game()
+Scene* create_game_scene()
 {
-	DEBUG_MODE = true;
-	Game app("Vampire Survival", WIN_SIZE);
-	app.start();
+	return new GameScene();
 }

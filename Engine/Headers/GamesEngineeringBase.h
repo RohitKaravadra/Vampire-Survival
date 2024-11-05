@@ -902,7 +902,7 @@ namespace GamesEngineeringBase
 		unsigned int width;       // Image width
 		unsigned int height;      // Image height
 		unsigned int channels;             // Number of color channels
-		unsigned char* data;      // Pointer to image data
+		unsigned char* data = nullptr;      // Pointer to image data
 
 		// Loads an image from a file using WIC
 		bool load(std::string filename)
@@ -1036,7 +1036,7 @@ namespace GamesEngineeringBase
 		// copy data of given image to this image  -- Rohit
 		void copy(Image& _image)
 		{
-			if (data != NULL)
+			if (data != nullptr)
 				delete[] data;
 
 			width = _image.width;
@@ -1049,10 +1049,10 @@ namespace GamesEngineeringBase
 		// Frees the allocated image data
 		void free()
 		{
-			if (data != NULL)
+			if (data != nullptr)
 			{
 				delete[] data;
-				data = NULL;
+				data = nullptr;
 			}
 		}
 

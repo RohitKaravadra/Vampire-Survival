@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival\Engine\Headers;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival;C:\Users\u5667101\Documents\CPP Codes\Vampire-Survival\Engine\Headers;$(ExternalIncludePath)</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -133,7 +133,9 @@
     <ClInclude Include="Engine\Headers\Engine.h" />
     <ClInclude Include="Engine\Headers\GameMath.h" />
     <ClInclude Include="Engine\Headers\GamesEngineeringBase.h" />
+    <ClInclude Include="Engine\Headers\SceneManagement.h" />
     <ClInclude Include="Engine\Headers\Utilities.h" />
+    <ClInclude Include="Resources.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Source\Camera.cpp" />
@@ -141,12 +143,13 @@
     <ClCompile Include="Engine\Source\GameMath.cpp" />
     <ClCompile Include="Engine\Source\General.cpp" />
     <ClCompile Include="Engine\Source\Inputs.cpp" />
+    <ClCompile Include="Engine\Source\SceneManagement.cpp" />
     <ClCompile Include="Engine\Source\Sprites.cpp" />
     <ClCompile Include="Engine\Source\TileMap.cpp" />
-    <ClCompile Include="ResourceLoader.cpp" />
-    <ClCompile Include="Source\Game.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\MapEditor.cpp" />
+    <ClCompile Include="Resources.cpp" />
+    <ClCompile Include="Source\GameScene.cpp" />
+    <ClCompile Include="Source\VampireSurvival.cpp" />
+    <ClCompile Include="Source\MapEditorScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\L.png" />

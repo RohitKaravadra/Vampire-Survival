@@ -1,55 +1,11 @@
 
-#include "Utilities.h"
 #include "Engine.h"
-#include <fstream>
+#include "Resources.h"
+#include "SceneManagement.h"
 
 using namespace Engine;
-
-extern const Vector2 WIN_SIZE;
-
-void save_level(Dictionary<Vector2, int>& _level)
-{
-	unsigned int size = _level.get_size();
-	if (size > 0)
-	{
-		std::ofstream levelFile("level.txt");
-
-		levelFile << size << "\n";
-		for (unsigned int i = 0; i < size; i++)
-		{
-			Pair<Vector2, int> pair = _level[i];
-			levelFile << pair.key.x << "\n";
-			levelFile << pair.key.y << "\n";
-			levelFile << pair.value << "\n";
-		}
-
-		levelFile.close();
-	}
-}
-
-void load_level(Dictionary<Vector2, int>& _level)
-{
-	_level.clear();
-	std::ifstream levelFile("level.txt");
-	if (levelFile)
-	{
-		unsigned int size;
-		levelFile >> size;
-		if (size > 0)
-		{
-			for (unsigned int i = 0; i < size; i++)
-			{
-				Pair<Vector2, int> pair;
-				levelFile >> pair.key.x;
-				levelFile >> pair.key.y;
-				levelFile >> pair.value;
-
-				_level.add(pair);
-			}
-		}
-	}
-	levelFile.close();
-}
+using namespace Utilities;
+using namespace std;
 
 class TilePointer :public Sprite
 {
@@ -100,9 +56,18 @@ public:
 		pointer.set_image(tiles[curTile]);
 	}
 
+	void load()
+	{
+		curTile = 0;
+		inpFreq = 0;
+		load_level(data);
+		size = data.get_size();
+		pointer.set_image(tiles[curTile]);
+	}
+
 	void add(Vector2 _pos, unsigned int tile)
 	{
-		Pair<Vector2, int> pair(_pos, tile);
+		Pair<Vector2, unsigned int> pair(_pos, tile);
 		if (data.add(pair) && DEBUG_MODE)
 			cout << data << endl;
 	}
@@ -145,75 +110,74 @@ public:
 			check_inputs();
 	}
 
-	~Map()
+	void save()
 	{
 		save_level(data);
 	}
 };
 
-class MapEditor : public App
+class MapEditorScene : public Scene
 {
-	bool isRunning;
 	float moveSpeed = 200;
 	Map map;
 public:
-	MapEditor(string _name, Vector2 _size) :App(_name, _size)
+	MapEditorScene()
 	{
-		isRunning = false;
+		name = "MapEditor";
 	}
 
-	~MapEditor()
+	~MapEditorScene()
 	{
-		destroy();
+
 	}
 
 	void start()
 	{
-		update_loop();
+		map.load();
+		isActive = true;
+		std::cout << name << " started" << std::endl;
 	}
 
 	void destroy()
 	{
+		isActive = false;
+		map.save();
+		std::cout << name << " destroyed" << std::endl;
 	}
 
-	void update_loop()
+	bool update(float dt)
 	{
-		isRunning = true;
-		while (isRunning)
+		pointer.update(dt);
+		map.update(dt);
+
+		Camera::camRect.move(Inputs::get_axis() * dt * moveSpeed);
+
+		if (Inputs::key_pressed('E'))
+			moveSpeed += 1000 * dt;
+		if (Inputs::key_pressed('Q'))
+			moveSpeed -= 1000 * dt;
+
+		if (Inputs::ui_back())
+			return true;
+		return false;
+	}
+
+	void draw()
+	{
+		map.draw();
+		pointer.draw();
+	}
+
+	void debug()
+	{
+		if (DEBUG_MODE)
 		{
-			App::update();
-
-			pointer.update(deltaTime);
-			map.update(deltaTime);
-
-			Camera::camRect.move(Inputs::get_axis() * deltaTime * moveSpeed);
-
-			if (Inputs::key_pressed('E'))
-				moveSpeed += 1000 * deltaTime;
-			if (Inputs::key_pressed('Q'))
-				moveSpeed -= 1000 * deltaTime;
-
-			Camera::clear();
-
-			map.draw();
-			pointer.draw();
-
-			if (DEBUG_MODE)
-			{
-				map.debug();
-			}
-
-			Camera::present();
-
-			if (Inputs::ui_back())
-				isRunning = false;
+			map.debug();
 		}
 	}
 };
 
-void map_editor()
+Scene* create_map_editor_scene()
 {
-	DEBUG_MODE = true;
-	MapEditor app("Map Editor", WIN_SIZE);
-	app.start();
+	return new MapEditorScene();
 }

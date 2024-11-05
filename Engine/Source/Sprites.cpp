@@ -4,12 +4,6 @@ using namespace Engine;
 
 #pragma region Sprite Methods
 
-// constructors
-Sprite::Sprite()
-{
-	id = generate_id();
-}
-
 Sprite::Sprite(Vector2 _size, Vector2 _pos)
 {
 	id = generate_id();

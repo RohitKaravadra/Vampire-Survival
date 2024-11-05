@@ -1,9 +1,10 @@
 #pragma once
-#include "GameMath.h"
+#include<ostream>
+#include<iostream>
 
-using namespace std;
+using std::ostream;
 
-namespace Engine
+namespace Utilities
 {
 
 #pragma region Dynamic Array
@@ -22,15 +23,27 @@ namespace Engine
 			size = 0;
 		}
 
+		// copy constructor
+		DArray(DArray& _other)
+		{
+			if (this == &_other)
+				return;
+
+			clear();
+
+			if (_other.size == 0)
+				return;
+
+			size = _other.size;
+			data = new T[size];
+			for (unsigned int i = 0; i < size; i++)
+				add(_other.data[i]);
+		}
+
 		// destructor
 		~DArray()
 		{
-			if (size != 0)
-			{
-				delete[] data;
-				data = nullptr;
-				size = 0;
-			}
+			clear();
 		}
 
 		// get current size of array
@@ -86,6 +99,7 @@ namespace Engine
 				{
 					delete[] data;
 					size = 0;
+					data = nullptr;
 				}
 				else
 				{
@@ -115,16 +129,33 @@ namespace Engine
 		// clear array
 		void clear()
 		{
-			if (data != nullptr)
-			{
-				delete[] data;
-				size = 0;
-			}
+			if (data == nullptr)
+				return;
+
+			delete[] data;
+			size = 0;
+			data = nullptr;
 		}
 
 		T& operator[](int index)
 		{
 			return data[index];
+		}
+
+		DArray& operator=(const DArray& _other)
+		{
+			if (this == &_other)
+				return *this;
+
+			clear();
+			size = _other.size;
+			if (size > 0)
+			{
+				data = new T[size];
+				memcpy(data, _other.data, size * sizeof(T));
+			}
+
+			return *this;
 		}
 
 		friend ostream& operator<<(ostream& os, DArray& value)
@@ -162,7 +193,26 @@ namespace Engine
 		DArray<Pair<T1, T2>> data;
 		unsigned int size = 0;
 	public:
+		// default constructor
+		Dictionary()
+		{
+			size = 0;
+		}
 
+		// copy constructor
+		Dictionary(Dictionary& _other)
+		{
+			if (this == &_other)
+				return;
+			data = _other.data;
+			size = data.get_size();
+		}
+
+		// destructor
+		~Dictionary()
+		{
+			clear();
+		}
 		// returns current size of data
 		unsigned int get_size()
 		{
@@ -262,6 +312,18 @@ namespace Engine
 				return data[index];
 			return data[0];
 		}
+
+		/*Dictionary<T1, T2>& operator=(Dictionary<T1, T2>& _other)
+		{
+			if (this == &_other)
+				return *this;
+
+			clear();
+			data = _other.data;
+			size = data.get_size();
+
+			return *this;
+		}*/
 
 		friend ostream& operator<<(ostream& os, Dictionary& _dict)
 		{

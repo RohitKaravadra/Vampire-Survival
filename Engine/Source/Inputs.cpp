@@ -68,13 +68,18 @@ Vector2 Inputs::get_mouse_pos()
 	return mousePos;
 }
 
-
-
 bool Inputs::key_pressed(int key)
 {
 	if (win == nullptr)
 		return false;
 	return win->keyPressed(key);
+}
+
+bool Inputs::ui_accept()
+{
+	if (win == nullptr)
+		return false;
+	return win->keyPressed('F') || win->keyPressed(VK_ACCEPT);
 }
 
 bool Inputs::ui_back()
