@@ -8,6 +8,9 @@ Sprite::Sprite(Vector2 _size, Vector2 _pos)
 {
 	id = generate_id();
 	rect.set(_size, _pos);
+	image.width = _size.x;
+	image.height = _size.y;
+	image.channels = 4;
 	create_debug_data();
 }
 
@@ -30,6 +33,7 @@ Sprite::Sprite(std::string _location, Vector2 _pos, bool _center)
 	rect.set(size, _center ? _pos : _pos + size / 2);
 	create_debug_data();
 }
+
 
 void Sprite::create_debug_data()
 {
@@ -54,11 +58,6 @@ void Sprite::debug()
 {
 	if (DEBUG_MODE)
 		Camera::draw(rect, dbgImage);
-}
-
-Sprite::~Sprite()
-{
-
 }
 
 bool Sprite::operator==(Sprite& other) const

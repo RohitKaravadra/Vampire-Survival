@@ -178,12 +178,31 @@ namespace Utilities
 		T1 key;
 		T2 value;
 
-		Pair() {};
-
+		Pair() = default;
+		Pair(Pair& _other)
+		{
+			key = _other.key;
+			value = _other.value;
+		}
 		Pair(T1 _key, T2 _value)
 		{
 			key = _key;
 			value = _value;
+		}
+
+		bool operator==(Pair& _other)
+		{
+			return key == _other.key && value == _other.value;
+		}
+
+		bool operator!=(Pair& _other)
+		{
+			return key != _other.key || value != _other.value;
+		}
+
+		friend ostream& operator<<(ostream& os, Pair& _pair)
+		{
+			return os << " (" << _pair.key << " , " << _pair.value << ") ";
 		}
 	};
 

@@ -1,8 +1,7 @@
-#include "Engine.h" 
+
+#include "Character.h"
 #include "Resources.h"
 #include "SceneManagement.h"
-
-using namespace Engine;
 
 class Level : public TileMap
 {
@@ -19,52 +18,35 @@ public:
 	}
 };
 
-Level* level;
-
-class Player : public Sprite
+class Enemy : public Sprite
 {
-	float speed = 400;
+	const float speed = 200;
+	float health;
+	Character& player;
 public:
-	Player() = default;
-	Player(std::string _location, Vector2 _pos) :Sprite(_location, _pos) {}
-	Player(float _rad, Vector2 _pos, Color _color) :Sprite(_rad, _pos, _color) {}
-	Player(Vector2 _size, Vector2 _pos) :Sprite(_size, _pos) {}
-	Player(Vector2 _size, Vector2 _pos, Color _color) :Sprite(_size, _pos, _color) {}
+	Enemy(Character& _player) :player(_player), Sprite("Resources/Joker.png", Vector2(rand() % 2000, rand() % 2000))
+	{
+		health = 100;
+	}
+
+	void move(float dt)
+	{
+		Vector2 pPos = player.rect.get_center();
+		Vector2 newPos = rect.get_center().move_towards(pPos, speed * dt, 100);
+		rect.set_center(newPos);
+	}
 
 	void update(float dt)
 	{
-		if (Inputs::key_pressed('E'))
-			speed += 1000 * dt;
-		if (Inputs::key_pressed('Q'))
-			speed -= 1000 * dt;
-
-		Vector2 delta = Inputs::get_axis() * dt * speed;
-		move(delta);
-	}
-
-	void move(Vector2 delta)
-	{
-		rect.move(delta);
-	}
-
-	void move_and_collide(Vector2 delta)
-	{
-		// check and resolve x axis collision
-		rect.move_h(delta.x);
-		if (level->is_colliding(rect))
-			rect.move_h(-delta.x);
-
-		// check and resolve y axis collision
-		rect.move_v(delta.y);
-		if (level->is_colliding(rect))
-			rect.move_v(-delta.y);
+		move(dt);
 	}
 };
 
 class GameScene :public Scene
 {
-	Player* player;
-
+	Character* player;
+	TileMap* level;
+	Enemy* enemy;
 public:
 	GameScene()
 	{
@@ -80,10 +62,12 @@ public:
 	// start app and create objects
 	void start()
 	{
+		srand(static_cast<unsigned int>(time(NULL)));
 		// creating objects
 		isActive = true;
 		level = new Level();
-		player = new Player("Resources/L.png", Vector2(0));
+		player = new Character("Resources/Hero.png", Vector2(0), *level);
+		enemy = new Enemy(*player);
 		Camera::set_follow_target(player->rect);
 		std::cout << name << " started" << std::endl;
 	}
@@ -92,9 +76,10 @@ public:
 	{
 		isActive = false;
 
-		delete player, level;
+		delete player, level, enemy;
 		player = nullptr;
 		level = nullptr;
+		enemy = nullptr;
 
 		std::cout << name << " destroyed" << std::endl;
 	}
@@ -103,6 +88,7 @@ public:
 	{
 		// update all objects
 		player->update(dt);
+		enemy->update(dt);
 		Camera::update(dt);
 
 		if (Inputs::ui_back())
@@ -114,12 +100,14 @@ public:
 	{
 		level->draw();
 		player->draw();
+		enemy->draw();
 	}
 
 	void debug()
 	{
 		level->debug();
 		player->debug();
+		enemy->debug();
 	}
 };
 

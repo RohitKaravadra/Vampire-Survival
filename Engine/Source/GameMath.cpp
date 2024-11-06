@@ -34,7 +34,7 @@ void Vector2::set(float _x, float _y)
 	y = _y;
 }
 
-float Vector2::magnitude()
+float Vector2::magnitude() const
 {
 	return sqrtf(x * x + y * y);
 }
@@ -52,7 +52,7 @@ Vector2 Vector2::to_int()
 
 float Vector2::distance(Vector2& v2) const
 {
-	return (*this - v2).magnitude();
+	return (v2 - *this).magnitude();
 }
 
 Vector2 Vector2::direction(Vector2& v2) const
@@ -77,7 +77,7 @@ Vector2 Vector2::move_towards(Vector2& v2, const float speed)
 
 Vector2 Vector2::move_towards(Vector2& v2, const float speed, float minDist)
 {
-	return distance(v2) > minDist ? *this + direction(v2) * speed : v2 - direction(v2) * minDist;
+	return distance(v2) > minDist ? *this + direction(v2) * speed : *this;
 }
 
 #pragma endregion

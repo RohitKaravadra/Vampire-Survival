@@ -8,7 +8,6 @@ SceneManager::~SceneManager()
 	if (scenes == nullptr)
 		return;
 
-	std::cout << "Destroy Manager";
 	for (unsigned int i = 0; i < curIndex; i++)
 	{
 		delete scenes[i];

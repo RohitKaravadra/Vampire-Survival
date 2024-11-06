@@ -7,6 +7,7 @@
 
 using namespace GamesEngineeringBase;
 using Utilities::Dictionary;
+using Utilities::Pair;
 
 static int OBJECT_ID_COUNTER = 0;
 extern bool DEBUG_MODE;
@@ -131,7 +132,7 @@ namespace Engine
 		// function to debug
 		virtual void debug();
 		// destructor
-		virtual ~Sprite();
+		virtual ~Sprite() = default;
 
 		bool operator==(Sprite& other) const;
 		bool operator==(Sprite* other) const;
@@ -191,11 +192,10 @@ namespace Engine
 		unsigned int totalTiles; // total variations of tiles
 		unsigned int size; // size of data 
 
-		Dictionary<Vector2, unsigned int> data; // data (tile position and variation)
+		Dictionary < Vector2, Pair<unsigned int, unsigned int>> data; // data (<position <layer, tile>)
 
 		// constructor
 		TileMap(unsigned int _tileSize);
-
 		// create a debug image for debugging colliders
 		void create_dbgImg();
 
@@ -203,7 +203,7 @@ namespace Engine
 		// update tilemap
 		virtual void update(float dt) {};
 		// check collision with tiles
-		virtual bool is_colliding(Rect& _rect);
+		virtual bool is_colliding(Rect& _rect, unsigned int _layer);
 		// draw all tiles
 		virtual void draw();
 		// draw debug image of tiles

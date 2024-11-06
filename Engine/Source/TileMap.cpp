@@ -22,16 +22,19 @@ void TileMap::create_dbgImg()
 	create_outline(dbgImg, Color::DEBUG_COLOR, 1);
 }
 
-bool TileMap::is_colliding(Rect& _rect)
+bool TileMap::is_colliding(Rect& _rect, unsigned int _layer)
 {
 	if (size <= 0)
 		return false;
 
 	for (unsigned int i = 0; i < size; i++)
 	{
-		collider.set_center(data[i].key * tileSize);
-		if (collider.collide_as_rect(_rect))
-			return true;
+		if (data[i].value.key == _layer)
+		{
+			collider.set_center(data[i].key * tileSize);
+			if (collider.collide_as_rect(_rect))
+				return true;
+		}
 	}
 
 	return false;
@@ -43,7 +46,7 @@ void TileMap::draw()
 	for (unsigned int i = 0; i < size; i++)
 	{
 		collider.set_center(data[i].key * tileSize);
-		Camera::draw(collider, tiles[data[i].value % totalTiles]);
+		Camera::draw(collider, tiles[data[i].value.value % totalTiles]);
 	}
 }
 

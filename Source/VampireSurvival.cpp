@@ -7,21 +7,19 @@ using namespace std;
 
 const Vector2 WIN_SIZE(1024, 768);
 
-void game();
-Scene* create_map_editor_scene();
 Scene* create_game_scene();
+Scene* create_editor_scene();
 
 class Pointer :public Sprite
 {
 	float inpFreq;
 	int value;
 
+public:
 	void set_pos()
 	{
 		rect.set_center(Vector2(0, value * rect.size.y + value * 20 - 50));
 	}
-
-public:
 	Pointer() :Sprite()
 	{
 		Vector2 size(300, 50);
@@ -133,13 +131,14 @@ public:
 		menuScene = new MainMenu();
 		sceneManager.add(menuScene);
 		sceneManager.add(create_game_scene());
-		sceneManager.add(create_map_editor_scene());
+		sceneManager.add(create_editor_scene());
 	}
 
 	// destructor
 	~Game()
 	{
 		destroy();
+		menuScene = nullptr;
 	}
 
 	// start app and create objects
@@ -151,8 +150,7 @@ public:
 
 	void destroy()
 	{
-		std::cout << "Average Fps : " << fps;
-		menuScene = nullptr;
+		std::cout << "Average Fps : " << fps << std::endl;
 	}
 
 	void update_loop()
@@ -164,7 +162,8 @@ public:
 				inpFreq -= dt;
 
 			App::update();
-			fps = (fps + 1 / dt) / 2;
+			if (dt > 0)
+				fps = (fps + 1 / dt) / 2;
 
 			// update all objects
 			bool change = curScene->update(dt);

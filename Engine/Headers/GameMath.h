@@ -66,7 +66,7 @@ namespace Engine
 		// setter Method
 		void set(float _x, float _y);
 		// returns magnitude of this vector
-		float magnitude();
+		float magnitude() const;
 		// returns normalized value of this vector
 		Vector2 normalize();
 		// converts and return this vector into int
@@ -160,4 +160,17 @@ namespace Engine
 
 	// converts given position into grid position
 	Vector2 get_grid_pos(Vector2 _pos, int _size, int _space = 0);
+
+	template<typename T>
+	T clamp(T _val, T _min, T _max)
+	{
+		return std::max(_min, std::min(_max, _val));
+	}
+	// generic definition of simple functions
+	template <typename T>
+	T lerp(T _a, T _b, float _t)
+	{
+		_t = clamp(_t, 0.f, 1.f);
+		return _a + _t * (_b - _a);
+	}
 }

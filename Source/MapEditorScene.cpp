@@ -39,6 +39,7 @@ TilePointer pointer;
 class Map :public TileMap
 {
 	int curTile;
+	unsigned int curLayer;
 	float inpFreq;
 
 public:
@@ -49,10 +50,11 @@ public:
 		for (unsigned int i = 0; i < totalTiles; i++)
 			load_image(tiles[i], "Resources/Tiles/" + std::to_string(i) + ".png");
 
-		curTile = 0;
-		inpFreq = 0;
 		load_level(data);
 		size = data.get_size();
+		curTile = 0;
+		curLayer = 0;
+		inpFreq = 0;
 		pointer.set_image(tiles[curTile]);
 	}
 
@@ -65,9 +67,12 @@ public:
 		pointer.set_image(tiles[curTile]);
 	}
 
-	void add(Vector2 _pos, unsigned int tile)
+	void add(Vector2 _pos, unsigned int _layer, unsigned int _tile)
 	{
-		Pair<Vector2, unsigned int> pair(_pos, tile);
+		Pair<Vector2, Pair<unsigned int, unsigned int>> pair;
+		pair.key = _pos;
+		pair.value.key = _layer;
+		pair.value.value = _tile;
 		if (data.add(pair) && DEBUG_MODE)
 			cout << data << endl;
 	}
@@ -93,13 +98,26 @@ public:
 			curTile = (curTile + 1) % totalTiles;
 			pointer.set_image(tiles[curTile]);
 		}
+		else if (Inputs::key_pressed('L'))
+		{
+			curLayer = curLayer == 0 ? 1 : 0;
+			if (curLayer == 1)
+				std::cout << "Layer changed to Solid\n";
+			else
+				std::cout << "Layer changed to Pass Through\n";
+		}
+		else if (Inputs::key_pressed('P'))
+		{
+			std::cout << "Level Saved" << std::endl;
+			save_level(data);
+		}
 		else
 			inpFreq = 0;
 
 		if (Inputs::key_pressed('X'))
 			remove(pointer.gPos);
 		if (Inputs::key_pressed(VK_SPACE))
-			add(pointer.gPos, curTile);
+			add(pointer.gPos, curLayer, curTile);
 	}
 
 	void update(float dt)
@@ -108,11 +126,6 @@ public:
 			inpFreq -= dt;
 		else
 			check_inputs();
-	}
-
-	void save()
-	{
-		save_level(data);
 	}
 };
 
@@ -141,7 +154,6 @@ public:
 	void destroy()
 	{
 		isActive = false;
-		map.save();
 		std::cout << name << " destroyed" << std::endl;
 	}
 
@@ -177,7 +189,7 @@ public:
 	}
 };
 
-Scene* create_map_editor_scene()
+Scene* create_editor_scene()
 {
 	return new MapEditorScene();
 }
