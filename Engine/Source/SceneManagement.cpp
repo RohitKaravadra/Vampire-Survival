@@ -1,7 +1,49 @@
 #include "SceneManagement.h"
-#include "Engine.h"
 
 using namespace Engine;
+
+void Scene::update_loop()
+{
+	isActive = true;
+
+	if (Camera::notNull)
+		Camera::camRect.set_center(Vector2(0));
+
+	timer.reset();
+
+	while (isActive)
+	{
+		Inputs::refresh();
+		dt = timer.dt();
+
+		Collisions::update();
+		update(dt);
+
+		if (Camera::notNull)
+			Camera::clear();
+
+		draw();
+
+		if (DEBUG_MODE)
+			debug();
+
+		if (Camera::notNull)
+			Camera::present();
+	}
+
+	if (Camera::notNull)
+		Camera::camRect.set_center(Vector2(0));
+
+	isActive = false;
+	destroy();
+}
+
+void Scene::stop()
+{
+	Collisions::destroy();
+	isActive = false;
+	destroy();
+}
 
 SceneManager::~SceneManager()
 {
@@ -55,23 +97,13 @@ string SceneManager::get_current()
 	return curScene;
 }
 
-Scene* SceneManager::change_scene(string _newScene)
+string SceneManager::change_scene(string _newScene)
 {
 	int i = get_index(_newScene);
 	if (i == -1)
-		return &nullScene;
-
-	if (!curScene.empty())
-	{
-		int ci = get_index(curScene);
-		if (ci != -1)
-			scenes[ci]->destroy();
-	}
-
-	if (Camera::notNull)
-		Camera::camRect.set_center(Vector2(0));
+		return "";
 
 	curScene = scenes[i]->get_name();
 	scenes[i]->start();
-	return scenes[i];
+	return scenes[i]->get_name();
 }

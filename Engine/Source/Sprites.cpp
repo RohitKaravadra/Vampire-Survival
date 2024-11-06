@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include "Resources.h"
 
 using namespace Engine;
 

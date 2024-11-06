@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Headers\Collisions.h" />
     <ClInclude Include="Engine\Headers\Engine.h" />
     <ClInclude Include="Engine\Headers\GameMath.h" />
     <ClInclude Include="Engine\Headers\GamesEngineeringBase.h" />
@@ -138,10 +139,10 @@
     <ClInclude Include="Resources.h" />
     <ClInclude Include="Source\Headers\Character.h" />
     <ClInclude Include="Source\Headers\Level.h" />
-    <ClInclude Include="Source\Headers\Level1Scene.h" />
     <ClInclude Include="Source\Headers\NPC.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Source\Collisions.cpp" />
     <ClCompile Include="Engine\Source\Camera.cpp" />
     <ClCompile Include="Engine\Source\Colors.cpp" />
     <ClCompile Include="Engine\Source\GameMath.cpp" />
@@ -152,9 +153,11 @@
     <ClCompile Include="Engine\Source\TileMap.cpp" />
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="Source\Character.cpp" />
+    <ClCompile Include="Source\Headers\Projectiles.h" />
     <ClCompile Include="Source\Level.cpp" />
     <ClCompile Include="Source\Level1Scene.cpp" />
     <ClCompile Include="Source\NPC.cpp" />
+    <ClCompile Include="Source\Projectiles.cpp" />
     <ClCompile Include="Source\VampireSurvival.cpp" />
     <ClCompile Include="Source\MapEditorScene.cpp" />
   </ItemGroup>

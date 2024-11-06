@@ -1,5 +1,6 @@
 #pragma once
 #include<iostream>
+#include "Engine.h"
 
 using std::string;
 
@@ -11,18 +12,21 @@ namespace Engine
 	protected:
 		bool isActive = false;
 		std::string name = "";
+		Timer timer;
+		float dt;
 	public:
 		Scene() = default;
 		virtual void start() {};
-		virtual void destroy() {};
-		virtual bool update(float dt) { return false; };
+		void stop();
+		void update_loop();
+		virtual void update(float dt) {};
 		virtual void draw() {};
 		virtual void debug() {};
+		virtual void destroy() {};
 		virtual ~Scene() {};
 
 		string get_name()
 		{
-			std::cout << name << std::endl;
 			return name;
 		}
 
@@ -72,6 +76,6 @@ namespace Engine
 		// get name of current scene
 		string get_current();
 		// change scene to given scene
-		Scene* change_scene(string _newScene);
+		string change_scene(string _newScene);
 	};
 }

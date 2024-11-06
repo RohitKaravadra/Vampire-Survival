@@ -10,9 +10,9 @@ class TilePointer :public Sprite
 {
 public:
 	Vector2 gPos;
-	TilePointer() :Sprite(Vector2(32), Vector2(0))
+	TilePointer() :Sprite(Vector2(33), Vector2(0))
 	{
-		create_rect_outline(image, Color::AQUA, 1);
+		create_rect_outline(image, Color::RED, 2);
 		gPos.set(0, 0);
 	}
 
@@ -25,7 +25,7 @@ public:
 	void set_image(Image& _image)
 	{
 		image.copy(_image);
-		create_rect_outline(image, Color::AQUA, 1);
+		create_rect_outline(image, Color::AQUA, 2);
 	}
 };
 
@@ -138,6 +138,8 @@ public:
 		map->load();
 		isActive = true;
 		std::cout << name << " started" << std::endl;
+
+		update_loop();
 	}
 
 	void destroy()
@@ -146,7 +148,7 @@ public:
 		std::cout << name << " destroyed" << std::endl;
 	}
 
-	bool update(float dt)
+	void update(float dt)
 	{
 		pointer.update(dt);
 		map->update(dt);
@@ -161,22 +163,19 @@ public:
 
 		// check for exiting scene condition
 		if (Inputs::ui_back())
-			return true;
-		return false;
+			isActive = false;
 	}
 
 	void draw()
 	{
 		map->draw();
+		map->debug(1);
 		pointer.draw();
 	}
 
 	void debug()
 	{
-		if (DEBUG_MODE)
-		{
-			map->debug(1);
-		}
+
 	}
 };
 

@@ -137,6 +137,65 @@ namespace Utilities
 			data = nullptr;
 		}
 
+		// remove and delete element at given index for pointer data
+		bool remove_and_delete_at(unsigned int index)
+		{
+			if (index < size)
+			{
+				if (size == 1)
+				{
+					delete data[0]; // deletes element
+					delete[] data;
+					size = 0;
+					data = nullptr;
+				}
+				else
+				{
+					T* newData = new T[--size];
+					memcpy(newData, data, index * sizeof(T));
+
+					if (index < size)
+						memcpy(&newData[index], &data[index + 1], (size - index) * sizeof(T));
+
+					delete data[index]; // deletes element
+					delete[] data;
+					data = newData;
+					newData = nullptr;
+				}
+
+				return true;
+			}
+			return false;
+		}
+
+		// remove and delete perticular element for pointer data
+		bool remove_and_delete(T value)
+		{
+			int index = get_index(value);
+			return  index == -1 ? false : remove_at(index);
+		}
+
+		// clear array with deleting all elements for pointer arrays
+		void clear_with_elements()
+		{
+			if (data == nullptr)
+				return;
+
+			for (unsigned int i = 0; i < size; i++) // delete each element of array (Pointers only)
+				delete data[i];
+
+			delete[] data;
+			size = 0;
+			data = nullptr;
+		}
+
+		template<typename Func>
+		void foreach(Func _todo)
+		{
+			for (unsigned int i = 0; i < size; i++)
+				_todo(data[i]);
+		}
+
 		T& operator[](int index)
 		{
 			return data[index];

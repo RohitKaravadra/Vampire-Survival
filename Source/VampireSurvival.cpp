@@ -1,9 +1,13 @@
 #include <iostream>
 #include "Engine.h"
 #include "SceneManagement.h"
+#include "Resources.h"
 
 using namespace Engine;
 using namespace std;
+
+class MapEditorScene;
+class GameScene;
 
 const Vector2 WIN_SIZE(1024, 768);
 
@@ -63,7 +67,7 @@ public:
 		Sprite::draw();
 	}
 
-	int get_value()
+	int get_value() const
 	{
 		return value;
 	}
@@ -72,139 +76,82 @@ public:
 class MainMenu : public Scene
 {
 	Pointer pointer;
+	float inpFreq;
+
+	string curScene;
+	SceneManager sceneManager;
 public:
 	MainMenu()
 	{
 		name = "Menu";
+
+		float inpFreq = 0;
+		sceneManager.create(2);
+		sceneManager.add(create_game_scene());
+		sceneManager.add(create_editor_scene());
 	}
 
 	void start()
 	{
-		pointer.reset();
+		inpFreq = 0;
+
+		// start update loop
+		update_loop();
 	}
 
-	bool update(float dt)
+	void update(float dt)
 	{
 		pointer.update(dt);
 
-		if (Inputs::ui_back())
-			return true;
-		return false;
+		if (inpFreq > 0)
+			inpFreq -= dt;
+
+		if (Inputs::ui_accept() && inpFreq <= 0)
+		{
+			int ch = pointer.get_value();
+			inpFreq = 0.2f;
+
+			switch (ch)
+			{
+			case 0:curScene = sceneManager.change_scene("Game");
+				break;
+			case 1:
+				break;
+			case 2:curScene = sceneManager.change_scene("MapEditor");
+				break;
+			case 3: isActive = false;
+				break;
+			default:inpFreq = 0;
+			}
+
+			pointer.reset();
+		}
 	}
 
 	void draw()
 	{
 		pointer.draw();
 	}
-
-	int get_choice()
-	{
-		return pointer.get_value();
-	}
 };
 
 class Game :public App
 {
-	bool isRunning;
-	float inpFreq;
-	float fps;
 
-	Scene* curScene;
-	MainMenu* menuScene;
-	SceneManager sceneManager;
+	MainMenu menuScene;
 public:
 	// constructor to create app and camera
-	Game(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero) :App(_name, _size, _camPos)
-	{
-		isRunning = false;
-		inpFreq = 0;
-		fps = 0;
-
-		sceneManager.create(3);
-		menuScene = new MainMenu();
-		sceneManager.add(menuScene);
-		sceneManager.add(create_game_scene());
-		sceneManager.add(create_editor_scene());
-	}
-
-	// destructor
-	~Game()
-	{
-		destroy();
-		menuScene = nullptr;
-	}
+	Game(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero) :App(_name, _size, _camPos) {}
 
 	// start app and create objects
 	void start()
 	{
-		curScene = sceneManager.change_scene("Menu");
-		update_loop();
-	}
-
-	void destroy()
-	{
-		std::cout << "Average Fps : " << fps << std::endl;
-	}
-
-	void update_loop()
-	{
-		isRunning = true;
-		while (isRunning)
-		{
-			if (inpFreq > 0)
-				inpFreq -= dt;
-
-			App::update();
-			if (dt > 0)
-				fps = (fps + 1 / dt) / 2;
-
-			// update all objects
-			bool change = curScene->update(dt);
-
-			Camera::clear();
-
-			// draw all objects on screen
-			curScene->draw();
-
-			// only to debug
-			if (DEBUG_MODE)
-			{
-				curScene->debug();
-			}
-
-			Camera::present();
-
-			if (change && inpFreq <= 0)
-			{
-				inpFreq = 2;
-				if (*curScene == "MapEditor")
-					curScene = sceneManager.change_scene("Menu");
-				else if (*curScene == "Game")
-					curScene = sceneManager.change_scene("Menu");
-				else
-					inpFreq = 0;
-			}
-
-			if (Inputs::ui_accept())
-			{
-				if (*curScene == "Menu")
-				{
-					int ch = menuScene->get_choice();
-					if (ch == 0)
-						curScene = sceneManager.change_scene("Game");
-					else if (ch == 2)
-						curScene = sceneManager.change_scene("MapEditor");
-					else if (ch == 3)
-						break;
-				}
-			}
-		}
+		menuScene.start();
 	}
 };
 
 int main()
 {
-	DEBUG_MODE = true;
+	DEBUG_MODE = false;
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	Game app("Vapmire Survival", WIN_SIZE);

@@ -1,28 +1,43 @@
 #include "NPC.h"
+#include "Resources.h"
 
-
-HeavyNpcData::HeavyNpcData(Vector2 _size, Vector2 _pos)
+HeavyNpc::HeavyNpc(Vector2 _size, Vector2 _pos)
 {
-	speed = 100 + rand() % 200;
+	speed = 100 + rand() % 50;
 	damage = 40;
-	range = 200;
+	range = 20;
 	health = 100;
 	coolDown = 3;
+	alive = true;
+	load_image(image, "Resources/Joker.png");
 	rect.set(_size, _pos);
+	tag = "Heavy Enemy";
+	Collisions::add_collider(*this);
 }
 
-void HeavyNpcData::move(Vector2 _target, float dt)
+HeavyNpc::~HeavyNpc()
+{
+	Collisions::remove_collider(*this);
+}
+
+bool HeavyNpc::is_alive()
+{
+	return alive;
+}
+
+void HeavyNpc::move(Vector2 _target, float dt)
 {
 	Vector2 pos = rect.get_center();
 	rect.set_center(pos.move_towards(_target, speed * dt, range - 20));
 }
 
-bool HeavyNpcData::is_collide(Rect _rect)
+void HeavyNpc::on_collide(std::string _tag)
 {
-	return rect.collide_as_rect(_rect);
+	if (_tag.compare("Player"))
+		std::cout << tag << " Collided " << _tag << std::endl;
 }
 
-void HeavyNpcData::update(float dt, Vector2 _target)
+void HeavyNpc::update(float dt, Vector2 _target)
 {
 	if (coolDown > 0)
 		coolDown -= dt;
@@ -33,20 +48,27 @@ void HeavyNpcData::update(float dt, Vector2 _target)
 HeavyNpcSwarm::HeavyNpcSwarm()
 {
 	load_image(image, "Resources/Joker.png");
-	rectSize.set(image.width, image.height);
+	rect.set(image.width, image.height);
 	addTime = 3;
 }
 
 void HeavyNpcSwarm::add()
 {
-	active.add(HeavyNpcData(rectSize, Vector2(rand() % 2000, rand() % 2000)));
+	Vector2 _pos = Vector2(1000 - rand() % 2000, 1000 - rand() % 2000);
+	active.add(new HeavyNpc(rect.size, _pos));
 }
 
-void HeavyNpcSwarm::create(unsigned int _number, Rect& _target)
+void HeavyNpcSwarm::create(unsigned int _number, Sprite& _target)
 {
 	target = &_target;
 	for (unsigned int i = 0; i < _number; i++)
 		add();
+}
+
+void HeavyNpcSwarm::destroy()
+{
+	target = nullptr;
+	active.clear_with_elements();
 }
 
 void HeavyNpcSwarm::update(float dt)
@@ -63,14 +85,16 @@ void HeavyNpcSwarm::update(float dt)
 	}
 
 	int _size = active.get_size();
-	Vector2 pos = target->get_center();
-	for (unsigned int i = 0; i < _size; i++)
-		active[i].move(pos, dt);
+	Vector2 _target = target->rect.get_center();
+	active.foreach([&](HeavyNpc* _npc) {
+		if (_npc->is_alive())
+			_npc->update(dt, _target);
+		else
+			active.remove_and_delete(_npc);
+		});
 }
 
 void HeavyNpcSwarm::draw()
 {
-	int _size = active.get_size();
-	for (unsigned int i = 0; i < _size; i++)
-		Camera::draw(active[i].rect, image);
+	active.foreach([](HeavyNpc* _npc) {_npc->draw(); });
 }

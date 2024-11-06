@@ -26,23 +26,24 @@ public:
 	// start app and create objects
 	void start()
 	{
-		// creating objects
-		isActive = true;
-
 		level = new Level();
 		player = new Character("Resources/Hero.png", Vector2(0), *level);
-		swarm.create(5, player->rect);
+		swarm.create(5, *player);
 
 		Camera::set_follow_target(player->rect);
 
 		gameOver = false;
 		endCounter = 0;
 		std::cout << name << " started" << std::endl;
+
+		// starte update loop for this scene
+		update_loop();
 	}
 
 	void destroy()
 	{
 		isActive = false;
+		swarm.destroy();
 		delete player, level;
 		player = nullptr;
 		level = nullptr;
@@ -69,7 +70,7 @@ public:
 		return false;
 	}
 
-	bool update(float dt)
+	void update(float dt)
 	{
 		// update all objects
 		player->update(dt);
@@ -77,16 +78,16 @@ public:
 		Camera::update(dt);
 
 		if (is_game_over(dt))
-			return true;
+			isActive = false;
 
 		// check for exit condition
 		if (!gameOver && Inputs::ui_back())
-			return true;
-		return false;
+			isActive = false;
 	}
 
 	void draw()
 	{
+		Camera::clear();
 		level->draw();
 		player->draw();
 		swarm.draw();

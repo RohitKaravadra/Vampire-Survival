@@ -25,7 +25,7 @@ public:
 	Character() = default;
 	Character(std::string _location, Vector2 _pos, TileMap& _level);
 	// destructor
-	~Character() = default;
+	~Character();
 	// update character
 	void update(float dt);
 	// move character without colliding
@@ -40,4 +40,6 @@ public:
 	bool is_alive() const;
 	// apply damage to player
 	void hit(float _damage);
+	// overriding on collide method
+	void on_collide(Collider& _other) override;
 };

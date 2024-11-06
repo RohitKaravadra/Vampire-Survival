@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utilities.h"
-#include "GameMath.h"
+#include "Collisions.h"
 #include "GamesEngineeringBase.h"
 #include <iostream>
 
@@ -14,8 +14,6 @@ extern bool DEBUG_MODE;
 
 // generate id for objects created
 int generate_id();
-// loads image from given location relative to project directory
-bool load_image(Image& image, std::string location);
 
 namespace Engine
 {
@@ -114,11 +112,9 @@ namespace Engine
 	};
 
 	// class to handle sprites 
-	class Sprite
+	class Sprite :public Collider
 	{
-		int id; // object id to identify the object
 	protected:
-
 		Image image; // sprite image
 		Image dbgImage; // rect image for debugging collider
 
@@ -131,8 +127,6 @@ namespace Engine
 		// create an outline rect for debugging
 		void create_debug_data();
 	public:
-		// rect for the sprite to draw and collide
-		Rect rect;
 		//method to update sprite 
 		virtual void update(float dt) {}
 		// method to draw sprite on window
@@ -224,27 +218,18 @@ namespace Engine
 	class App
 	{
 	protected:
-		Timer timer;
-		float dt;
-
 		// constructor to create an app
 		App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero)
 		{
 			Camera::create(_name, _size, _camPos);
 			Inputs::Init(Camera::get_window());
-			dt = 1;
 		}
 		// destructor to destroy app
 		~App()
 		{
+			Collisions::destroy();
 			Inputs::destroy();
 			Camera::destroy();
-		}
-		// update method for app
-		void update()
-		{
-			Inputs::refresh();
-			dt = timer.dt();
 		}
 	};
 }

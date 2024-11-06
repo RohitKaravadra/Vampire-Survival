@@ -15,8 +15,15 @@ Character::Character(std::string _location, Vector2 _pos, TileMap& _level) :leve
 	range = 400;
 	damage = 50;
 	alive = true;
-
+	tag = "Player";
 	dmgArea.create(range, rect.get_center());
+	Collisions::add_collider(*this);
+}
+
+Character::~Character()
+{
+
+	Collisions::remove_collider(*this);
 }
 
 void Character::update(float dt)
@@ -28,9 +35,6 @@ void Character::update(float dt)
 		speed += 1000 * dt;
 	if (Inputs::key_pressed('Q'))
 		speed -= 1000 * dt;
-
-	if (Inputs::key_pressed(VK_SPACE))
-		hit(5);
 
 	Vector2 delta = Inputs::get_axis() * dt * speed;
 	move_and_collide(delta);
@@ -83,4 +87,10 @@ void Character::hit(float _damage)
 	health = clamp(health, 0.f, 100.f);
 	alive = health > 0;
 	std::cout << "Health : " << health << std::endl;
+}
+
+void Character::on_collide(Collider& _other)
+{
+	if (_other.compare_tag("Heavy Enemy"))
+		hit(5);
 }

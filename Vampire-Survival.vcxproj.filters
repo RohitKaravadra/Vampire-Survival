@@ -42,7 +42,7 @@
     <ClInclude Include="Source\Headers\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Headers\Level1Scene.h">
+    <ClInclude Include="Engine\Headers\Collisions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -90,6 +90,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Level1Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Headers\Projectiles.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Projectiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Source\Collisions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

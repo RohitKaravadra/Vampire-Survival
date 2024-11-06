@@ -72,12 +72,16 @@ float Vector2::distance(const Vector2& v1, const Vector2& v2)
 
 Vector2 Vector2::move_towards(Vector2& v2, const float speed)
 {
-	return distance(v2) > speed ? *this + direction(v2) * speed : v2;
+	return  distance(v2) > speed ? *this + direction(v2) * speed : v2;
 }
 
 Vector2 Vector2::move_towards(Vector2& v2, const float speed, float minDist)
 {
-	return distance(v2) > minDist ? *this + direction(v2) * speed : *this;
+	float dist = distance(v2);
+	if (dist <= minDist)
+		return *this;
+	dist -= minDist;
+	return *this + direction(v2) * min(dist, speed);
 }
 
 #pragma endregion

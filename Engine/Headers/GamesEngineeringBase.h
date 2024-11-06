@@ -938,6 +938,24 @@ namespace GamesEngineeringBase
 		unsigned int channels;             // Number of color channels
 		unsigned char* data = nullptr;      // Pointer to image data
 
+		Image() = default;
+
+		// copy constructor for resolving multiple reference pointer --Rohit
+		Image(Image& _other)
+		{
+			if (_other.data == nullptr)
+				return;
+
+			if (data != nullptr)
+				delete[] data;
+
+			width = _other.width;
+			height = _other.height;
+			channels = _other.channels;
+			data = new unsigned char[width * height * channels] {};
+			memcpy(data, _other.data, width * height * channels);
+		}
+
 		// Loads an image from a file using WIC
 		bool load(std::string filename)
 		{
@@ -1070,6 +1088,9 @@ namespace GamesEngineeringBase
 		// copy data of given image to this image  -- Rohit
 		void copy(Image& _image)
 		{
+			if (_image.data == nullptr)
+				return;
+
 			if (data != nullptr)
 				delete[] data;
 
@@ -1080,13 +1101,20 @@ namespace GamesEngineeringBase
 			memcpy(data, _image.data, width * height * channels);
 		}
 
+		// operator = overloading --Rohit
+		Image& operator=(Image& _other)
+		{
+			copy(_other);
+			return *this;
+		}
+
 		// Frees the allocated image data
 		void free()
 		{
-			if (data != NULL)
+			if (data != nullptr)
 			{
 				delete[] data;
-				data = NULL;
+				data = nullptr;
 			}
 		}
 
