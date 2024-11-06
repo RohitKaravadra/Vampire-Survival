@@ -19,7 +19,7 @@ void TileMap::create_dbgImg()
 	dbgImg.height = dbgImg.width = tileSize;
 	dbgImg.channels = 4;
 	dbgImg.free();
-	create_outline(dbgImg, Color::DEBUG_COLOR, 1);
+	create_rect_outline(dbgImg, Color::DEBUG_COLOR, 1);
 }
 
 bool TileMap::is_colliding(Rect& _rect, unsigned int _layer)
@@ -50,13 +50,16 @@ void TileMap::draw()
 	}
 }
 
-void TileMap::debug()
+void TileMap::debug(unsigned int _layer)
 {
 	unsigned int size = data.get_size();
 	for (unsigned int i = 0; i < size; i++)
 	{
-		collider.set_center(data[i].key * tileSize);
-		Camera::draw(collider, dbgImg);
+		if (data[i].value.key == _layer)
+		{
+			collider.set_center(data[i].key * tileSize);
+			Camera::draw(collider, dbgImg);
+		}
 	}
 }
 

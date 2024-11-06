@@ -50,9 +50,9 @@ Vector2 Vector2::to_int()
 	return Vector2(static_cast<int>(x), static_cast<int>(y));
 }
 
-float Vector2::distance(Vector2& v2) const
+float Vector2::distance(Vector2 v2) const
 {
-	return (v2 - *this).magnitude();
+	return (*this - v2).magnitude();
 }
 
 Vector2 Vector2::direction(Vector2& v2) const

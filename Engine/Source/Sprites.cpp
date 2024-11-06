@@ -43,7 +43,7 @@ void Sprite::create_debug_data()
 	dbgImage.width = rect.size.x;
 	dbgImage.height = rect.size.y;
 	dbgImage.channels = 4;
-	create_outline(dbgImage, Color::DEBUG_COLOR);
+	create_rect_outline(dbgImage, Color::DEBUG_COLOR);
 }
 
 void Sprite::draw()

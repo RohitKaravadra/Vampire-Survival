@@ -14,21 +14,19 @@ class Pointer :public Sprite
 {
 	float inpFreq;
 	int value;
+	Image menuImage;
 
-public:
 	void set_pos()
 	{
-		rect.set_center(Vector2(0, value * rect.size.y + value * 20 - 50));
+		rect.set_center(Vector2(0, value * rect.size.y + value * 40 - 190));
 	}
-	Pointer() :Sprite()
-	{
-		Vector2 size(300, 50);
-		image.width = size.x;
-		image.height = size.y;
-		image.channels = 4;
-		create_outline(image, Color::AQUA, 2);
-		rect.set(size, Vector2(0));
 
+public:
+
+	Pointer() :Sprite(Vector2(350, 70), Vector2(0))
+	{
+		load_image(menuImage, "Resources/Menu.png");
+		create_rect_outline(image, Color::YELLOW, 10);
 		reset();
 	}
 
@@ -52,11 +50,17 @@ public:
 			else
 			{
 				value += axis > 0 ? 1 : -1;
-				value = min(max(value, 0), 2);
+				value = min(max(value, 0), 3);
 				set_pos();
 				inpFreq = 0.2f;
 			}
 		}
+	}
+
+	void draw()
+	{
+		Camera::draw_ui(Vector2(0), menuImage);
+		Sprite::draw();
 	}
 
 	int get_value()
@@ -74,24 +78,13 @@ public:
 		name = "Menu";
 	}
 
-	~MainMenu()
-	{
-
-	}
-
 	void start()
 	{
 		pointer.reset();
 	}
 
-	void destroy()
-	{
-
-	}
-
 	bool update(float dt)
 	{
-
 		pointer.update(dt);
 
 		if (Inputs::ui_back())
@@ -113,19 +106,19 @@ public:
 class Game :public App
 {
 	bool isRunning;
+	float inpFreq;
 	float fps;
 
 	Scene* curScene;
 	MainMenu* menuScene;
-	float inpFreq;
 	SceneManager sceneManager;
 public:
 	// constructor to create app and camera
 	Game(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero) :App(_name, _size, _camPos)
 	{
 		isRunning = false;
-		fps = 0;
 		inpFreq = 0;
+		fps = 0;
 
 		sceneManager.create(3);
 		menuScene = new MainMenu();
@@ -199,9 +192,9 @@ public:
 					int ch = menuScene->get_choice();
 					if (ch == 0)
 						curScene = sceneManager.change_scene("Game");
-					else if (ch == 1)
-						curScene = sceneManager.change_scene("MapEditor");
 					else if (ch == 2)
+						curScene = sceneManager.change_scene("MapEditor");
+					else if (ch == 3)
 						break;
 				}
 			}
@@ -211,8 +204,11 @@ public:
 
 int main()
 {
-	//DEBUG_MODE = true;
+	DEBUG_MODE = true;
+	srand(static_cast<unsigned int>(time(NULL)));
+
 	Game app("Vapmire Survival", WIN_SIZE);
 	app.start();
+
 	return 0;
 }

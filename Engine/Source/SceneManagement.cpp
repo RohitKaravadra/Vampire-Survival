@@ -59,7 +59,7 @@ Scene* SceneManager::change_scene(string _newScene)
 {
 	int i = get_index(_newScene);
 	if (i == -1)
-		return nullptr;
+		return &nullScene;
 
 	if (!curScene.empty())
 	{

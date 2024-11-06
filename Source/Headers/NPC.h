@@ -6,29 +6,37 @@
 using namespace Engine;
 using namespace Utilities;
 
-class HeavyNpc :public Sprite
+struct HeavyNpcData
 {
-public:
-	HeavyNpc() = default;
-	void create();
+	float speed;
+	float damage;
+	float range;
+	float health;
+	float coolDown;
+	Rect rect;
+
+	HeavyNpcData() = default;
+	HeavyNpcData(Vector2 _size, Vector2 _pos);
+	void move(Vector2 _target, float dt);
+	bool is_collide(Rect _rect);
+	void update(float dt, Vector2 _target);
 };
 
 class HeavyNpcSwarm
 {
-	const float speed = 200;
-	const float damage = 50;
-	const float range = 100;
-	HeavyNpc npc;
-	DArray<Vector2> active;
-	Character& player;
+	Image image;
+	Vector2 rectSize;
+	DArray<HeavyNpcData> active;
+	Rect* target;
+
+	float addTime;
 public:
-	HeavyNpcSwarm(Character& _player);
-	void create(unsigned int _number);
-	void move(float dt);
+	HeavyNpcSwarm();
+	void create(unsigned int _number, Rect& _rect);
+	void add();
 	void update(float dt);
 	void draw();
-	void isActive();
-	void collide(Character& _player);
+	void debug() {};
 };
 
 class NpcManager

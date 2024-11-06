@@ -111,6 +111,38 @@ namespace Engine
 		}
 	}
 
+	void Camera::draw_ui(Vector2 _pos, Image& _image)
+	{
+		if (!notNull) // return if camera is not initialized
+			return;
+
+		for (unsigned int y = 0; y < _image.height; y++)
+		{
+			int posY = _pos.y + y; // y position of image pixel on window
+
+			//bound check for y
+			if (posY < 0)
+				continue;
+			if (posY > camRect.size.y)
+				break;
+
+			for (unsigned int x = 0; x < _image.width; x++)
+			{
+				int posX = _pos.x + x; // x position of image pixel on window
+
+				//x bound check for x
+				if (posX < 0)
+					continue;
+				if (posX > camRect.size.x - 1)
+					break;
+
+				//draw pixel if alpha is greater than 0
+				if (_image.alphaAt(x, y) > 0)
+					win.draw(posX, posY, _image.at(x, y));
+			}
+		}
+	}
+
 	void Camera::present()
 	{
 		win.present();

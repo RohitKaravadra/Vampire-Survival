@@ -13,10 +13,12 @@ public:
 
 class Character : public Sprite
 {
-	float health = 100;
-	float speed = 200;
-	float range = 400;
-	float damage = 50;
+	float health;
+	float speed;
+	float range;
+	float damage;
+	bool alive;
+
 	DamageArea dmgArea;
 	TileMap& level;
 public:
@@ -34,4 +36,8 @@ public:
 	void attack();
 	// overriding draw methos
 	void draw();
+	// method to check if player is alive
+	bool is_alive() const;
+	// apply damage to player
+	void hit(float _damage);
 };

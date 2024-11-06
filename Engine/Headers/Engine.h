@@ -19,8 +19,10 @@ bool load_image(Image& image, std::string location);
 
 namespace Engine
 {
-	// create outline in an image
-	void create_outline(Image& _image, Color _color, int _width = 1);
+	// create rectangular outline in an image
+	void create_rect_outline(Image& _image, Color _color, int _width = 1);
+	// create circular outline in an image
+	void create_circle_outline(Image& _image, Color _color, int _width = 1);
 	// fill image with color
 	void fill_image(Image& _image, Color _color);
 
@@ -60,6 +62,10 @@ namespace Engine
 		static Vector2 get_axis();
 		// returns mouse position on window
 		static Vector2 get_mouse_pos();
+		// returns the mouse button values
+		static bool mouse_button(MouseButton _button);
+		// returns scroll wheel value
+		static int mouse_wheel();
 		// checks if given key is pressed or not
 		static bool key_pressed(int key);
 		// check if accept is precced
@@ -101,6 +107,8 @@ namespace Engine
 		static void clear();
 		// draw object on canvas if in view
 		static void draw(Rect& _rect, Image& _image);
+		// draw ui on canvas
+		static void draw_ui(Vector2 _pos, Image& _image);
 		// present canvas
 		static void present();
 	};
@@ -207,7 +215,7 @@ namespace Engine
 		// draw all tiles
 		virtual void draw();
 		// draw debug image of tiles
-		virtual void debug();
+		virtual void debug(unsigned int _layer);
 		// destructor
 		virtual ~TileMap();
 	};

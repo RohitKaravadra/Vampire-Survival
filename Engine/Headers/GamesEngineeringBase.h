@@ -51,6 +51,14 @@ namespace GamesEngineeringBase
 #define CANVAS_GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
 #define CANVAS_GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
 
+	// Enum for mouse buttons
+	enum MouseButton
+	{
+		MouseLeft = 0,
+		MouseMiddle = 1,
+		MouseRight = 2
+	};
+
 	// The Window class manages the creation and rendering of a window
 	class Window
 	{
@@ -69,7 +77,7 @@ namespace GamesEngineeringBase
 		ID3D11ShaderResourceView* srv = nullptr;           // Shader resource view
 		ID3D11PixelShader* ps = nullptr;                   // Pixel shader
 		ID3D11VertexShader* vs = nullptr;                  // Vertex shader
-		unsigned char* image;                    // Back buffer image data
+		unsigned char* image = nullptr;                    // Back buffer image data
 		bool keys[256];                          // Keyboard state array
 		int mousex;                              // Mouse X-coordinate
 		int mousey;                              // Mouse Y-coordinate
@@ -175,7 +183,7 @@ namespace GamesEngineeringBase
 			case WM_MOUSEWHEEL:
 			{
 				// Handle mouse wheel movement
-				updateMouse(CANVAS_GET_X_LPARAM(lParam), CANVAS_GET_Y_LPARAM(lParam));
+				// updateMouse(CANVAS_GET_X_LPARAM(lParam), CANVAS_GET_Y_LPARAM(lParam));
 				mouseWheel += GET_WHEEL_DELTA_WPARAM(wParam);
 				return 0;
 			}
@@ -544,6 +552,32 @@ namespace GamesEngineeringBase
 		bool keyPressed(int key)
 		{
 			return keys[key];
+		}
+
+		// Check if a mouse button is pressed. Takes a MouseButton enum
+		bool mouseButtonPressed(MouseButton button)
+		{
+			return mouseButtons[button];
+		}
+
+		// Returns the mouse x coordinate
+		int getMouseX()
+		{
+			return mousex;
+		}
+
+		// Returns the mouse y coordinate
+		int getMouseY()
+		{
+			return mousey;
+		}
+
+		// Returns the mouse wheel value
+		int getMouseWheel()
+		{
+			int val = mouseWheel;
+			mouseWheel = 0;
+			return val;
 		}
 
 		// Gets the mouse X-coordinate relative to the window, accounting for zoom
@@ -1049,10 +1083,10 @@ namespace GamesEngineeringBase
 		// Frees the allocated image data
 		void free()
 		{
-			if (data != nullptr)
+			if (data != NULL)
 			{
 				delete[] data;
-				data = nullptr;
+				data = NULL;
 			}
 		}
 

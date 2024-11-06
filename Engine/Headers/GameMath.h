@@ -72,7 +72,7 @@ namespace Engine
 		// converts and return this vector into int
 		Vector2 to_int();
 		// returns float distance between this vector and v2
-		float distance(Vector2& v2) const;
+		float distance(Vector2 v2) const;
 		// returns direct vector to target vector
 		Vector2 direction(Vector2& v2) const;
 		// returns clamped value of this vector between max and min vectors

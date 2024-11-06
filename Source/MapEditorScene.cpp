@@ -1,6 +1,5 @@
 
-#include "Engine.h"
-#include "Resources.h"
+#include "Level.h"
 #include "SceneManagement.h"
 
 using namespace Engine;
@@ -11,14 +10,10 @@ class TilePointer :public Sprite
 {
 public:
 	Vector2 gPos;
-	TilePointer() :Sprite()
+	TilePointer() :Sprite(Vector2(32), Vector2(0))
 	{
-		image.width = 32;
-		image.height = 32;
-		image.channels = 4;
-		create_outline(image, Color::AQUA, 1);
+		create_rect_outline(image, Color::AQUA, 1);
 		gPos.set(0, 0);
-		rect.set(Vector2(32), gPos);
 	}
 
 	void update(float dt)
@@ -30,28 +25,19 @@ public:
 	void set_image(Image& _image)
 	{
 		image.copy(_image);
-		create_outline(image, Color::AQUA, 1);
+		create_rect_outline(image, Color::AQUA, 1);
 	}
 };
 
-TilePointer pointer;
-
-class Map :public TileMap
+class EditorMap :public Level
 {
 	int curTile;
 	unsigned int curLayer;
 	float inpFreq;
-
+	TilePointer& pointer;
 public:
-	Map() : TileMap(32)
+	EditorMap(TilePointer& _pointer) :pointer(_pointer), Level()
 	{
-		totalTiles = 24;
-		tiles = new Image[totalTiles];
-		for (unsigned int i = 0; i < totalTiles; i++)
-			load_image(tiles[i], "Resources/Tiles/" + std::to_string(i) + ".png");
-
-		load_level(data);
-		size = data.get_size();
 		curTile = 0;
 		curLayer = 0;
 		inpFreq = 0;
@@ -62,8 +48,10 @@ public:
 	{
 		curTile = 0;
 		inpFreq = 0;
+
 		load_level(data);
 		size = data.get_size();
+
 		pointer.set_image(tiles[curTile]);
 	}
 
@@ -73,32 +61,31 @@ public:
 		pair.key = _pos;
 		pair.value.key = _layer;
 		pair.value.value = _tile;
-		if (data.add(pair) && DEBUG_MODE)
-			cout << data << endl;
+		data.add(pair);
 	}
 
 	void remove(Vector2 _pos)
 	{
-		if (data.remove_key(_pos) && DEBUG_MODE)
-			cout << data << endl;
+		data.remove_key(_pos);
 	}
 
 	void check_inputs()
 	{
 		inpFreq = 0.2f;
-		if (Inputs::key_pressed('C'))
+		int wheel = Inputs::mouse_wheel();
+		if (wheel < 0)
 		{
 			curTile--;
 			if (curTile < 0)
 				curTile = totalTiles - 1;
 			pointer.set_image(tiles[curTile]);
 		}
-		else if (Inputs::key_pressed('V'))
+		else if (wheel > 0)
 		{
 			curTile = (curTile + 1) % totalTiles;
 			pointer.set_image(tiles[curTile]);
 		}
-		else if (Inputs::key_pressed('L'))
+		else if (Inputs::key_pressed(VK_SPACE))
 		{
 			curLayer = curLayer == 0 ? 1 : 0;
 			if (curLayer == 1)
@@ -114,9 +101,9 @@ public:
 		else
 			inpFreq = 0;
 
-		if (Inputs::key_pressed('X'))
+		if (Inputs::mouse_button(MouseRight))
 			remove(pointer.gPos);
-		if (Inputs::key_pressed(VK_SPACE))
+		if (Inputs::mouse_button(MouseLeft))
 			add(pointer.gPos, curLayer, curTile);
 	}
 
@@ -132,21 +119,23 @@ public:
 class MapEditorScene : public Scene
 {
 	float moveSpeed = 200;
-	Map map;
+	EditorMap* map;
+	TilePointer pointer;
 public:
 	MapEditorScene()
 	{
+		map = new EditorMap(pointer);
 		name = "MapEditor";
 	}
 
 	~MapEditorScene()
 	{
-
+		delete map;
 	}
 
 	void start()
 	{
-		map.load();
+		map->load();
 		isActive = true;
 		std::cout << name << " started" << std::endl;
 	}
@@ -160,15 +149,17 @@ public:
 	bool update(float dt)
 	{
 		pointer.update(dt);
-		map.update(dt);
+		map->update(dt);
 
 		Camera::camRect.move(Inputs::get_axis() * dt * moveSpeed);
 
+		// update camera movement speed
 		if (Inputs::key_pressed('E'))
 			moveSpeed += 1000 * dt;
 		if (Inputs::key_pressed('Q'))
 			moveSpeed -= 1000 * dt;
 
+		// check for exiting scene condition
 		if (Inputs::ui_back())
 			return true;
 		return false;
@@ -176,7 +167,7 @@ public:
 
 	void draw()
 	{
-		map.draw();
+		map->draw();
 		pointer.draw();
 	}
 
@@ -184,7 +175,7 @@ public:
 	{
 		if (DEBUG_MODE)
 		{
-			map.debug();
+			map->debug(1);
 		}
 	}
 };

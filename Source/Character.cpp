@@ -5,20 +5,32 @@ void DamageArea::create(float _range, Vector2 _pos)
 	image.width = image.height = _range;
 	image.channels = 4;
 	rect.set(Vector2(_range), _pos);
-	create_outline(image, Color::YELLOW, 2);
+	create_rect_outline(image, Color::YELLOW, 2);
 }
 
 Character::Character(std::string _location, Vector2 _pos, TileMap& _level) :level(_level), Sprite(_location, _pos)
 {
+	health = 100;
+	speed = 200;
+	range = 400;
+	damage = 50;
+	alive = true;
+
 	dmgArea.create(range, rect.get_center());
 }
 
 void Character::update(float dt)
 {
+	if (!alive)
+		return;
+
 	if (Inputs::key_pressed('E'))
 		speed += 1000 * dt;
 	if (Inputs::key_pressed('Q'))
 		speed -= 1000 * dt;
+
+	if (Inputs::key_pressed(VK_SPACE))
+		hit(5);
 
 	Vector2 delta = Inputs::get_axis() * dt * speed;
 	move_and_collide(delta);
@@ -50,6 +62,25 @@ void Character::attack()
 
 void Character::draw()
 {
+	if (!alive)
+		return;
+
 	dmgArea.draw();
 	Sprite::draw();
+}
+
+bool Character::is_alive() const
+{
+	return alive;
+}
+
+void Character::hit(float _damage)
+{
+	if (!alive)
+		return;
+
+	health -= _damage;
+	health = clamp(health, 0.f, 100.f);
+	alive = health > 0;
+	std::cout << "Health : " << health << std::endl;
 }

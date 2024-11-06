@@ -51,6 +51,7 @@ namespace Engine
 	class SceneManager
 	{
 
+		Scene nullScene; // null scene if no scene found
 		Scene** scenes; // array to scene pointers
 		unsigned totalScenes = 0; // total number of scenes
 		unsigned int curIndex = 0; // last index of scenes array

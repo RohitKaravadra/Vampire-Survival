@@ -25,7 +25,8 @@ void Inputs::refresh()
 	if (win == nullptr)
 		return;
 
-	mousePos.set(win->getMouseInWindowX(), win->getMouseInWindowY());
+	win->checkInput();
+	mousePos.set(win->getMouseX(), win->getMouseY());
 }
 
 int Inputs::get_h_axis()
@@ -66,6 +67,16 @@ Vector2 Inputs::get_axis()
 Vector2 Inputs::get_mouse_pos()
 {
 	return mousePos;
+}
+
+bool Inputs::mouse_button(MouseButton _button)
+{
+	return win->mouseButtonPressed(_button);
+}
+
+int Inputs::mouse_wheel()
+{
+	return win->getMouseWheel();
 }
 
 bool Inputs::key_pressed(int key)
