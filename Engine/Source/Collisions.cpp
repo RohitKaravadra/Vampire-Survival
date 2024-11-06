@@ -1,5 +1,7 @@
 #include "Collisions.h"
 
+#pragma region Collider
+
 Collider::~Collider()
 {
 
@@ -20,7 +22,11 @@ bool Collider::compare_tag(std::string _tag) const
 	return tag == _tag;
 }
 
+#pragma endregion
 
+#pragma region Collisions
+
+// static definitions
 DArray<Collider*> Collisions::colliders;
 unsigned int Collisions::size = 0;
 
@@ -58,3 +64,5 @@ void Collisions::destroy()
 	colliders.clear();
 	size = 0;
 }
+
+#pragma endregion

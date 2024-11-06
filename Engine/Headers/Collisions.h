@@ -33,13 +33,17 @@ public:
 // collision class handles collions in game
 static class Collisions
 {
-	static DArray<Collider*> colliders;
-	static unsigned int size;
+	static DArray<Collider*> colliders; // collection of colliders to collide with each others
+	static unsigned int size; // size of collider collection
 
 	Collisions() = default;
 public:
+	// add collider to collisions
 	static void add_collider(Collider& _collider);
+	// remove collider from collisions
 	static void remove_collider(Collider& _collider);
+	// updates collisions
 	static void update();
+	// remove all colliders from collision
 	static void destroy();
 };

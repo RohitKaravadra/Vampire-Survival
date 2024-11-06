@@ -68,10 +68,10 @@
     <ClCompile Include="Engine\Source\Inputs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\VampireSurvival.cpp">
+    <ClCompile Include="Source\Scenes\VampireSurvival.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\MapEditorScene.cpp">
+    <ClCompile Include="Source\Scenes\MapEditorScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\TileMap.cpp">
@@ -80,22 +80,22 @@
     <ClCompile Include="Engine\Source\SceneManagement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Character.cpp">
+    <ClCompile Include="Source\Player &amp; NPCs\Character.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\NPC.cpp">
+    <ClCompile Include="Source\Player &amp; NPCs\NPC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Level1Scene.cpp">
+    <ClCompile Include="Source\Scenes\Level1Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Headers\Projectiles.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Projectiles.cpp">
+    <ClCompile Include="Source\Player &amp; NPCs\Projectiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Source\Collisions.cpp">

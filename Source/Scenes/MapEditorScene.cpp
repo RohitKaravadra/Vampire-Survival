@@ -10,9 +10,9 @@ class TilePointer :public Sprite
 {
 public:
 	Vector2 gPos;
-	TilePointer() :Sprite(Vector2(33), Vector2(0))
+	TilePointer() :Sprite(Vector2(32), Vector2(0))
 	{
-		create_rect_outline(image, Color::RED, 2);
+		create_rect_outline(image, Color::RED, 1);
 		gPos.set(0, 0);
 	}
 
@@ -25,7 +25,7 @@ public:
 	void set_image(Image& _image)
 	{
 		image.copy(_image);
-		create_rect_outline(image, Color::AQUA, 2);
+		create_rect_outline(image, Color::RED, 2);
 	}
 };
 
