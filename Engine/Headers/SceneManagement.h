@@ -16,11 +16,12 @@ namespace Engine
 		float dt;
 	public:
 		Scene() = default;
-		virtual void start() {};
+		virtual void start() { App::sceneTimer = 0; };
 		void stop();
 		void update_loop();
 		virtual void update(float dt) {};
 		virtual void draw() {};
+		virtual void draw_ui() {};
 		virtual void debug() {};
 		virtual void destroy() {};
 		virtual ~Scene() {};
@@ -52,30 +53,68 @@ namespace Engine
 	};
 
 	// scene management class to handle scene change
+	template<unsigned int totalScenes = 1U>
 	class SceneManager
 	{
 
 		Scene nullScene; // null scene if no scene found
-		Scene** scenes; // array to scene pointers
-		unsigned totalScenes = 0; // total number of scenes
+		Scene* scenes[totalScenes]; // array to scene pointers
 		unsigned int curIndex = 0; // last index of scenes array
 		string curScene = ""; // name of current scene
 
 		// get index of given string return -1 if not found
-		int get_index(string _scene);
+		int get_index(string _scene)
+		{
+			if (_scene.empty())
+				return -1;
+
+			for (unsigned int i = 0; i < totalScenes; i++)
+				if (*scenes[i] == _scene)
+					return i;
+		}
 
 	public:
 		// default constructor
 		SceneManager() = default;
 		// destructor
-		~SceneManager();
-		// create scenes array with given total size
-		bool create(int _totalScenes);
+		~SceneManager()
+		{
+			if (totalScenes <= 0)
+				return;
+
+			for (unsigned int i = 0; i < curIndex; i++)
+			{
+				delete scenes[i];
+				scenes[i] = nullptr;
+			}
+		}
+
 		// add scene pointer to scenes
-		bool add(Scene* _scene);
+		bool add(Scene* _scene)
+		{
+			if (curIndex >= totalScenes)
+			{
+				delete _scene;
+				return false;
+			}
+
+			scenes[curIndex++] = _scene;
+			return true;
+		}
+
 		// get name of current scene
-		string get_current();
+		string get_current() { return curScene; }
+
 		// change scene to given scene
-		string change_scene(string _newScene);
+		string change_scene(string _newScene)
+		{
+			int i = get_index(_newScene);
+			if (i == -1)
+				return "";
+
+			curScene = scenes[i]->get_name();
+			scenes[i]->start();
+			return scenes[i]->get_name();
+		}
 	};
 }

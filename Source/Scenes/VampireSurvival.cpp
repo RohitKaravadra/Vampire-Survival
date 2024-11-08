@@ -79,14 +79,13 @@ class MainMenu : public Scene
 	float inpFreq;
 
 	string curScene;
-	SceneManager sceneManager;
+	SceneManager<2> sceneManager;
 public:
 	MainMenu()
 	{
 		name = "Menu";
 
 		float inpFreq = 0;
-		sceneManager.create(2);
 		sceneManager.add(create_game_scene());
 		sceneManager.add(create_editor_scene());
 	}
@@ -145,7 +144,9 @@ public:
 	// start app and create objects
 	void start()
 	{
+		isActive = true;
 		menuScene.start();
+		isActive = false;
 	}
 };
 

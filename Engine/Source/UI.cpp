@@ -25,7 +25,9 @@ void FillBar::create(Vector2 _size, Vector2 _pos, Engine::Color _front, Engine::
 	// setting default values
 	fColor = _front;
 	bColor = _back;
-	rect.set(Vector2(image.width, image.height), _pos);
+	rect.size.set(image.width, image.height);
+	rect.set_top(_pos.y);
+	rect.set_left(_pos.x);
 	set_value(_val);
 }
 
@@ -47,5 +49,5 @@ void FillBar::draw()
 
 void FillBar::draw_ui()
 {
-	Engine::Camera::draw_ui(rect.get_center(), image);
+	Engine::Camera::draw_ui(rect.get_topleft(), image);
 }

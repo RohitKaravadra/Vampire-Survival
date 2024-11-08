@@ -133,6 +133,8 @@ namespace Engine
 		virtual void draw();
 		// function to debug
 		virtual void debug();
+		// method to draw ui sprite on window
+		virtual void draw_ui() {};
 		// destructor
 		virtual ~Sprite() = default;
 
@@ -141,24 +143,31 @@ namespace Engine
 		bool operator!=(Sprite& other) const;
 		bool operator!=(Sprite* other) const;
 	};
-
 	// sample App class for easy build up
 	class App
 	{
 	protected:
+		static bool isActive;
 		// constructor to create an app
 		App(std::string _name, Vector2 _size, Vector2 _camPos = Vector2::zero)
 		{
 			Camera::create(_name, _size, _camPos);
 			Inputs::Init(Camera::get_window());
+			appTimer = 0;
 		}
+
 		// destructor to destroy app
 		~App()
 		{
 			Collisions::destroy();
 			Inputs::destroy();
 			Camera::destroy();
+			appTimer = 0;
 		}
+	public:
+		static float appTimer;
+		static float sceneTimer;
+		static bool is_active();
 	};
 }
 

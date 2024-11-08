@@ -1,7 +1,8 @@
 #pragma once
 
-#include<ostream>
-#include<math.h>
+#include <ostream>
+#include <iostream>
+#include <math.h>
 
 using std::ostream;
 
@@ -83,6 +84,8 @@ namespace Engine
 		Vector2 move_towards(Vector2& v2, const float speed);
 		// returns moved vector towards given vector with speed keeping minimum distance in check
 		Vector2 move_towards(Vector2& v2, const float speed, float minDist);
+		// get a random Vector2 between gin=ven range
+		static Vector2 get_random(Vector2 _min, Vector2 _max);
 
 		Vector2 operator-();
 		Vector2 operator+(const Vector2& v2) const;
@@ -173,4 +176,7 @@ namespace Engine
 		_t = clamp(_t, 0.f, 1.f);
 		return _a + _t * (_b - _a);
 	}
+
+	// function to convert time into HH::MM::SS format
+	std::string get_time(float _sec);
 }

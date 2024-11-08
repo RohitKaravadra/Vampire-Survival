@@ -20,12 +20,15 @@ class Character : public Sprite
 	float health;
 	float speed;
 	float range;
+	const float coolDown = 5; // for area attack
 	float hitDamage; // cumulative damage to be addet while updating frame
 
-	float fireRate;
+	float fireRate;// for continous attack
+	float cdTimer; // timer for area attack
 	Vector2 target;
 
 	UI::FillBar healthBar;
+	UI::FillBar attackCharge;
 	ProjectilePool<20U> pPool;
 
 	DamageArea dmgArea;
@@ -36,7 +39,9 @@ public:
 	// destructor
 	~Character() override;
 	// update character
-	void update(float dt);
+	void update(float dt)override;
+	// apply damage to player
+	void hit(float _val);
 	// move character without colliding
 	void move(Vector2 delta);
 	// move character and collide
@@ -44,7 +49,9 @@ public:
 	// method to attack enemy
 	void attack();
 	// overriding draw methos
-	void draw();
+	void draw()override;
+	// overriding ui draw of sprite
+	void draw_ui() override;
 	// method to check if player is alive
 	bool is_alive() const;
 	// overriding on collide method

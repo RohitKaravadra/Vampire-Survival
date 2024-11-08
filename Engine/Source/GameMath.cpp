@@ -84,6 +84,11 @@ Vector2 Vector2::move_towards(Vector2& v2, const float speed, float minDist)
 	return *this + direction(v2) * min(dist, speed);
 }
 
+Vector2 Vector2::get_random(Vector2 _min, Vector2 _max)
+{
+	Vector2 _range = _max - _min;
+	return _min + Vector2(rand() % static_cast<int>(_range.y), rand() % static_cast<int>(_range.y));
+}
 #pragma endregion
 
 #pragma region Vector2 operators
@@ -289,5 +294,14 @@ Vector2 Engine::get_grid_pos(Vector2 _pos, int _size, int _space)
 	gPos.y += _pos.y < 0 ? -0.5f : 0.5f;
 
 	return gPos;
+}
+
+std::string Engine::get_time(float _sec)
+{
+	std::string time = "";
+	time += std::to_string(static_cast<int>(_sec / 3600)) +
+		":" + std::to_string(static_cast<int>(_sec) % 3600 / 60) +
+		":" + std::to_string(static_cast<int>(_sec) % 60);
+	return time;
 }
 

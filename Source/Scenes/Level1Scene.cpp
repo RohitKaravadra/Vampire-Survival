@@ -25,8 +25,9 @@ public:
 	}
 
 	// start app and create objects
-	void start()
+	void start() override
 	{
+		Scene::start();
 		level = new Level();
 		player = new Character("Resources/Hero.png", Vector2(0), *level);
 		npcManager.create(*player);
@@ -35,23 +36,25 @@ public:
 
 		gameOver = false;
 		endCounter = 0;
-		std::cout << name << " started" << std::endl;
 
 		// starte update loop for this scene
 		update_loop();
 	}
 
-	void destroy()
+	void destroy()override
 	{
 		isActive = false;
 
+		if (App::is_active())
+		{
+			std::cout << "Survive Time : " << get_time(App::sceneTimer) << std::endl;
+			NpcStats::print();
+		}
 		npcManager.destroy();
 
 		delete player, level;
 		player = nullptr;
 		level = nullptr;
-
-		std::cout << name << " destroyed" << std::endl;
 	}
 
 	bool is_game_over(float dt)
@@ -73,7 +76,7 @@ public:
 		return false;
 	}
 
-	void update(float dt)
+	void update(float dt)override
 	{
 		// update all objects
 		player->update(dt);
@@ -89,15 +92,19 @@ public:
 			isActive = false;
 	}
 
-	void draw()
+	void draw() override
 	{
-		Camera::clear();
 		level->draw();
 		player->draw();
 		npcManager.draw();
 	}
 
-	void debug()
+	void draw_ui() override
+	{
+		player->draw_ui();
+	}
+
+	void debug()override
 	{
 		level->debug(1);
 		player->debug();

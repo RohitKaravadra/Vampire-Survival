@@ -11,7 +11,7 @@ void DamageArea::create(float _range, Vector2 _pos)
 
 void DamageArea::on_collide(Collider& _other)
 {
-	if (_other.compare_tag(EnemyHeavyTag))
+	if (_other.compare_tag(HeavyNpcTag))
 		player->on_collide(_other);
 }
 
@@ -24,9 +24,12 @@ Character::Character(std::string _location, Vector2 _pos, Level& _level) :level(
 	tag = PlayerTag;
 
 	fireRate = 0;
+	cdTimer = coolDown;
 	target.set(0, 0);
 
-	healthBar.create(Vector2(50, 10), Vector2(0, 0), Color::GREEN, Color::RED);
+	healthBar.create(Vector2(200, 20), Vector2(Camera::camRect.size.x / 2 - 100, Camera::camRect.size.y - 35), Color::GREEN, Color::RED);
+	attackCharge.create(Vector2(200, 10), Vector2(Camera::camRect.size.x / 2 - 100, Camera::camRect.size.y - 50), Color::AQUA, Color::WHITE);
+
 	pPool.create(Vector2(10, 10), 300, 300, PlayerProjectileTag);
 	dmgArea.create(range, rect.get_center());
 
@@ -38,10 +41,36 @@ Character::~Character()
 	Collisions::remove_collider(*this);
 }
 
+void Character::hit(float _val)
+{
+	if (!isActive)
+		return;
+
+	health -= _val;
+	healthBar.set_value(health / 100.f);
+	if (health <= 0)
+		isActive = false;
+}
+
 void Character::update(float dt)
 {
+	if (hitDamage > 0)
+	{
+		hit(hitDamage * dt);
+		hitDamage = 0;
+	}
+
 	if (isActive)
 	{
+		if (cdTimer > 0)
+		{
+			cdTimer -= dt;
+			attackCharge.set_value((coolDown - cdTimer) / coolDown);
+			dmgArea.isActive = false;
+		}
+		else
+			dmgArea.isActive = true;
+
 		if (fireRate > 0)
 			fireRate -= dt;
 
@@ -50,30 +79,21 @@ void Character::update(float dt)
 		if (Inputs::key_pressed('Q'))
 			speed -= 1000 * dt;
 
-		if (hitDamage > 0)
-		{
-			health -= hitDamage * dt;
-			hitDamage = 0;
-			healthBar.set_value(health / 100.f);
-		}
+		Vector2 delta = Inputs::get_axis() * dt * speed;
+		move_and_collide(delta);
 
-		if (health <= 0)
-			isActive = false;
-		else
-		{
-			Vector2 delta = Inputs::get_axis() * dt * speed;
-			move_and_collide(delta);
+		if (dmgArea.isActive)
 			dmgArea.rect.set_center(rect.get_center());
 
-			if (fireRate <= 0 && target.magnitude() > 0)
-			{
-				pPool.add(rect.get_center(), rect.get_center().direction(target));
-				fireRate = 0.2f;
-			}
-			if (Inputs::key_pressed(VK_SPACE))
-				Collisions::circle_cast(dmgArea.rect, [](Collider* col) { col->on_collide(PlayerHeavyTag); });
-
-			healthBar.set_pos(rect.get_center() + Vector2::up * 50);
+		if (fireRate <= 0 && target.magnitude() > 0)
+		{
+			pPool.add(rect.get_center(), rect.get_center().direction(target));
+			fireRate = 0.2f;
+		}
+		if (cdTimer <= 0 && Inputs::key_pressed(VK_SPACE))
+		{
+			Collisions::circle_cast(dmgArea.rect, [](Collider* col) { col->on_collide(PlayerHeavyTag); });
+			cdTimer = coolDown;
 		}
 	}
 
@@ -107,12 +127,17 @@ void Character::draw()
 {
 	if (isActive)
 	{
-
-		dmgArea.draw();
+		if (dmgArea.isActive)
+			dmgArea.draw();
 		Sprite::draw();
-		healthBar.draw();
 	}
 	pPool.draw();
+}
+
+void Character::draw_ui()
+{
+	attackCharge.draw_ui();
+	healthBar.draw_ui();
 }
 
 bool Character::is_alive() const
@@ -122,8 +147,15 @@ bool Character::is_alive() const
 
 void Character::on_collide(Collider& _other)
 {
-	if (_other.compare_tag(EnemyHeavyTag))
-		hitDamage += EnemyHeavyDamage;
+	if (_other.compare_tag(HeavyNpcTag))
+		hitDamage += HeavyNpcDamage;
+	else if (_other.compare_tag(StaticNpcTag))
+		hitDamage += StaticNpcDamage;
+	else if (_other.compare_tag(NpcProjectileTag))
+	{
+		hit(NpcProjectileDamage);
+		_other.on_collide(PlayerTag);
+	}
 }
 
 void Character::set_nearest(Vector2 _pos)

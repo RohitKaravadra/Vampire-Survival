@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine.h"
+#include "Projectiles.h"
 #include "Utilities.h"
 
 using namespace Engine;
@@ -13,19 +13,15 @@ class NpcSwarm
 
 public:
 
-	void create(unsigned int _number)
+	void create(unsigned int _number, Vector2 _minPos, Vector2 _maxPos)
 	{
 		for (unsigned int i = 0; i < _number; i++)
-			add();
+			add(Vector2::get_random(_minPos, _maxPos));
 	}
 
 	void destroy() { active.clear_with_elements(); }
 
-	void add()
-	{
-		Vector2 _pos = Vector2(1000 - rand() % 2000, 1000 - rand() % 2000);
-		active.add(new T(_pos));
-	}
+	void add(Vector2 _pos) { active.add(new T(_pos)); }
 
 	void update(Vector2 _target, float dt)
 	{
@@ -59,6 +55,15 @@ public:
 	}
 };
 
+static struct NpcStats
+{
+	static unsigned int heavyKilled;
+	static unsigned int staticKilled;
+
+	static void print();
+	static void reset();
+};
+
 // base class for all Npcs
 class NpcBase : public Sprite
 {
@@ -70,12 +75,12 @@ protected:
 	float coolDown;
 	float hitAmount; // commulative ammout of damage to be added
 
-
 	UI::FillBar healthBar;
 public:
 	float distToTarget;
 
 	NpcBase();
+	virtual ~NpcBase();
 	void move(Vector2 _target, float dt);
 	bool is_alive();
 	void on_collide(std::string) override;
@@ -93,11 +98,25 @@ public:
 	void draw() override;
 };
 
+class StaticNpc : public NpcBase
+{
+	float cdTimer;
+	ProjectilePool<10> pool;
+public:
+	StaticNpc() = default;
+	StaticNpc(Vector2);
+	~StaticNpc();
+	void update(float, Vector2);
+	void draw() override;
+};
+
 class NpcManager
 {
 	NpcSwarm<HeavyNpc> heavy;
+	NpcSwarm<StaticNpc> staticNpcs;
 	unsigned int heavyNo;
 	Sprite* player;
+	unsigned int wave = 0;
 public:
 	NpcManager();
 	void create(Sprite&);

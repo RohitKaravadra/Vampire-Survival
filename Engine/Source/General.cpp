@@ -4,6 +4,12 @@ using namespace Engine;
 
 extern bool DEBUG_MODE = false;
 
+float App::appTimer = 0;
+float App::sceneTimer = 0;
+bool App::isActive = false;
+
+bool App::is_active() { return isActive; }
+
 int generate_id()
 {
 	return OBJECT_ID_COUNTER++;

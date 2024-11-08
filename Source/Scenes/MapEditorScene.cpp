@@ -125,7 +125,6 @@ public:
 	{
 		map = new EditorMap(pointer);
 		isActive = true;
-		std::cout << name << " started" << std::endl;
 
 		update_loop();
 	}
@@ -135,7 +134,6 @@ public:
 		isActive = false;
 		delete map;
 		map = nullptr;
-		std::cout << name << " destroyed" << std::endl;
 	}
 
 	void update(float dt)

@@ -21,7 +21,6 @@ public:
 
 	void set(Vector2 _pos, Vector2 _vel)
 	{
-		std::cout << "Set" << std::endl;
 		pos = _pos;
 		vel = _vel;
 		rect.set_center(_pos);
