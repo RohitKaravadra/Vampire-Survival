@@ -158,7 +158,6 @@
     <ClCompile Include="Source\Headers\Projectiles.h" />
     <ClCompile Include="Source\Scenes\Level1Scene.cpp" />
     <ClCompile Include="Source\Player &amp; NPCs\NPC.cpp" />
-    <ClCompile Include="Source\Player &amp; NPCs\Projectiles.cpp" />
     <ClCompile Include="Source\Scenes\VampireSurvival.cpp" />
     <ClCompile Include="Source\Scenes\MapEditorScene.cpp" />
   </ItemGroup>

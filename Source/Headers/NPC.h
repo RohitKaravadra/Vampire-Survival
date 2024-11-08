@@ -1,6 +1,5 @@
 #pragma once
 #include "Engine.h"
-#include "Character.h"
 #include "Utilities.h"
 
 using namespace Engine;
@@ -44,6 +43,20 @@ public:
 	void draw() { active.foreach([](T* _npc) {_npc->draw(); }); }
 
 	bool is_active() { return active.get_size() > 0; }
+
+	Vector2 get_nearest()
+	{
+		Vector2 pos(0, 0);
+		float dist = 10000.f;
+		active.foreach([&](T* _npc) {
+			if (_npc->distToTarget < dist)
+			{
+				pos = _npc->rect.get_center();
+				dist = _npc->distToTarget;
+			}
+			});
+		return pos;
+	}
 };
 
 // base class for all Npcs
@@ -57,12 +70,16 @@ protected:
 	float coolDown;
 	float hitAmount; // commulative ammout of damage to be added
 
+
 	UI::FillBar healthBar;
 public:
+	float distToTarget;
+
 	NpcBase();
 	void move(Vector2 _target, float dt);
 	bool is_alive();
 	void on_collide(std::string) override;
+	void on_collide(Collider& _other) override;
 };
 
 // Heavy Enemy type (only moves towards enemies, damages on collision)
@@ -87,4 +104,5 @@ public:
 	void destroy();
 	void update(float);
 	void draw();
+	Vector2 get_nearest();
 };

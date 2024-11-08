@@ -32,6 +32,15 @@ void NpcBase::on_collide(std::string _tag)
 		hitAmount += PlayerHeavyDamage;
 }
 
+void NpcBase::on_collide(Collider& _other)
+{
+	if (_other.compare_tag(PlayerProjectileTag))
+	{
+		hitAmount += PlayerLiteDamage;
+		_other.on_collide(tag);
+	}
+}
+
 #pragma endregion
 
 #pragma region Heavy
@@ -60,11 +69,14 @@ HeavyNpc::~HeavyNpc()
 void HeavyNpc::update(float dt, Vector2 _target)
 {
 	if (!isActive)
+	{
+		distToTarget = 10000.f;
 		return;
+	}
 
 	if (hitAmount != 0)
 	{
-		health -= hitAmount * dt;
+		health -= hitAmount;
 		hitAmount = 0;
 		healthBar.set_value(health / 100.f);
 	}
@@ -76,6 +88,8 @@ void HeavyNpc::update(float dt, Vector2 _target)
 		move(_target, dt);
 		healthBar.set_pos(rect.get_center() + Vector2::up * 50);
 	}
+
+	distToTarget = _target.distance(rect.get_center());
 }
 
 void HeavyNpc::draw()
@@ -105,6 +119,12 @@ void NpcManager::update(float dt)
 	if (!heavy.is_active())
 		heavy.create(heavyNo++);
 	heavy.update(player->rect.get_center(), dt);
+}
+
+Vector2 NpcManager::get_nearest()
+{
+	Vector2 pos = heavy.get_nearest();
+	return pos;
 }
 
 void NpcManager::draw()

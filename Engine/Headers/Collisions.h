@@ -57,4 +57,14 @@ public:
 					_todo(col);
 			});
 	}
+	// functions cast a circle to colliders and performs the given task to each
+	template<typename Func>
+	static void circle_cast(Rect& _rect, Func _todo)
+	{
+		colliders.foreach([&_rect, &_todo](Collider* col)
+			{
+				if (col->isActive && col->rect.collide_as_circle(_rect))
+					_todo(col);
+			});
+	}
 };

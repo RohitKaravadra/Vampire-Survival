@@ -34,22 +34,18 @@ void Engine::create_rect_outline(Image& _image, Color _color, int _width)
 
 void Engine::create_circle_outline(Image& _image, Color _color, int _width)
 {
-	int iw = _image.width, ih = _image.height;
-	Vector2 _center(iw / 2.f, ih / 2.f);
+	int len = _image.width * _image.height;
+	Vector2 center(_image.width / 2, _image.height / 2);
+	float oRad = _image.width / 2, iRad = oRad - _width, dist;
 
 	if (_image.data == NULL)
-		_image.data = new unsigned char[iw * ih * _image.channels] {0};
+		_image.data = new unsigned char[len * _image.channels] {0};
 
-	float dist;
-	for (int x = 0; x < iw; x++)
+	for (int i = 0; i < len; i++)
 	{
-		for (int y = 0; y < ih; y++)
-		{
-			dist = _center.distance(Vector2(x, y));
-
-			if (dist <= _center.x && dist >= _center.x - _width)
-				memcpy(&_image.data[x * y * _image.channels], _color.value, _image.channels);
-		}
+		dist = center.distance(Vector2(i % _image.width, i / _image.width));
+		if (dist < oRad && dist > iRad)
+			memcpy(&_image.data[i * _image.channels], _color.value, _image.channels);
 	}
 }
 

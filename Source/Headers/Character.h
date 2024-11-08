@@ -1,14 +1,18 @@
 #pragma once
 #include <iostream>
 #include "Level.h"
+#include "Projectiles.h"
 
 using namespace Engine;
 
 class DamageArea : public Sprite
 {
+	Sprite* player = nullptr;
 public:
 	DamageArea() = default;
 	void create(float _range, Vector2 _pos);
+	void set_player(Sprite*);
+	void on_collide(Collider& _other);
 };
 
 class Character : public Sprite
@@ -16,9 +20,13 @@ class Character : public Sprite
 	float health;
 	float speed;
 	float range;
-	float damage;
-	float hitDamage;
+	float hitDamage; // cumulative damage to be addet while updating frame
+
+	float fireRate;
+	Vector2 target;
+
 	UI::FillBar healthBar;
+	ProjectilePool<20U> pPool;
 
 	DamageArea dmgArea;
 	Level& level;
@@ -41,4 +49,6 @@ public:
 	bool is_alive() const;
 	// overriding on collide method
 	void on_collide(Collider& _other) override;
+	// overriding on collide method
+	void set_nearest(Vector2 _pos);
 };

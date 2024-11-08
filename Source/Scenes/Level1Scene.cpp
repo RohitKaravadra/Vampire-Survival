@@ -2,6 +2,7 @@
 #include "NPC.h"
 #include "level.h"
 #include "SceneManagement.h"
+#include"Character.h"
 
 class GameScene :public Scene
 {
@@ -77,6 +78,7 @@ public:
 		// update all objects
 		player->update(dt);
 		npcManager.update(dt);
+		player->set_nearest(npcManager.get_nearest());
 		Camera::update(dt);
 
 		if (is_game_over(dt))
