@@ -24,9 +24,9 @@ void load_level(Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
 		size = stoi(line);
 		if (size > 0)
 		{
+			Pair<Vector2, Pair<unsigned int, unsigned int>> pair;
 			for (unsigned int i = 0; i < size; i++)
 			{
-				Pair<Vector2, Pair<unsigned int, unsigned int>> pair;
 
 				getline(levelFile, line, ',');
 				pair.key.x = stof(line);

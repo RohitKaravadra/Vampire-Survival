@@ -6,37 +6,85 @@
 using namespace Engine;
 using namespace Utilities;
 
-class HeavyNpc :public Sprite
+// template class to create swarms of enemies
+template<typename T>
+class NpcSwarm
 {
+	DArray<T*> active;
+
+public:
+
+	void create(unsigned int _number)
+	{
+		for (unsigned int i = 0; i < _number; i++)
+			add();
+	}
+
+	void destroy() { active.clear_with_elements(); }
+
+	void add()
+	{
+		Vector2 _pos = Vector2(1000 - rand() % 2000, 1000 - rand() % 2000);
+		active.add(new T(_pos));
+	}
+
+	void update(Vector2 _target, float dt)
+	{
+		if (active.get_size() > 0)
+		{
+			active.foreach([&](T* _npc) {
+				if (_npc->is_alive())
+					_npc->update(dt, _target);
+				else
+					active.remove_and_delete(_npc);
+				});
+		}
+	}
+
+	void draw() { active.foreach([](T* _npc) {_npc->draw(); }); }
+
+	bool is_active() { return active.get_size() > 0; }
+};
+
+// base class for all Npcs
+class NpcBase : public Sprite
+{
+protected:
 	float speed;
 	float damage;
 	float range;
 	float health;
 	float coolDown;
-	bool alive;
+	float hitAmount; // commulative ammout of damage to be added
 
+	UI::FillBar healthBar;
 public:
-	HeavyNpc() = default;
-	HeavyNpc(Vector2 _size, Vector2 _pos);
-	~HeavyNpc();
+	NpcBase();
 	void move(Vector2 _target, float dt);
-	void on_collide(std::string _tag) override;
-	void update(float dt, Vector2 _target);
 	bool is_alive();
+	void on_collide(std::string) override;
 };
 
-class HeavyNpcSwarm :public Sprite
+// Heavy Enemy type (only moves towards enemies, damages on collision)
+class HeavyNpc : public NpcBase
 {
-	DArray<HeavyNpc*> active;
-	Sprite* target;
-
-	float addTime;
 public:
-	HeavyNpcSwarm();
-	void create(unsigned int _number, Sprite& _rect);
+	HeavyNpc() = default;
+	HeavyNpc(Vector2);
+	~HeavyNpc();
+	void update(float, Vector2);
+	void draw() override;
+};
+
+class NpcManager
+{
+	NpcSwarm<HeavyNpc> heavy;
+	unsigned int heavyNo;
+	Sprite* player;
+public:
+	NpcManager();
+	void create(Sprite&);
 	void destroy();
-	void add();
-	void update(float dt);
+	void update(float);
 	void draw();
-	void debug() {};
 };

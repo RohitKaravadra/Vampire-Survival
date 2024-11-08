@@ -142,78 +142,6 @@ namespace Engine
 		bool operator!=(Sprite* other) const;
 	};
 
-	// class allows to group Sprites together
-	class SpriteGroup
-	{
-		Sprite** group = nullptr; // sprite group pointer
-		unsigned int curIndex; // index of last element (subjected to change)
-		unsigned int maxSize; // max size for the group (subjected to change after changing with dynamic data structure like vector)
-	public:
-		// constructor
-		SpriteGroup(unsigned int _maxSize);
-		// getter for curSize
-		int get_size();
-		// getter for i'th element
-		Sprite* get_sprite(unsigned int i);
-		// method to add sprite to the group
-		void add(Sprite* sprite);
-		// method to add sprites of given group to this group
-		void add(SpriteGroup* _group);
-		// remove sprite from group
-		bool remove(Sprite& _sprite);
-		// remove sprite from group
-		int remove(SpriteGroup& _group);
-		// method to update all sprites in this group
-		void update(float dt);
-		// method to draw all sprites of this group
-		void draw();
-		// function to debug
-		void debug();
-		// checks collision of given sprite with all sprites
-		bool is_colliding(Rect& rect);
-		// method to destroy all sprites and this group
-		void destroy();
-
-		// destructor
-		~SpriteGroup()
-		{
-			destroy();
-		}
-	};
-
-	// class to handle tilemaps for level creation
-	static class TileMap
-	{
-	protected:
-		Image* tiles;
-		Image dbgImg;
-
-		Rect collider;
-
-		unsigned int tileSize; // size of tile
-		unsigned int totalTiles; // total variations of tiles
-		unsigned int size; // size of data 
-
-		Dictionary < Vector2, Pair<unsigned int, unsigned int>> data; // data (<position <layer, tile>)
-
-		// constructor
-		TileMap(unsigned int _tileSize);
-		// create a debug image for debugging colliders
-		void create_dbgImg();
-
-	public:
-		// update tilemap
-		virtual void update(float dt) {};
-		// check collision with tiles
-		virtual bool is_colliding(Rect& _rect, unsigned int _layer);
-		// draw all tiles
-		virtual void draw();
-		// draw debug image of tiles
-		virtual void debug(unsigned int _layer);
-		// destructor
-		virtual ~TileMap();
-	};
-
 	// sample App class for easy build up
 	class App
 	{
@@ -231,5 +159,31 @@ namespace Engine
 			Inputs::destroy();
 			Camera::destroy();
 		}
+	};
+}
+
+namespace UI
+{
+	// class creates a fill type ui image 
+	class FillBar
+	{
+		Image image;
+		Rect rect;
+		float val = 1; // current value of fill
+		Engine::Color fColor, bColor; // foreground and background color
+
+		// method to fills the image
+		void fill();
+	public:
+		// method to create image
+		void create(Vector2, Vector2, Engine::Color, Engine::Color = Engine::Color::BLACK, float = 1);
+		// method to set value of image fill
+		void set_value(float);
+		// method to set image position
+		void set_pos(Vector2);
+		// method to draw image relative to camera
+		void draw();
+		// method to draw image as ui
+		void draw_ui();
 	};
 }

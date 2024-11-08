@@ -938,24 +938,6 @@ namespace GamesEngineeringBase
 		unsigned int channels;             // Number of color channels
 		unsigned char* data = nullptr;      // Pointer to image data
 
-		Image() = default;
-
-		// copy constructor for resolving multiple reference pointer --Rohit
-		Image(Image& _other)
-		{
-			if (_other.data == nullptr)
-				return;
-
-			if (data != nullptr)
-				delete[] data;
-
-			width = _other.width;
-			height = _other.height;
-			channels = _other.channels;
-			data = new unsigned char[width * height * channels] {};
-			memcpy(data, _other.data, width * height * channels);
-		}
-
 		// Loads an image from a file using WIC
 		bool load(std::string filename)
 		{

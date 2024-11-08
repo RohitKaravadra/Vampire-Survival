@@ -6,8 +6,8 @@
 class GameScene :public Scene
 {
 	Character* player;
-	TileMap* level;
-	HeavyNpcSwarm swarm;
+	Level* level;
+	NpcManager npcManager;
 
 	bool gameOver;
 	float endCounter;
@@ -28,7 +28,7 @@ public:
 	{
 		level = new Level();
 		player = new Character("Resources/Hero.png", Vector2(0), *level);
-		swarm.create(5, *player);
+		npcManager.create(*player);
 
 		Camera::set_follow_target(player->rect);
 
@@ -43,7 +43,9 @@ public:
 	void destroy()
 	{
 		isActive = false;
-		swarm.destroy();
+
+		npcManager.destroy();
+
 		delete player, level;
 		player = nullptr;
 		level = nullptr;
@@ -74,7 +76,7 @@ public:
 	{
 		// update all objects
 		player->update(dt);
-		swarm.update(dt);
+		npcManager.update(dt);
 		Camera::update(dt);
 
 		if (is_game_over(dt))
@@ -90,14 +92,13 @@ public:
 		Camera::clear();
 		level->draw();
 		player->draw();
-		swarm.draw();
+		npcManager.draw();
 	}
 
 	void debug()
 	{
 		level->debug(1);
 		player->debug();
-		swarm.debug();
 	}
 };
 

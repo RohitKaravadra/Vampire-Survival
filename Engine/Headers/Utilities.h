@@ -172,7 +172,7 @@ namespace Utilities
 		bool remove_and_delete(T value)
 		{
 			int index = get_index(value);
-			return  index == -1 ? false : remove_at(index);
+			return  index == -1 ? false : remove_and_delete_at(index);
 		}
 
 		// clear array with deleting all elements for pointer arrays
@@ -201,6 +201,7 @@ namespace Utilities
 			return data[index];
 		}
 
+		// only use if array is not a pointer array
 		DArray& operator=(const DArray& _other)
 		{
 			if (this == &_other)

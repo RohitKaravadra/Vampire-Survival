@@ -1,4 +1,5 @@
 #include "Character.h"
+#include "Constants.h"
 
 void DamageArea::create(float _range, Vector2 _pos)
 {
@@ -8,27 +9,29 @@ void DamageArea::create(float _range, Vector2 _pos)
 	create_rect_outline(image, Color::YELLOW, 2);
 }
 
-Character::Character(std::string _location, Vector2 _pos, TileMap& _level) :level(_level), Sprite(_location, _pos)
+Character::Character(std::string _location, Vector2 _pos, Level& _level) :level(_level), Sprite(_location, _pos)
 {
 	health = 100;
 	speed = 200;
 	range = 400;
 	damage = 50;
-	alive = true;
 	tag = "Player";
+	hitDamage = 0;
+
+	healthBar.create(Vector2(50, 10), Vector2(0, 0), Color::GREEN, Color::RED);
 	dmgArea.create(range, rect.get_center());
+
 	Collisions::add_collider(*this);
 }
 
 Character::~Character()
 {
-
 	Collisions::remove_collider(*this);
 }
 
 void Character::update(float dt)
 {
-	if (!alive)
+	if (!isActive)
 		return;
 
 	if (Inputs::key_pressed('E'))
@@ -36,9 +39,26 @@ void Character::update(float dt)
 	if (Inputs::key_pressed('Q'))
 		speed -= 1000 * dt;
 
-	Vector2 delta = Inputs::get_axis() * dt * speed;
-	move_and_collide(delta);
-	dmgArea.rect.set_center(rect.get_center());
+	if (hitDamage > 0)
+	{
+		health -= hitDamage * dt;
+		hitDamage = 0;
+		healthBar.set_value(health / 100.f);
+	}
+
+	if (health <= 0)
+		isActive = false;
+	else
+	{
+		Vector2 delta = Inputs::get_axis() * dt * speed;
+		move_and_collide(delta);
+		dmgArea.rect.set_center(rect.get_center());
+
+		if (Inputs::key_pressed(VK_SPACE))
+			Collisions::rect_cast(dmgArea.rect, [](Collider* col) { col->on_collide(PlayerHeavyTag); });
+
+		healthBar.set_pos(rect.get_center() + Vector2::up * 50);
+	}
 }
 
 void Character::move(Vector2 delta)
@@ -66,31 +86,21 @@ void Character::attack()
 
 void Character::draw()
 {
-	if (!alive)
+	if (!isActive)
 		return;
 
 	dmgArea.draw();
 	Sprite::draw();
+	healthBar.draw();
 }
 
 bool Character::is_alive() const
 {
-	return alive;
-}
-
-void Character::hit(float _damage)
-{
-	if (!alive)
-		return;
-
-	health -= _damage;
-	health = clamp(health, 0.f, 100.f);
-	alive = health > 0;
-	std::cout << "Health : " << health << std::endl;
+	return isActive;
 }
 
 void Character::on_collide(Collider& _other)
 {
-	if (_other.compare_tag("Heavy Enemy"))
-		hit(5);
+	if (_other.compare_tag(EnemyHeavyTag))
+		hitDamage += EnemyHeavyDamage;
 }

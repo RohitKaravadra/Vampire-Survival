@@ -15,6 +15,7 @@ protected:
 	std::string tag = "";// identify layers for collision
 	Collider() = default;
 public:
+	bool isActive = true;
 	Rect rect;
 	// compare tag with given sprite
 	bool compare_tag(Collider& _other) const;
@@ -46,4 +47,14 @@ public:
 	static void update();
 	// remove all colliders from collision
 	static void destroy();
+	// functions cast a rects to colliders and performs the given task to each
+	template<typename Func>
+	static void rect_cast(Rect& _rect, Func _todo)
+	{
+		colliders.foreach([&_rect, &_todo](Collider* col)
+			{
+				if (col->isActive && col->rect.collide_as_rect(_rect))
+					_todo(col);
+			});
+	}
 };

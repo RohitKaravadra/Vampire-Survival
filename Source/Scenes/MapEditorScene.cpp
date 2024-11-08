@@ -41,18 +41,7 @@ public:
 		curTile = 0;
 		curLayer = 0;
 		inpFreq = 0;
-		pointer.set_image(tiles[curTile]);
-	}
-
-	void load()
-	{
-		curTile = 0;
-		inpFreq = 0;
-
-		load_level(data);
-		size = data.get_size();
-
-		pointer.set_image(tiles[curTile]);
+		pointer.set_image(tileSet[curTile]);
 	}
 
 	void add(Vector2 _pos, unsigned int _layer, unsigned int _tile)
@@ -77,13 +66,13 @@ public:
 		{
 			curTile--;
 			if (curTile < 0)
-				curTile = totalTiles - 1;
-			pointer.set_image(tiles[curTile]);
+				curTile = setSize - 1;
+			pointer.set_image(tileSet[curTile]);
 		}
 		else if (wheel > 0)
 		{
-			curTile = (curTile + 1) % totalTiles;
-			pointer.set_image(tiles[curTile]);
+			curTile = (curTile + 1) % setSize;
+			pointer.set_image(tileSet[curTile]);
 		}
 		else if (Inputs::key_pressed(VK_SPACE))
 		{
@@ -124,18 +113,17 @@ class MapEditorScene : public Scene
 public:
 	MapEditorScene()
 	{
-		map = new EditorMap(pointer);
 		name = "MapEditor";
 	}
 
 	~MapEditorScene()
 	{
-		delete map;
+
 	}
 
 	void start()
 	{
-		map->load();
+		map = new EditorMap(pointer);
 		isActive = true;
 		std::cout << name << " started" << std::endl;
 
@@ -145,6 +133,8 @@ public:
 	void destroy()
 	{
 		isActive = false;
+		delete map;
+		map = nullptr;
 		std::cout << name << " destroyed" << std::endl;
 	}
 

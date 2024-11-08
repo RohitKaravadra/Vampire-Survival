@@ -48,12 +48,18 @@ void Collisions::update()
 {
 	for (unsigned int i = 0; i < size; i++)
 	{
-		for (unsigned int j = i + 1; j < size - 1; j++)
+		if (colliders[i]->isActive)
 		{
-			if (colliders[i]->rect.collide_as_rect(colliders[j]->rect))
+			for (unsigned int j = i + 1; j < size - 1; j++)
 			{
-				colliders[i]->on_collide(*colliders[j]);
-				colliders[j]->on_collide(*colliders[i]);
+				if (colliders[j]->isActive)
+				{
+					if (colliders[i]->rect.collide_as_rect(colliders[j]->rect))
+					{
+						colliders[i]->on_collide(*colliders[j]);
+						colliders[j]->on_collide(*colliders[i]);
+					}
+				}
 			}
 		}
 	}

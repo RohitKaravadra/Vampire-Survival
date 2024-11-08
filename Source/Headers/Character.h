@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include "Engine.h"
+#include "Level.h"
 
 using namespace Engine;
 
@@ -17,15 +17,16 @@ class Character : public Sprite
 	float speed;
 	float range;
 	float damage;
-	bool alive;
+	float hitDamage;
+	UI::FillBar healthBar;
 
 	DamageArea dmgArea;
-	TileMap& level;
+	Level& level;
 public:
 	Character() = default;
-	Character(std::string _location, Vector2 _pos, TileMap& _level);
+	Character(std::string _location, Vector2 _pos, Level& _level);
 	// destructor
-	~Character();
+	~Character() override;
 	// update character
 	void update(float dt);
 	// move character without colliding
@@ -38,8 +39,6 @@ public:
 	void draw();
 	// method to check if player is alive
 	bool is_alive() const;
-	// apply damage to player
-	void hit(float _damage);
 	// overriding on collide method
 	void on_collide(Collider& _other) override;
 };
