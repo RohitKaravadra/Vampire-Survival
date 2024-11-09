@@ -11,6 +11,7 @@ double GameStats::time = 0;
 
 void GameStats::print()
 {
+	std::cout << "\n---------------------------------\n";
 	std::cout << "Survive Time : " << Engine::get_time(time) << std::endl;
 	std::cout << "Wave(s) Survived :" << wave << std::endl;
 	std::cout << "---------------\nEnemy Killed";
@@ -58,5 +59,4 @@ void GameStats::load_stats(std::string _data)
 		else
 			_num += _data[i];
 	}
-	print();
 }

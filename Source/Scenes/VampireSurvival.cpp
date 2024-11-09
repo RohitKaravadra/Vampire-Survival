@@ -7,11 +7,12 @@ using namespace Engine;
 using namespace std;
 
 class MapEditorScene;
-class GameScene;
+class Level1Scene;
 
 const Vector2 WIN_SIZE(1024, 768);
 
-Scene* create_game_scene();
+Scene* create_level_1_scene();
+Scene* create_level_2_scene();
 Scene* create_editor_scene();
 
 class Pointer :public Sprite
@@ -79,14 +80,15 @@ class MainMenu : public Scene
 	float inpFreq;
 
 	string curScene;
-	SceneManager<2> sceneManager;
+	SceneManager<3> sceneManager;
 public:
 	MainMenu()
 	{
 		name = "Menu";
 
 		float inpFreq = 0;
-		sceneManager.add(create_game_scene());
+		sceneManager.add(create_level_1_scene());
+		sceneManager.add(create_level_2_scene());
 		sceneManager.add(create_editor_scene());
 	}
 
@@ -112,9 +114,9 @@ public:
 
 			switch (ch)
 			{
-			case 0:curScene = sceneManager.change_scene("Game");
+			case 0:curScene = sceneManager.change_scene("Level1Scene");
 				break;
-			case 1:
+			case 1:curScene = sceneManager.change_scene("Level2Scene");
 				break;
 			case 2:curScene = sceneManager.change_scene("MapEditor");
 				break;

@@ -6,22 +6,22 @@
 #include "Constants.h"
 #include "DataManager.h"
 
-class Level1Scene :public Scene
+class Level2Scene :public Scene
 {
 	Character* player;
 	Level* level;
-	NpcManager npcManager;
+	//NpcManager npcManager;
 
 	bool gameOver;
 	bool gameStarted;
 	float timer;
 public:
-	Level1Scene()
+	Level2Scene()
 	{
-		name = "Level1Scene";
+		name = "Level2Scene";
 	}
 
-	~Level1Scene()
+	~Level2Scene()
 	{
 		destroy();
 	}
@@ -30,9 +30,9 @@ public:
 	void start() override
 	{
 		Scene::start();
+		GameStats::reset();
 		level = new Level();
-		load_game_state();
-
+		player = new Character("Resources/Hero.png", Vector2(0), 100, *level);
 		Camera::set_follow_target(player->rect);
 
 		gameOver = false;
@@ -43,50 +43,17 @@ public:
 		update_loop();
 	}
 
-	// load saved data of game
-	void load_game_state()
-	{
-		GameStats::reset();
-		DataManager::clear_data();
-		DataManager::load_data();
-
-		if (DataManager::is_loaded())
-		{
-			Pair<Vector2, float> playerData = DataManager::get_player_data();
-			player = new Character("Resources/Hero.png", playerData.key, playerData.value, *level);
-		}
-		else
-			player = new Character("Resources/Hero.png", Vector2::zero, 100, *level);
-
-		npcManager.create(*player, true);
-	}
-
-	// save current data of game if available
-	void save_game_state()
-	{
-		if (gameOver)
-			DataManager::save_data(true);
-		else
-		{
-			DataManager::set_player_data(player->rect.get_center(), player->get_health());
-			npcManager.save_data();
-			DataManager::save_data();
-		}
-	}
-
 	void destroy()override
 	{
 		isActive = false;
 
 		if (App::is_active())
 		{
-			GameStats::time += App::sceneTimer;
 			if (gameOver)
 				GameStats::print();
-			save_game_state();
 		}
 
-		npcManager.destroy();
+		//npcManager.destroy();
 
 		delete player, level;
 		player = nullptr;
@@ -107,6 +74,7 @@ public:
 					{
 						gameOver = true;
 						timer = 3;
+						GameStats::time = App::sceneTimer;
 					}
 				}
 			}
@@ -128,8 +96,8 @@ public:
 		{
 			// update all objects
 			player->update(dt);
-			npcManager.update(dt);
-			player->set_nearest(npcManager.get_nearest());
+			//npcManager.update(dt);
+			//player->set_nearest(npcManager.get_nearest());
 
 			// check for exit condition
 			if (!gameOver && Inputs::ui_back())
@@ -143,7 +111,7 @@ public:
 	{
 		level->draw();
 		player->draw();
-		npcManager.draw();
+		//npcManager.draw();
 	}
 
 	void draw_ui() override
@@ -158,7 +126,7 @@ public:
 	}
 };
 
-Scene* create_level_1_scene()
+Scene* create_level_2_scene()
 {
-	return new Level1Scene();
+	return new Level2Scene();
 }

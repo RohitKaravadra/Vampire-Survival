@@ -167,7 +167,7 @@ class NpcManager
 	NpcSwarm<HeavyNpc> heavyNpcs;
 	NpcSwarm<StaticNpc> staticNpcs;
 	NpcSwarm<ShooterNpc> shooterNpcs;
-	unsigned int heavyNo;
+	unsigned int npcIncrease;
 	Sprite* player;
 	unsigned int wave = 0;
 public:

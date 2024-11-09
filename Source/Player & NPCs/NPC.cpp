@@ -221,7 +221,7 @@ void ShooterNpc::update(float dt, Vector2 _target)
 
 NpcManager::NpcManager()
 {
-	heavyNo = 2;
+	npcIncrease = 1;
 }
 
 void NpcManager::create(Sprite& _player, bool _load)
@@ -230,7 +230,8 @@ void NpcManager::create(Sprite& _player, bool _load)
 
 	if (_load && DataManager::is_loaded())
 	{
-		wave = GameStats::wave;
+		wave = GameStats::wave + 1;
+		npcIncrease = wave;
 
 		DArray<Pair<Vector2, float>> data = DataManager::get_enemy_data(LiteNpcTag);
 		int size = data.get_size();
@@ -253,26 +254,30 @@ void NpcManager::create(Sprite& _player, bool _load)
 			shooterNpcs.add(data[i].key, data[i].value);
 	}
 	else
+	{
+		wave = 0;
+		npcIncrease = 1;
 		update_wave();
+	}
 }
 
 void NpcManager::update_wave()
 {
 	if (!liteNpcs.is_active() && !shooterNpcs.is_active())
 	{
-		liteNpcs.create(heavyNo++, LiteNpcTag);
-		shooterNpcs.create(heavyNo++, ShooterNpcTag);
+		liteNpcs.create(++npcIncrease + wave, LiteNpcTag);
+		shooterNpcs.create(npcIncrease + wave, ShooterNpcTag);
 		heavyNpcs.create(2 + wave, HeavyNpcTag);
 		staticNpcs.create(2 + wave, StaticNpcTag);
 		wave++;
-		GameStats::wave = wave;
+		GameStats::wave = wave - 1;
+		std::cout << " Wave " << wave << " started " << std::endl;
 	}
 }
 
 void NpcManager::update(float dt)
 {
 	update_wave();
-
 	Vector2 _target = player->rect.get_center();
 	liteNpcs.update(_target, dt);
 	staticNpcs.update(_target, dt);
@@ -346,6 +351,8 @@ void NpcManager::draw()
 
 void NpcManager::destroy()
 {
+	wave = 0;
+
 	liteNpcs.destroy();
 	staticNpcs.destroy();
 	shooterNpcs.destroy();

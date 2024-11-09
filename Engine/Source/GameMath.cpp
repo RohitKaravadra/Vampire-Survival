@@ -309,7 +309,7 @@ Vector2 Engine::get_random_exclude(Rect _rect, Vector2 _extra)
 {
 	// choose a random side
 	int _side = rand() % 4;
-	Vector2 _tl = _rect.get_topleft() - Vector2(50), _br = _rect.get_botmright() + Vector2(50);
+	Vector2 _tl = _rect.get_topleft() - Vector2(200), _br = _rect.get_botmright() + Vector2(200);
 	Vector2 _min, _max;
 	switch (_side)
 	{

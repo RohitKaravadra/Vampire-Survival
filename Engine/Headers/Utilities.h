@@ -129,7 +129,7 @@ namespace Utilities
 		// clear array
 		void clear()
 		{
-			if (data == nullptr || size == 0)
+			if (data == nullptr)
 				return;
 
 			delete[] data;
@@ -208,13 +208,10 @@ namespace Utilities
 				return *this;
 
 			clear();
-			size = _other.size;
-
-			if (size <= 0)
-				return *this;
 
 			size = _other.size;
-			data = new T[size];
+			if (size > 0)
+				data = new T[size];
 			for (int i = 0; i < size; i++)
 				data[i] = _other.data[i];
 

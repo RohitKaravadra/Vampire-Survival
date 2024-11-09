@@ -25,12 +25,12 @@ public:
 		vel = _vel;
 		rect.set_center(_pos);
 		isActive = true;
-		Collisions::add_collider(*this);
+		Collisions::add_collider(*this, 1);
 	}
 
 	void reset()
 	{
-		Collisions::remove_collider(*this);
+		Collisions::remove_collider(*this, 1);
 		isActive = false;
 	}
 

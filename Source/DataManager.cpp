@@ -111,11 +111,12 @@ void DataManager::load_data()
 
 	if (saveFile)
 	{
-		clear_data();
-		isLoaded = true;
 		std::string line;
-
 		std::getline(saveFile, line);
+
+		if (!saveFile.eof())
+			isLoaded = true;
+
 		GameStats::load_stats(line);
 
 		while (std::getline(saveFile, line))
