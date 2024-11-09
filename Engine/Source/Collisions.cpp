@@ -34,12 +34,14 @@ void Collisions::add_collider(Collider& _collider)
 {
 	colliders.add(&_collider);
 	size = colliders.get_size();
+	//std::cout << "Collider Added " << _collider.get_tag() << std::endl;
 }
 
 void Collisions::remove_collider(Collider& _collider)
 {
 	colliders.remove(&_collider);
 	size = colliders.get_size();
+	//std::cout << "Collider Removed " << _collider.get_tag() << std::endl;
 }
 
 void Collisions::update()

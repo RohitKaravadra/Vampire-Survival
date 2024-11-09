@@ -165,8 +165,9 @@ namespace Engine
 			appTimer = 0;
 		}
 	public:
-		static float appTimer;
-		static float sceneTimer;
+		static double appTimer; //  App timer
+		static double sceneTimer; // Scene timer
+		// check if scene is active 
 		static bool is_active();
 	};
 }

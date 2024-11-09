@@ -33,6 +33,7 @@ public:
 		npcManager.create(*player);
 
 		Camera::set_follow_target(player->rect);
+		GameStats::reset();
 
 		gameOver = false;
 		endCounter = 0;
@@ -45,11 +46,9 @@ public:
 	{
 		isActive = false;
 
-		if (App::is_active())
-		{
-			std::cout << "Survive Time : " << get_time(App::sceneTimer) << std::endl;
-			NpcStats::print();
-		}
+		if (gameOver)
+			GameStats::print();
+
 		npcManager.destroy();
 
 		delete player, level;
@@ -70,6 +69,7 @@ public:
 			if (!player->is_alive())
 			{
 				gameOver = true;
+				GameStats::time = App::sceneTimer;
 				endCounter = 3;
 			}
 		}

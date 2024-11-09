@@ -1,6 +1,7 @@
 #pragma once
 #include "Projectiles.h"
 #include "Utilities.h"
+#include "GameStats.h"
 
 using namespace Engine;
 using namespace Utilities;
@@ -55,23 +56,17 @@ public:
 	}
 };
 
-static struct NpcStats
-{
-	static unsigned int heavyKilled;
-	static unsigned int staticKilled;
-
-	static void print();
-	static void reset();
-};
-
 // base class for all Npcs
 class NpcBase : public Sprite
 {
 protected:
 	float speed;
-	float damage;
-	float range;
+	int range;
+	int rangeDelta;
+
+	float maxHealth;
 	float health;
+
 	float coolDown;
 	float hitAmount; // commulative ammout of damage to be added
 
@@ -85,35 +80,61 @@ public:
 	bool is_alive();
 	void on_collide(std::string) override;
 	void on_collide(Collider& _other) override;
+	void update(float dt) override;
+	virtual void draw() override;
 };
 
+class ShooterNpcBase :public NpcBase
+{
+protected:
+	float cdTimer;
+	ProjectilePool<10> pool;
+public:
+	void update(float dt, Vector2 _target);
+	void draw() override;
+};
+
+
 // Heavy Enemy type (only moves towards enemies, damages on collision)
-class HeavyNpc : public NpcBase
+class LiteNpc : public NpcBase
+{
+public:
+	LiteNpc() = default;
+	LiteNpc(Vector2);
+	~LiteNpc() = default;
+	void update(float, Vector2);
+};
+
+class HeavyNpc : public LiteNpc
 {
 public:
 	HeavyNpc() = default;
 	HeavyNpc(Vector2);
-	~HeavyNpc();
-	void update(float, Vector2);
-	void draw() override;
 };
 
-class StaticNpc : public NpcBase
+class StaticNpc : public ShooterNpcBase
 {
-	float cdTimer;
-	ProjectilePool<10> pool;
 public:
 	StaticNpc() = default;
 	StaticNpc(Vector2);
-	~StaticNpc();
+	~StaticNpc() = default;
 	void update(float, Vector2);
-	void draw() override;
+};
+
+class ShooterNpc : public ShooterNpcBase
+{
+public:
+	ShooterNpc() = default;
+	ShooterNpc(Vector2);
+	void update(float, Vector2);
 };
 
 class NpcManager
 {
-	NpcSwarm<HeavyNpc> heavy;
+	NpcSwarm<LiteNpc> liteNpcs;
+	NpcSwarm<HeavyNpc> heavyNpcs;
 	NpcSwarm<StaticNpc> staticNpcs;
+	NpcSwarm<ShooterNpc> shooterNpcs;
 	unsigned int heavyNo;
 	Sprite* player;
 	unsigned int wave = 0;
@@ -121,6 +142,7 @@ public:
 	NpcManager();
 	void create(Sprite&);
 	void destroy();
+	void update_wave();
 	void update(float);
 	void draw();
 	Vector2 get_nearest();

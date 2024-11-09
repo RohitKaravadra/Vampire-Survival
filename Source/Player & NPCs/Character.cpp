@@ -30,7 +30,7 @@ Character::Character(std::string _location, Vector2 _pos, Level& _level) :level(
 	healthBar.create(Vector2(200, 20), Vector2(Camera::camRect.size.x / 2 - 100, Camera::camRect.size.y - 35), Color::GREEN, Color::RED);
 	attackCharge.create(Vector2(200, 10), Vector2(Camera::camRect.size.x / 2 - 100, Camera::camRect.size.y - 50), Color::AQUA, Color::WHITE);
 
-	pPool.create(Vector2(10, 10), 300, 300, PlayerProjectileTag);
+	pPool.create(Vector2(10, 10), 300, 300, PlayerProjectileTag, Color::BLACK);
 	dmgArea.create(range, rect.get_center());
 
 	Collisions::add_collider(*this);
@@ -147,10 +147,14 @@ bool Character::is_alive() const
 
 void Character::on_collide(Collider& _other)
 {
-	if (_other.compare_tag(HeavyNpcTag))
-		hitDamage += HeavyNpcDamage;
+	if (_other.compare_tag(LiteNpcTag))
+		hitDamage += LiteNpcDamage;
 	else if (_other.compare_tag(StaticNpcTag))
 		hitDamage += StaticNpcDamage;
+	else if (_other.compare_tag(HeavyNpcTag))
+		hitDamage += HeavyNpcDamage;
+	else if (_other.compare_tag(ShooterNpcTag))
+		hitDamage += ShooterNpcDamage;
 	else if (_other.compare_tag(NpcProjectileTag))
 	{
 		hit(NpcProjectileDamage);

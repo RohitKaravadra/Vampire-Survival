@@ -178,5 +178,5 @@ namespace Engine
 	}
 
 	// function to convert time into HH::MM::SS format
-	std::string get_time(float _sec);
+	std::string get_time(double _sec);
 }

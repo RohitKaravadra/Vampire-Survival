@@ -4,8 +4,8 @@ using namespace Engine;
 
 extern bool DEBUG_MODE = false;
 
-float App::appTimer = 0;
-float App::sceneTimer = 0;
+double App::appTimer = 0;
+double App::sceneTimer = 0;
 bool App::isActive = false;
 
 bool App::is_active() { return isActive; }

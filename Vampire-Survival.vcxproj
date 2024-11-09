@@ -140,6 +140,7 @@
     <ClInclude Include="Resources.h" />
     <ClInclude Include="Source\Headers\Character.h" />
     <ClInclude Include="Source\Headers\Constants.h" />
+    <ClInclude Include="Source\Headers\GameStats.h" />
     <ClInclude Include="Source\Headers\Level.h" />
     <ClInclude Include="Source\Headers\NPC.h" />
   </ItemGroup>
@@ -154,6 +155,7 @@
     <ClCompile Include="Engine\Source\Sprites.cpp" />
     <ClCompile Include="Engine\Source\UI.cpp" />
     <ClCompile Include="Resources.cpp" />
+    <ClCompile Include="Source\GameStats.cpp" />
     <ClCompile Include="Source\Player &amp; NPCs\Character.cpp" />
     <ClCompile Include="Source\Headers\Projectiles.h" />
     <ClCompile Include="Source\Scenes\Level1Scene.cpp" />

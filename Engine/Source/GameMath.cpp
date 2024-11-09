@@ -296,7 +296,7 @@ Vector2 Engine::get_grid_pos(Vector2 _pos, int _size, int _space)
 	return gPos;
 }
 
-std::string Engine::get_time(float _sec)
+std::string Engine::get_time(double _sec)
 {
 	std::string time = "";
 	time += std::to_string(static_cast<int>(_sec / 3600)) +
