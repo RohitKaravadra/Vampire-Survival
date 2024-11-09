@@ -9,8 +9,8 @@ const std::string PlayerProjectileTag = "PlayerProjectile";
 const float PlayerHeavyDamage = 50;
 const float PlayerLiteDamage = 3;
 
-const std::string LiteNpcTag = "LiteEnemy";
-const std::string HeavyNpcTag = "EnemyHeavy";
+const std::string LiteNpcTag = "LiteNpc";
+const std::string HeavyNpcTag = "HeavyNpc";
 const std::string StaticNpcTag = "StaticNpc";
 const std::string ShooterNpcTag = "ShooterNpc";
 const std::string NpcProjectileTag = "NpcProjectile";

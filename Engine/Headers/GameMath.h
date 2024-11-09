@@ -117,7 +117,6 @@ namespace Engine
 		float l, r, t, b;
 	public:
 		Vector2 size; // size of the rectangle
-		//Vector2 center; // center of rect
 
 		// constructors
 		Rect();
@@ -179,4 +178,7 @@ namespace Engine
 
 	// function to convert time into HH::MM::SS format
 	std::string get_time(double _sec);
+
+	// function generates a random vector outof the rect
+	Vector2 get_random_exclude(Rect, Vector2);
 }

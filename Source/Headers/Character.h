@@ -35,7 +35,7 @@ class Character : public Sprite
 	Level& level;
 public:
 	Character() = default;
-	Character(std::string _location, Vector2 _pos, Level& _level);
+	Character(std::string _location, Vector2 _pos, float _health, Level& _level);
 	// destructor
 	~Character() override;
 	// update character
@@ -58,4 +58,6 @@ public:
 	void on_collide(Collider& _other) override;
 	// overriding on collide method
 	void set_nearest(Vector2 _pos);
+	// returns health of the player
+	float get_health();
 };

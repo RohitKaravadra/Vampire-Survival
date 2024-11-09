@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 static struct GameStats
 {
@@ -11,4 +12,5 @@ static struct GameStats
 
 	static void print();
 	static void reset();
+	static void load_stats(std::string _data);
 };

@@ -30,3 +30,33 @@ void GameStats::reset()
 	shooterKilled = 0;
 	time = 0;
 }
+
+void GameStats::load_stats(std::string _data)
+{
+	int size = _data.size();
+	if (size < 2)
+		return;
+
+	std::string _num = "";
+	int count = 0;
+	for (int i = 0; i < size; i++)
+	{
+		if (_data[i] == ',')
+		{
+			switch (++count)
+			{
+			case 1: time = stod(_num); break;
+			case 2: wave = stoi(_num); break;
+			case 3: liteKilled = stoi(_num); break;
+			case 4: heavyKilled = stoi(_num); break;
+			case 5: staticKilled = stoi(_num); break;
+			case 6: shooterKilled = stoi(_num); break;
+			default:;
+			}
+			_num = "";
+		}
+		else
+			_num += _data[i];
+	}
+	print();
+}

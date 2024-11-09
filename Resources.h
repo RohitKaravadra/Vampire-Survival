@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Engine.h"
+#include <sstream>;
 
-using GamesEngineeringBase::Image;
-using Engine::Vector2;
+using namespace Engine;
 
 // copy image to the given reference og image
 bool load_image(Image& _image, std::string _location);

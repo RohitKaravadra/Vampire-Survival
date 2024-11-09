@@ -9,6 +9,7 @@ namespace Engine
 	Rect* Camera::followTarget = nullptr;
 	Vector2 Camera::offset;
 	Rect Camera::camRect;
+	Vector2 size;
 
 	void Camera::create(std::string _name, Vector2 _size, Vector2 _pos)
 	{
@@ -16,6 +17,7 @@ namespace Engine
 			return;
 		notNull = true;
 		win.create(_size.x, _size.y, _name);
+		size = _size;
 		camRect.set(_size, _pos);
 		offset = _size / 2;
 	}
@@ -91,7 +93,7 @@ namespace Engine
 			//bound check for y
 			if (posY < 0)
 				continue;
-			if (posY > camRect.size.y)
+			if (posY > size.y)
 				break;
 
 			for (unsigned int x = 0; x < _image.width; x++)
@@ -101,7 +103,7 @@ namespace Engine
 				//x bound check for x
 				if (posX < 0)
 					continue;
-				if (posX > camRect.size.x - 1)
+				if (posX > size.x - 1)
 					break;
 
 				//draw pixel if alpha is greater than 0
@@ -123,7 +125,7 @@ namespace Engine
 			//bound check for y
 			if (posY < 0)
 				continue;
-			if (posY > camRect.size.y)
+			if (posY > size.y)
 				break;
 
 			for (unsigned int x = 0; x < _image.width; x++)
@@ -133,7 +135,7 @@ namespace Engine
 				//x bound check for x
 				if (posX < 0)
 					continue;
-				if (posX > camRect.size.x - 1)
+				if (posX > size.x - 1)
 					break;
 
 				//draw pixel if alpha is greater than 0

@@ -1,6 +1,8 @@
 #include "NPC.h"
 #include "Resources.h"
-#include "Constants.h"
+#include "DataManager.h"
+
+using namespace std;
 
 #pragma region Base
 
@@ -11,6 +13,7 @@ NpcBase::NpcBase()
 	rangeDelta = 0;
 	maxHealth = health = 100;
 	coolDown = 0;
+	otherDamage = 0;
 
 	healthBar.create(Vector2(50, 10), Vector2(0, 0), Color::GREEN, Color::RED);
 	Collisions::add_collider(*this);
@@ -18,7 +21,7 @@ NpcBase::NpcBase()
 
 NpcBase::~NpcBase()
 {
-	if (health <= 0) // update game stats when npc is killed
+	if (health <= 0 && otherDamage < maxHealth / 2) // update game stats when npc is killed
 	{
 		if (tag == LiteNpcTag)
 			GameStats::liteKilled++;
@@ -28,8 +31,6 @@ NpcBase::~NpcBase()
 			GameStats::staticKilled++;
 		else if (tag == ShooterNpcTag)
 			GameStats::shooterKilled++;
-
-		GameStats::time = App::sceneTimer;
 	}
 	Collisions::remove_collider(*this);
 }
@@ -60,8 +61,11 @@ void NpcBase::update(float dt)
 		healthBar.set_value(health / maxHealth);
 	}
 
-	if (distToTarget > 1500) // apply damage to npc if too far from player
+	if (distToTarget > 2000) // apply damage to npc if too far from player
+	{
 		health -= 10;
+		otherDamage -= 10;
+	}
 
 	if (health <= 0)
 		isActive = false;
@@ -89,6 +93,10 @@ void NpcBase::draw()
 	Sprite::draw();
 	healthBar.draw();
 }
+
+float NpcBase::get_health() { return health; }
+
+void NpcBase::set_health(float _val) { health = _val; healthBar.set_value(_val / maxHealth); }
 
 void ShooterNpcBase::update(float dt, Vector2 _target)
 {
@@ -128,6 +136,7 @@ LiteNpc::LiteNpc(Vector2 _pos)
 
 	rect.set(Vector2(image.width, image.height), _pos);
 	tag = LiteNpcTag;
+	healthBar.set_pos(rect.get_center() + Vector2::up * 50);
 }
 
 void LiteNpc::update(float dt, Vector2 _target)
@@ -142,11 +151,11 @@ void LiteNpc::update(float dt, Vector2 _target)
 	}
 }
 
-HeavyNpc::HeavyNpc(Vector2 _pos)
+HeavyNpc::HeavyNpc(Vector2 _pos) :LiteNpc(_pos)
 {
-	range = 20;
 	speed = 100 + rand() % 20;
 	maxHealth = health = 100;
+
 	image.free();
 	load_image(image, "Resources/Joker.png");
 	rect.set(Vector2(image.width, image.height), _pos);
@@ -195,6 +204,7 @@ ShooterNpc::ShooterNpc(Vector2 _pos)
 
 	rect.set(Vector2(image.width, image.height), _pos);
 	tag = ShooterNpcTag;
+	healthBar.set_pos(rect.get_center() + Vector2::up * 50);
 }
 
 void ShooterNpc::update(float dt, Vector2 _target)
@@ -207,7 +217,6 @@ void ShooterNpc::update(float dt, Vector2 _target)
 		distToTarget = _target.distance(rect.get_center());
 	}
 }
-
 #pragma endregion
 
 NpcManager::NpcManager()
@@ -215,23 +224,46 @@ NpcManager::NpcManager()
 	heavyNo = 2;
 }
 
-void NpcManager::create(Sprite& _player)
+void NpcManager::create(Sprite& _player, bool _load)
 {
 	player = &_player;
-	liteNpcs.create(heavyNo, Vector2(-2000), Vector2(2000));
-	shooterNpcs.create(heavyNo, Vector2(-2000), Vector2(2000));
-	heavyNpcs.create(2, Vector2(-2000), Vector2(2000));
-	staticNpcs.create(5, Vector2(-1000), Vector2(1000));
+
+	if (_load && DataManager::is_loaded())
+	{
+		wave = GameStats::wave;
+
+		DArray<Pair<Vector2, float>> data = DataManager::get_enemy_data(LiteNpcTag);
+		int size = data.get_size();
+		for (unsigned int i = 0; i < size; i++)
+			liteNpcs.add(data[i].key, data[i].value);
+
+		data = DataManager::get_enemy_data(HeavyNpcTag);
+		size = data.get_size();
+		for (unsigned int i = 0; i < size; i++)
+			heavyNpcs.add(data[i].key, data[i].value);
+
+		data = DataManager::get_enemy_data(StaticNpcTag);
+		size = data.get_size();
+		for (unsigned int i = 0; i < size; i++)
+			staticNpcs.add(data[i].key, data[i].value);
+
+		data = DataManager::get_enemy_data(ShooterNpcTag);
+		size = data.get_size();
+		for (unsigned int i = 0; i < size; i++)
+			shooterNpcs.add(data[i].key, data[i].value);
+	}
+	else
+		update_wave();
 }
 
 void NpcManager::update_wave()
 {
 	if (!liteNpcs.is_active() && !shooterNpcs.is_active())
 	{
-		liteNpcs.create(heavyNo++, Vector2(-2000), Vector2(2000));
-		shooterNpcs.create(heavyNo++, Vector2(-2000), Vector2(2000));
-		heavyNpcs.create(2, Vector2(-2000), Vector2(2000));
-		staticNpcs.create(5 + wave, Vector2(-1000), Vector2(1000));
+		liteNpcs.create(heavyNo++, LiteNpcTag);
+		shooterNpcs.create(heavyNo++, ShooterNpcTag);
+		heavyNpcs.create(2 + wave, HeavyNpcTag);
+		staticNpcs.create(2 + wave, StaticNpcTag);
 		wave++;
 		GameStats::wave = wave;
 	}
@@ -318,4 +350,12 @@ void NpcManager::destroy()
 	staticNpcs.destroy();
 	shooterNpcs.destroy();
 	heavyNpcs.destroy();
+}
+
+void NpcManager::save_data()
+{
+	DataManager::set_npc_data(LiteNpcTag, liteNpcs.get_data());
+	DataManager::set_npc_data(HeavyNpcTag, heavyNpcs.get_data());
+	DataManager::set_npc_data(StaticNpcTag, staticNpcs.get_data());
+	DataManager::set_npc_data(ShooterNpcTag, shooterNpcs.get_data());
 }

@@ -15,9 +15,9 @@ void DamageArea::on_collide(Collider& _other)
 		player->on_collide(_other);
 }
 
-Character::Character(std::string _location, Vector2 _pos, Level& _level) :level(_level), Sprite(_location, _pos)
+Character::Character(std::string _location, Vector2 _pos, float _health, Level& _level) :level(_level), Sprite(_location, _pos)
 {
-	health = 100;
+	health = _health;
 	speed = 200;
 	range = 400;
 	hitDamage = 0;
@@ -27,8 +27,9 @@ Character::Character(std::string _location, Vector2 _pos, Level& _level) :level(
 	cdTimer = coolDown;
 	target.set(0, 0);
 
-	healthBar.create(Vector2(200, 20), Vector2(Camera::camRect.size.x / 2 - 100, Camera::camRect.size.y - 35), Color::GREEN, Color::RED);
-	attackCharge.create(Vector2(200, 10), Vector2(Camera::camRect.size.x / 2 - 100, Camera::camRect.size.y - 50), Color::AQUA, Color::WHITE);
+	Vector2 camSize = Camera::camRect.size;
+	healthBar.create(Vector2(200, 20), Vector2(camSize.x / 2 - 100, camSize.y - 35), Color::GREEN, Color::RED, health / 100);
+	attackCharge.create(Vector2(200, 10), Vector2(camSize.x / 2 - 100, camSize.y - 50), Color::AQUA, Color::WHITE);
 
 	pPool.create(Vector2(10, 10), 300, 300, PlayerProjectileTag, Color::BLACK);
 	dmgArea.create(range, rect.get_center());
@@ -166,3 +167,5 @@ void Character::set_nearest(Vector2 _pos)
 {
 	target = _pos.distance(rect.get_center()) <= range ? _pos : Vector2::zero;
 }
+
+float Character::get_health() { return health; }

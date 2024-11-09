@@ -87,7 +87,7 @@ Vector2 Vector2::move_towards(Vector2& v2, const float speed, float minDist)
 Vector2 Vector2::get_random(Vector2 _min, Vector2 _max)
 {
 	Vector2 _range = _max - _min;
-	return _min + Vector2(rand() % static_cast<int>(_range.y), rand() % static_cast<int>(_range.y));
+	return _min + Vector2(rand() % static_cast<int>(_range.x), rand() % static_cast<int>(_range.y));
 }
 #pragma endregion
 
@@ -303,5 +303,31 @@ std::string Engine::get_time(double _sec)
 		":" + std::to_string(static_cast<int>(_sec) % 3600 / 60) +
 		":" + std::to_string(static_cast<int>(_sec) % 60);
 	return time;
+}
+
+Vector2 Engine::get_random_exclude(Rect _rect, Vector2 _extra)
+{
+	// choose a random side
+	int _side = rand() % 4;
+	Vector2 _tl = _rect.get_topleft() - Vector2(50), _br = _rect.get_botmright() + Vector2(50);
+	Vector2 _min, _max;
+	switch (_side)
+	{
+		// left side
+	case 0:_min.set(_tl.x - _extra.x, _tl.y - _extra.y); _max.set(_tl.x, _br.y + _extra.y);
+		break;
+		//right side
+	case 1:_min.set(_br.x, _tl.y - _extra.y); _max.set(_br.x + _extra.x, _br.y + _extra.y);
+		break;
+		//top side
+	case 2:_min.set(_tl.x - _extra.x, _tl.y - _extra.y); _max.set(_br.x + _extra.x, _tl.y);
+		break;
+		// bottom side
+	case 3:_min.set(_tl.x - _extra.x, _br.y); _max.set(_br.x + _extra.x, _br.y + _extra.y);
+		break;
+	}
+
+	// return random between 2 vectors
+	return Vector2::get_random(_min, _max);
 }
 

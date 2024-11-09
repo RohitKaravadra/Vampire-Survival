@@ -24,7 +24,7 @@ namespace Utilities
 		}
 
 		// copy constructor
-		DArray(DArray& _other)
+		DArray(const DArray& _other)
 		{
 			if (this == &_other)
 				return;
@@ -36,8 +36,8 @@ namespace Utilities
 
 			size = _other.size;
 			data = new T[size];
-			for (unsigned int i = 0; i < size; i++)
-				add(_other.data[i]);
+			for (int i = 0; i < size; i++)
+				data[i] = _other.data[i];
 		}
 
 		// destructor
@@ -129,7 +129,7 @@ namespace Utilities
 		// clear array
 		void clear()
 		{
-			if (data == nullptr)
+			if (data == nullptr || size == 0)
 				return;
 
 			delete[] data;
@@ -209,13 +209,27 @@ namespace Utilities
 
 			clear();
 			size = _other.size;
-			if (size > 0)
-			{
-				data = new T[size];
-				memcpy(data, _other.data, size * sizeof(T));
-			}
+
+			if (size <= 0)
+				return *this;
+
+			size = _other.size;
+			data = new T[size];
+			for (int i = 0; i < size; i++)
+				data[i] = _other.data[i];
 
 			return *this;
+		}
+
+		// comparision operators
+		bool operator==(DArray& _other)
+		{
+			return data == _other.data;
+		}
+
+		bool operator!=(DArray& _other)
+		{
+			return data != _other.data;
 		}
 
 		friend ostream& operator<<(ostream& os, DArray& value)
@@ -239,11 +253,14 @@ namespace Utilities
 		T2 value;
 
 		Pair() = default;
-		Pair(Pair& _other)
+
+		// copy constructor
+		Pair(const Pair& _other)
 		{
 			key = _other.key;
 			value = _other.value;
 		}
+
 		Pair(T1 _key, T2 _value)
 		{
 			key = _key;
@@ -258,6 +275,13 @@ namespace Utilities
 		bool operator!=(Pair& _other)
 		{
 			return key != _other.key || value != _other.value;
+		}
+
+		Pair& operator=(const Pair& _other)
+		{
+			key = _other.key;
+			value = _other.value;
+			return *this;
 		}
 
 		friend ostream& operator<<(ostream& os, Pair& _pair)
@@ -279,7 +303,7 @@ namespace Utilities
 		}
 
 		// copy constructor
-		Dictionary(Dictionary& _other)
+		Dictionary(const Dictionary& _other)
 		{
 			if (this == &_other)
 				return;
@@ -392,7 +416,7 @@ namespace Utilities
 			return data[0];
 		}
 
-		/*Dictionary<T1, T2>& operator=(Dictionary<T1, T2>& _other)
+		Dictionary<T1, T2>& operator=(const Dictionary<T1, T2>& _other)
 		{
 			if (this == &_other)
 				return *this;
@@ -402,7 +426,7 @@ namespace Utilities
 			size = data.get_size();
 
 			return *this;
-		}*/
+		}
 
 		friend ostream& operator<<(ostream& os, Dictionary& _dict)
 		{

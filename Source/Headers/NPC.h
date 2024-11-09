@@ -2,6 +2,7 @@
 #include "Projectiles.h"
 #include "Utilities.h"
 #include "GameStats.h"
+#include "Constants.h"
 
 using namespace Engine;
 using namespace Utilities;
@@ -14,15 +15,26 @@ class NpcSwarm
 
 public:
 
-	void create(unsigned int _number, Vector2 _minPos, Vector2 _maxPos)
+	void create(unsigned int _number, std::string _tag)
 	{
-		for (unsigned int i = 0; i < _number; i++)
-			add(Vector2::get_random(_minPos, _maxPos));
+		if (_tag == StaticNpcTag)
+		{
+			Vector2 _min = Camera::camRect.get_topleft(), _max = Camera::camRect.get_botmright();
+			for (unsigned int i = 0; i < _number; i++)
+				add(Vector2::get_random(_min, _max));
+		}
+		else
+		{
+			for (unsigned int i = 0; i < _number; i++)
+				add(get_random_exclude(Camera::camRect, Vector2(100, 100)));
+		}
 	}
 
 	void destroy() { active.clear_with_elements(); }
 
 	void add(Vector2 _pos) { active.add(new T(_pos)); }
+
+	void add(Vector2 _pos, float _health) { active.add(new T(_pos)); active[active.get_size() - 1]->set_health(_health); }
 
 	void update(Vector2 _target, float dt)
 	{
@@ -54,11 +66,29 @@ public:
 			});
 		return pos;
 	}
+
+	DArray<Pair<Vector2, float>> get_data()
+	{
+		DArray<Pair<Vector2, float>> data;
+		int size = active.get_size();
+		if (size > 0)
+		{
+			Pair<Vector2, float> pair;
+			for (int i = 0; i < size; i++)
+			{
+				pair.key = active[i]->rect.get_center();
+				pair.value = active[i]->get_health();
+				data.add(pair);
+			}
+		}
+		return data;
+	}
 };
 
 // base class for all Npcs
 class NpcBase : public Sprite
 {
+	float otherDamage; // keeps in check of automatic damage
 protected:
 	float speed;
 	int range;
@@ -82,6 +112,8 @@ public:
 	void on_collide(Collider& _other) override;
 	void update(float dt) override;
 	virtual void draw() override;
+	float get_health();
+	void set_health(float);
 };
 
 class ShooterNpcBase :public NpcBase
@@ -140,10 +172,11 @@ class NpcManager
 	unsigned int wave = 0;
 public:
 	NpcManager();
-	void create(Sprite&);
+	void create(Sprite&, bool = false);
 	void destroy();
 	void update_wave();
 	void update(float);
 	void draw();
 	Vector2 get_nearest();
+	void save_data();
 };

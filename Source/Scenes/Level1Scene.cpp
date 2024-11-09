@@ -3,6 +3,8 @@
 #include "level.h"
 #include "SceneManagement.h"
 #include"Character.h"
+#include "Constants.h"
+#include "DataManager.h"
 
 class GameScene :public Scene
 {
@@ -11,7 +13,8 @@ class GameScene :public Scene
 	NpcManager npcManager;
 
 	bool gameOver;
-	float endCounter;
+	bool gameStarted;
+	float timer;
 public:
 	GameScene()
 	{
@@ -27,27 +30,60 @@ public:
 	// start app and create objects
 	void start() override
 	{
+		GameStats::reset();
 		Scene::start();
 		level = new Level();
-		player = new Character("Resources/Hero.png", Vector2(0), *level);
-		npcManager.create(*player);
+		load_game_state();
 
 		Camera::set_follow_target(player->rect);
-		GameStats::reset();
 
 		gameOver = false;
-		endCounter = 0;
+		gameStarted = false;
+		timer = 3;
 
 		// starte update loop for this scene
 		update_loop();
+	}
+
+	// load saved data of game
+	void load_game_state()
+	{
+		DataManager::load_data();
+		if (DataManager::is_loaded())
+		{
+			Pair<Vector2, float> playerData = DataManager::get_player_data();
+			player = new Character("Resources/Hero.png", playerData.key, playerData.value, *level);
+		}
+		else
+			player = new Character("Resources/Hero.png", Vector2::zero, 100, *level);
+
+		npcManager.create(*player, true);
+	}
+
+	// save current data of game if available
+	void save_game_state()
+	{
+		if (gameOver)
+			DataManager::save_data(true);
+		else
+		{
+			DataManager::set_player_data(player->rect.get_center(), player->get_health());
+			npcManager.save_data();
+			DataManager::save_data();
+		}
 	}
 
 	void destroy()override
 	{
 		isActive = false;
 
-		if (gameOver)
-			GameStats::print();
+		if (App::is_active())
+		{
+			GameStats::time += App::sceneTimer;
+			if (gameOver)
+				GameStats::print();
+			save_game_state();
+		}
 
 		npcManager.destroy();
 
@@ -56,40 +92,51 @@ public:
 		level = nullptr;
 	}
 
-	bool is_game_over(float dt)
+	void update_game_state()
 	{
-		if (gameOver)
+		if (timer <= 0)
 		{
-			if (endCounter <= 0)
-				return true;
-			endCounter -= dt;
-		}
-		else
-		{
-			if (!player->is_alive())
+			if (gameStarted)
 			{
-				gameOver = true;
-				GameStats::time = App::sceneTimer;
-				endCounter = 3;
+				if (gameOver)
+					isActive = false;
+				else
+				{
+					if (!player->is_alive())
+					{
+						gameOver = true;
+						timer = 3;
+						GameStats::time = App::sceneTimer;
+					}
+				}
 			}
+			else
+				gameStarted = true;
 		}
-		return false;
 	}
 
 	void update(float dt)override
 	{
-		// update all objects
-		player->update(dt);
-		npcManager.update(dt);
-		player->set_nearest(npcManager.get_nearest());
+		// update timer
+		if (timer > 0)
+			timer -= dt;
+
+		update_game_state();
+
+		// check if game is started
+		if (gameStarted)
+		{
+			// update all objects
+			player->update(dt);
+			npcManager.update(dt);
+			player->set_nearest(npcManager.get_nearest());
+
+			// check for exit condition
+			if (!gameOver && Inputs::ui_back())
+				isActive = false;
+		}
+
 		Camera::update(dt);
-
-		if (is_game_over(dt))
-			isActive = false;
-
-		// check for exit condition
-		if (!gameOver && Inputs::ui_back())
-			isActive = false;
 	}
 
 	void draw() override
