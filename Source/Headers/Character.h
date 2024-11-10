@@ -32,10 +32,10 @@ class Character : public Sprite
 	ProjectilePool<20U> pPool;
 
 	DamageArea dmgArea;
-	Level& level;
+	TileMap<32U, 24U>& level;
 public:
 	Character() = default;
-	Character(std::string _location, Vector2 _pos, float _health, Level& _level);
+	Character(std::string _location, Vector2 _pos, float _health, TileMap<32U, 24U>& _level);
 	// destructor
 	~Character() override;
 	// update character

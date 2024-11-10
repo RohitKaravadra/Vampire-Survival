@@ -12,10 +12,10 @@ bool load_image(Image& image, std::string location)
 	return image.load(location);
 }
 
-void load_level(Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
+void load_level(std::string _name, Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
 {
 	_level.clear();
-	std::ifstream levelFile("level.txt");
+	std::ifstream levelFile(_name);
 	if (levelFile)
 	{
 		string line;
@@ -44,12 +44,12 @@ void load_level(Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
 	levelFile.close();
 }
 
-void save_level(Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
+void save_level(std::string _name, Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
 {
 	unsigned int size = _level.get_size();
 	if (size > 0)
 	{
-		std::ofstream levelFile("level.txt");
+		std::ofstream levelFile(_name);
 
 		levelFile << size << "\n";
 		for (unsigned int i = 0; i < size; i++)

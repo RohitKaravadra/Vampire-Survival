@@ -15,7 +15,7 @@ void DamageArea::on_collide(Collider& _other)
 		player->on_collide(_other);
 }
 
-Character::Character(std::string _location, Vector2 _pos, float _health, Level& _level) :level(_level), Sprite(_location, _pos)
+Character::Character(std::string _location, Vector2 _pos, float _health, TileMap<32U, 24U>& _level) :level(_level), Sprite(_location, _pos)
 {
 	health = _health;
 	speed = 200;
