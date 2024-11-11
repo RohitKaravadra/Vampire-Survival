@@ -575,7 +575,7 @@ namespace GamesEngineeringBase
 		// Returns the mouse wheel value
 		int getMouseWheel()
 		{
-			int val = mouseWheel;
+			int val = mouseWheel; // resetting for next update --Rohit
 			mouseWheel = 0;
 			return val;
 		}

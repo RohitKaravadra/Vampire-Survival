@@ -15,10 +15,7 @@ void Inputs::Init(Window& _win)
 		Inputs::win = &_win;
 }
 
-void Inputs::destroy()
-{
-	Inputs::win = nullptr;
-}
+void Inputs::destroy() { Inputs::win = nullptr; }
 
 void Inputs::refresh()
 {
@@ -59,25 +56,13 @@ int Inputs::get_v_axis()
 	return axis;
 }
 
-Vector2 Inputs::get_axis()
-{
-	return Vector2(get_h_axis(), get_v_axis()).normalize();
-}
+Vector2 Inputs::get_axis() { return Vector2(get_h_axis(), get_v_axis()).normalize(); }
 
-Vector2 Inputs::get_mouse_pos()
-{
-	return mousePos;
-}
+Vector2 Inputs::get_mouse_pos() { return mousePos; }
 
-bool Inputs::mouse_button(MouseButton _button)
-{
-	return win->mouseButtonPressed(_button);
-}
+bool Inputs::mouse_button(MouseButton _button) { return win->mouseButtonPressed(_button); }
 
-int Inputs::mouse_wheel()
-{
-	return win->getMouseWheel();
-}
+int Inputs::mouse_wheel() { return win->getMouseWheel(); }
 
 bool Inputs::key_pressed(int key)
 {

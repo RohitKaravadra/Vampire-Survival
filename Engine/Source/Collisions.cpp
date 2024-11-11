@@ -2,25 +2,11 @@
 
 #pragma region Collider
 
-Collider::~Collider()
-{
+std::string Collider::get_tag() { return tag; }
 
-}
+bool Collider::compare_tag(Collider& _other) const { return tag == _other.tag; }
 
-std::string Collider::get_tag()
-{
-	return tag;
-}
-
-bool Collider::compare_tag(Collider& _other) const
-{
-	return tag == _other.tag;
-}
-
-bool Collider::compare_tag(std::string _tag) const
-{
-	return tag == _tag;
-}
+bool Collider::compare_tag(std::string _tag) const { return tag == _tag; }
 
 #pragma endregion
 

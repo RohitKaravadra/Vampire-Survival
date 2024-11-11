@@ -6,14 +6,16 @@
 #include "DataManager.h"
 #include "TileMap.h"
 
+// another level but infinite or can say rolling
 class InfiniteLevel :public TileMap<32, 24>
 {
-	Vector2 camPos;
-	Vector2 camGPos;
-	Vector2 mapSize;
-	Vector2 maxBounds;
-	Vector2 minBounds;
+	Vector2 camPos; // camera position
+	Vector2 camGPos; // camera position according to grid
+	Vector2 mapSize; // map size
+	Vector2 maxBounds; // maximum bounds of map
+	Vector2 minBounds; // minimum bounds of map
 public:
+	// loading level in constructor
 	InfiniteLevel()
 	{
 		for (unsigned int i = 0; i < 24; i++)
@@ -28,6 +30,7 @@ public:
 		minBounds = Vector2::zero - (mapSize / 2) * 32;
 	}
 
+	// update map
 	void update(float dt) override
 	{
 		camPos = Camera::camRect.get_center();
@@ -35,6 +38,7 @@ public:
 		update_pos();
 	}
 
+	// check for updating tiles
 	void update_pos()
 	{
 		for (unsigned int i = 0; i < size; i++)
@@ -57,25 +61,20 @@ public:
 	}
 };
 
+// another scene
 class Level2Scene :public Scene
 {
 	Character* player;
 	InfiniteLevel* level;
 	NpcManager npcManager;
 
-	bool gameOver;
-	bool gameStarted;
-	float timer;
+	bool gameOver; // to check game over state
+	bool gameStarted; // to check game started state
+	float timer; // timer for game start and over
+	float fps; // fps to check performance
 public:
-	Level2Scene()
-	{
-		name = "Level2Scene";
-	}
-
-	~Level2Scene()
-	{
-		destroy();
-	}
+	Level2Scene() { name = "Level2Scene"; }
+	~Level2Scene() { destroy(); }
 
 	// start app and create objects
 	void start() override
@@ -89,7 +88,8 @@ public:
 
 		gameOver = false;
 		gameStarted = false;
-		timer = 1;
+		timer = 3;
+		fps = 0;
 
 		// starte update loop for this scene
 		update_loop();
@@ -103,6 +103,7 @@ public:
 		{
 			if (gameOver)
 				GameStats::print();
+			std::cout << "\nAverage FPS : " << fps << "\n\n";
 		}
 
 		npcManager.destroy();
@@ -141,6 +142,9 @@ public:
 		if (timer > 0)
 			timer -= dt;
 
+		// calculate fps
+		fps = (fps + 1 / dt) / 2;
+
 		update_game_state();
 
 		// check if game is started
@@ -171,14 +175,9 @@ public:
 	{
 		player->draw_ui();
 	}
-
-	void debug()override
-	{
-		level->debug(1);
-		player->debug();
-	}
 };
 
+// creates and returns new level 2 scene
 Scene* create_level_2_scene()
 {
 	return new Level2Scene();

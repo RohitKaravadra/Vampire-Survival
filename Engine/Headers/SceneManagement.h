@@ -10,46 +10,39 @@ namespace Engine
 	class Scene
 	{
 	protected:
-		bool isActive = false;
-		std::string name = "";
-		Timer timer;
-		float dt;
+		bool isActive = false; // holds current state of scene
+		std::string name = ""; // name of the scene use to identify scne by scene manager
+		Timer timer; // timer to get delta time
+		float dt; // delta time
 	public:
 		Scene() = default;
+		// method starts the scene loop
 		virtual void start() { App::sceneTimer = 0; };
+		// method stops the scene
 		void stop();
+		// scene update loop to update scene state
 		void update_loop();
+		// virtual function to be overriden later
+		// update scene objects
 		virtual void update(float dt) {};
+		// draw scene objects
 		virtual void draw() {};
+		// draw scene ui
 		virtual void draw_ui() {};
+		// debug scene objects
 		virtual void debug() {};
+		// destroy scene
 		virtual void destroy() {};
+		// virtual destructor
 		virtual ~Scene() {};
 
-		string get_name()
-		{
-			return name;
-		}
+		// getter for scene name
+		string get_name() { return name; }
 
-		bool operator==(Scene& _other)
-		{
-			return _other.name == name;
-		}
-
-		bool operator==(std::string _other)
-		{
-			return _other == name;
-		}
-
-		bool operator!=(Scene& _other)
-		{
-			return _other.name != name;
-		}
-
-		bool operator!=(std::string _other)
-		{
-			return _other != name;
-		}
+		bool operator==(Scene& _other) { return _other.name == name; }
+		bool operator==(std::string _other) { return _other == name; }
+		bool operator!=(Scene& _other) { return _other.name != name; }
+		bool operator!=(std::string _other) { return _other != name; }
 	};
 
 	// scene management class to handle scene change
@@ -84,7 +77,7 @@ namespace Engine
 
 			for (unsigned int i = 0; i < curIndex; i++)
 			{
-				delete scenes[i];
+				delete scenes[i]; // destroy each scene
 				scenes[i] = nullptr;
 			}
 		}
@@ -92,7 +85,7 @@ namespace Engine
 		// add scene pointer to scenes
 		bool add(Scene* _scene)
 		{
-			if (curIndex >= totalScenes)
+			if (curIndex >= totalScenes) // if no space delete scene
 			{
 				delete _scene;
 				return false;

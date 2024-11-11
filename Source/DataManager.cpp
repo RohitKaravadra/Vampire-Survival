@@ -4,10 +4,10 @@
 #include <fstream>
 #include <string>
 
-DArray<Pair<Vector2, float>> DataManager::liteEnemyData;
-DArray<Pair<Vector2, float>> DataManager::heavyEnemyData;
-DArray<Pair<Vector2, float>> DataManager::staticEnemyData;
-DArray<Pair<Vector2, float>> DataManager::shooterEnemyData;
+DArray<Pair<Vector2, float>> DataManager::liteNpcData;
+DArray<Pair<Vector2, float>> DataManager::heavyNpcData;
+DArray<Pair<Vector2, float>> DataManager::staticNpcData;
+DArray<Pair<Vector2, float>> DataManager::shooterNpcData;
 
 Pair<Vector2, float> DataManager::playerData;
 bool DataManager::isLoaded = false;
@@ -16,13 +16,13 @@ bool DataManager::isLoaded = false;
 void DataManager::set_npc_data(std::string _tag, DArray<Pair<Vector2, float>> _data)
 {
 	if (_tag == LiteNpcTag)
-		liteEnemyData = _data;
+		liteNpcData = _data;
 	else if (_tag == HeavyNpcTag)
-		heavyEnemyData = _data;
+		heavyNpcData = _data;
 	else if (_tag == StaticNpcTag)
-		staticEnemyData = _data;
+		staticNpcData = _data;
 	else if (_tag == ShooterNpcTag)
-		shooterEnemyData = _data;
+		shooterNpcData = _data;
 }
 
 void DataManager::set_player_data(Vector2 _pos, float _health)
@@ -34,13 +34,13 @@ void DataManager::set_player_data(Vector2 _pos, float _health)
 DArray<Pair<Vector2, float>>& DataManager::get_enemy_data(std::string _tag)
 {
 	if (_tag == LiteNpcTag)
-		return liteEnemyData;
+		return liteNpcData;
 	if (_tag == HeavyNpcTag)
-		return heavyEnemyData;
+		return heavyNpcData;
 	if (_tag == StaticNpcTag)
-		return staticEnemyData;
+		return staticNpcData;
 	if (_tag == ShooterNpcTag)
-		return shooterEnemyData;
+		return shooterNpcData;
 
 	DArray<Pair<Vector2, float>> data;
 	return data;
@@ -56,10 +56,10 @@ void DataManager::clear_data()
 	playerData.key = Vector2::zero;
 	playerData.value = 100;
 
-	liteEnemyData.clear();
-	heavyEnemyData.clear();
-	staticEnemyData.clear();
-	shooterEnemyData.clear();
+	liteNpcData.clear();
+	heavyNpcData.clear();
+	staticNpcData.clear();
+	shooterNpcData.clear();
 
 	isLoaded = false;
 }
@@ -77,29 +77,29 @@ void DataManager::save_data(bool _null)
 		saveFile << PlayerTag << "\n" << playerData.key.x << ','
 			<< playerData.key.y << ',' << playerData.value << "\n";
 
-		int size = liteEnemyData.get_size();
+		int size = liteNpcData.get_size();
 		saveFile << LiteNpcTag << "\n" << size << "\n";
 		for (unsigned int i = 0; i < size; i++)
-			saveFile << liteEnemyData[i].key.x << ',' <<
-			liteEnemyData[i].key.y << ',' << liteEnemyData[i].value << "\n";
+			saveFile << liteNpcData[i].key.x << ',' <<
+			liteNpcData[i].key.y << ',' << liteNpcData[i].value << "\n";
 
-		size = heavyEnemyData.get_size();
+		size = heavyNpcData.get_size();
 		saveFile << HeavyNpcTag << "\n" << size << "\n";
 		for (unsigned int i = 0; i < size; i++)
-			saveFile << heavyEnemyData[i].key.x << ',' <<
-			heavyEnemyData[i].key.y << ',' << heavyEnemyData[i].value << "\n";
+			saveFile << heavyNpcData[i].key.x << ',' <<
+			heavyNpcData[i].key.y << ',' << heavyNpcData[i].value << "\n";
 
-		size = staticEnemyData.get_size();
+		size = staticNpcData.get_size();
 		saveFile << StaticNpcTag << "\n" << size << "\n";
 		for (unsigned int i = 0; i < size; i++)
-			saveFile << staticEnemyData[i].key.x << ',' <<
-			staticEnemyData[i].key.y << ',' << staticEnemyData[i].value << "\n";
+			saveFile << staticNpcData[i].key.x << ',' <<
+			staticNpcData[i].key.y << ',' << staticNpcData[i].value << "\n";
 
-		size = shooterEnemyData.get_size();
+		size = shooterNpcData.get_size();
 		saveFile << ShooterNpcTag << "\n" << size << "\n";
 		for (unsigned int i = 0; i < size; i++)
-			saveFile << shooterEnemyData[i].key.x << ',' <<
-			shooterEnemyData[i].key.y << ',' << shooterEnemyData[i].value << "\n";
+			saveFile << shooterNpcData[i].key.x << ',' <<
+			shooterNpcData[i].key.y << ',' << shooterNpcData[i].value << "\n";
 	}
 
 	saveFile.close();
@@ -145,7 +145,7 @@ void DataManager::load_data()
 					std::getline(saveFile, line);
 					pair.value = stof(line);
 
-					liteEnemyData.add(pair);
+					liteNpcData.add(pair);
 				}
 			}
 
@@ -163,7 +163,7 @@ void DataManager::load_data()
 					std::getline(saveFile, line);
 					pair.value = stof(line);
 
-					heavyEnemyData.add(pair);
+					heavyNpcData.add(pair);
 				}
 			}
 
@@ -181,7 +181,7 @@ void DataManager::load_data()
 					std::getline(saveFile, line);
 					pair.value = stof(line);
 
-					staticEnemyData.add(pair);
+					staticNpcData.add(pair);
 				}
 			}
 
@@ -199,7 +199,7 @@ void DataManager::load_data()
 					std::getline(saveFile, line);
 					pair.value = stof(line);
 
-					shooterEnemyData.add(pair);
+					shooterNpcData.add(pair);
 				}
 			}
 		}

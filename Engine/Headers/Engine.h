@@ -9,8 +9,8 @@ using namespace GamesEngineeringBase;
 using Utilities::Dictionary;
 using Utilities::Pair;
 
-static int OBJECT_ID_COUNTER = 0;
-extern bool DEBUG_MODE;
+static int OBJECT_ID_COUNTER = 0; // keeps count of the object created
+extern bool DEBUG_MODE; // use to debug 
 
 // generate id for objects created
 int generate_id();
@@ -23,15 +23,6 @@ namespace Engine
 	void create_circle_outline(Image& _image, Color _color, int _width = 1);
 	// fill image with color
 	void fill_image(Image& _image, Color _color);
-
-	//// class for loading resources
-	//static class Resources
-	//{
-	//	static Dictionary<string, Image> image_collection;
-	//	static int load_image(string location);
-	//public:
-	//	static Image& get_image(string location);
-	//};
 
 	// class handles inputs 
 	class Inputs

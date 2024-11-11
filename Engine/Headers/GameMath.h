@@ -114,9 +114,9 @@ namespace Engine
 	// class to handle rect for drawing and collision (subjected to change)
 	class Rect
 	{
-		float l, r, t, b;
+		float l, r, t, b; // bounds for rectangle
 	public:
-		Vector2 size; // size of the rectangle
+		Vector2 size; // size of the rectangle (keeping public may cause problem, implement getter for more safety)
 
 		// constructors
 		Rect();

@@ -9,11 +9,13 @@ namespace Utilities
 
 #pragma region Dynamic Array
 
+	// Dynamic growable array template (Array grows by 1 every time, not a very good approach)
+	// logic can be updated to make it grow by some factor
 	template<typename T>
 	class DArray
 	{
-		T* data;
-		unsigned int size;
+		T* data; // dynamic array pointer
+		unsigned int size; // size of the array
 
 	public:
 		// constructor
@@ -41,16 +43,10 @@ namespace Utilities
 		}
 
 		// destructor
-		~DArray()
-		{
-			clear();
-		}
+		~DArray() { clear(); }
 
 		// get current size of array
-		int get_size()
-		{
-			return size;
-		}
+		int get_size() { return size; }
 
 		// check if element is in the array or not
 		bool has(T value)
@@ -196,10 +192,7 @@ namespace Utilities
 				_todo(data[i]);
 		}
 
-		T& operator[](int index)
-		{
-			return data[index];
-		}
+		T& operator[](int index) { return data[index]; }
 
 		// only use if array is not a pointer array
 		DArray& operator=(const DArray& _other)
@@ -219,15 +212,8 @@ namespace Utilities
 		}
 
 		// comparision operators
-		bool operator==(DArray& _other)
-		{
-			return data == _other.data;
-		}
-
-		bool operator!=(DArray& _other)
-		{
-			return data != _other.data;
-		}
+		bool operator==(DArray& _other) { return data == _other.data; }
+		bool operator!=(DArray& _other) { return data != _other.data; }
 
 		friend ostream& operator<<(ostream& os, DArray& value)
 		{
@@ -244,6 +230,7 @@ namespace Utilities
 #pragma region Dictionary
 
 	template<typename T1, typename T2>
+	// key value pair template for dictionary to use
 	struct Pair
 	{
 		T1 key;
@@ -264,15 +251,8 @@ namespace Utilities
 			value = _value;
 		}
 
-		bool operator==(Pair& _other)
-		{
-			return key == _other.key && value == _other.value;
-		}
-
-		bool operator!=(Pair& _other)
-		{
-			return key != _other.key || value != _other.value;
-		}
+		bool operator==(Pair& _other) { return key == _other.key && value == _other.value; }
+		bool operator!=(Pair& _other) { return key != _other.key || value != _other.value; }
 
 		Pair& operator=(const Pair& _other)
 		{
@@ -288,16 +268,15 @@ namespace Utilities
 	};
 
 	template<typename T1, typename T2>
+	// Dictionary/map template to store data
+	// avoid using with pointers (dangling pointers problem)
 	class Dictionary
 	{
-		DArray<Pair<T1, T2>> data;
+		DArray<Pair<T1, T2>> data; // dynamic array of pairs
 		unsigned int size = 0;
 	public:
 		// default constructor
-		Dictionary()
-		{
-			size = 0;
-		}
+		Dictionary() { size = 0; }
 
 		// copy constructor
 		Dictionary(const Dictionary& _other)
@@ -309,15 +288,10 @@ namespace Utilities
 		}
 
 		// destructor
-		~Dictionary()
-		{
-			clear();
-		}
+		~Dictionary() { clear(); }
+
 		// returns current size of data
-		unsigned int get_size()
-		{
-			return size;
-		}
+		unsigned int get_size() { return size; }
 
 		// checks if data has given key or not
 		bool has(T1 _key)
@@ -413,6 +387,7 @@ namespace Utilities
 			return data[0];
 		}
 
+		// something ChatGpt tought was to use const in assignment operator and copy constructors (AI is useful)
 		Dictionary<T1, T2>& operator=(const Dictionary<T1, T2>& _other)
 		{
 			if (this == &_other)

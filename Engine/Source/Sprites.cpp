@@ -61,24 +61,9 @@ void Sprite::debug()
 		Camera::draw(rect, dbgImage);
 }
 
-bool Sprite::operator==(Sprite& other) const
-{
-	return id == other.id;
-}
-
-bool Sprite::operator==(Sprite* other) const
-{
-	return id == other->id;
-}
-
-bool Sprite::operator!=(Sprite& other) const
-{
-	return id != other.id;
-}
-
-bool Sprite::operator!=(Sprite* other) const
-{
-	return id != other->id;
-}
+bool Sprite::operator==(Sprite& other) const { return id == other.id; }
+bool Sprite::operator==(Sprite* other) const { return id == other->id; }
+bool Sprite::operator!=(Sprite& other) const { return id != other.id; }
+bool Sprite::operator!=(Sprite* other) const { return id != other->id; }
 
 #pragma endregion

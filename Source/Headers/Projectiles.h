@@ -4,12 +4,14 @@
 
 using Engine::Vector2;
 
+// class for projectiles
 class Projectile :public Collider
 {
-	Vector2 vel;
-	Vector2 pos;
-	float range;
+	Vector2 vel; // velodity
+	Vector2 pos; // initial position for range check
+	float range; // range
 public:
+	// create a projectile
 	void create(Vector2 _size, float _range, std::string _tag)
 	{
 		vel = pos = Vector2(0);
@@ -19,6 +21,7 @@ public:
 		isActive = false;
 	}
 
+	// set projectile
 	void set(Vector2 _pos, Vector2 _vel)
 	{
 		pos = _pos;
@@ -28,16 +31,14 @@ public:
 		Collisions::add_collider(*this, 1);
 	}
 
+	// reset projectile
 	void reset()
 	{
 		Collisions::remove_collider(*this, 1);
 		isActive = false;
 	}
 
-	void on_collide(std::string _tag) override
-	{
-		reset();
-	}
+	void on_collide(std::string _tag) override { reset(); }
 
 	void update(float dt)
 	{
@@ -49,23 +50,22 @@ public:
 			reset();
 	}
 
-	~Projectile()
-	{
-		reset();
-	}
+	~Projectile() { reset(); }
 };
 
 template<unsigned int poolSize>
+// template for projectile pool
 class ProjectilePool
 {
-	Projectile pool[poolSize];
-	Image image;
-	float speed;
-	Engine::Color color;
+	Projectile pool[poolSize]; // projectile pool
+	Image image; // image of projectile to draw
+	float speed; // speed of projectile
+	Engine::Color color; // color of projectile
 
 public:
 	ProjectilePool() = default;
 
+	// create pool with give data and assign tab for collision
 	void create(Vector2 _size, float _speed, float _range, std::string _tag, Engine::Color _color = Engine::Color::AQUA)
 	{
 		color = _color;
@@ -75,6 +75,7 @@ public:
 			pool[i].create(_size, _range, _tag);
 	}
 
+	// create a circle for projectile visual (can be swaped with an image)
 	void create_image(Vector2 _size)
 	{
 		image.width = _size.x;
@@ -91,6 +92,7 @@ public:
 				memcpy(&image.data[i * image.channels], color.value, image.channels);
 	}
 
+	// update all projectiles in pool
 	void update(float dt)
 	{
 		for (unsigned int i = 0; i < poolSize; i++)
@@ -98,6 +100,7 @@ public:
 				pool[i].update(dt);
 	}
 
+	// add projectile (basically finds inactive projectile and activate it)
 	void add(Vector2 _pos, Vector2 _dir)
 	{
 		for (int i = 0; i < poolSize; i++)
@@ -110,6 +113,7 @@ public:
 		}
 	}
 
+	// draw all projectiles
 	void draw()
 	{
 		for (unsigned int i = 0; i < poolSize; i++)

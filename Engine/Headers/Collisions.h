@@ -28,7 +28,7 @@ public:
 	//function called when collided
 	virtual void on_collide(Collider& _other) {};
 	// vitual destructor
-	virtual ~Collider();
+	virtual ~Collider() = default;
 };
 
 // collision class handles collions in game

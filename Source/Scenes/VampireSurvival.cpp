@@ -6,25 +6,22 @@
 using namespace Engine;
 using namespace std;
 
-class MapEditorScene;
-class Level1Scene;
-
 const Vector2 WIN_SIZE(1024, 768);
 
+// functions declaration for getting scenes
 Scene* create_level_1_scene();
 Scene* create_level_2_scene();
 Scene* create_editor_scene();
 
+
+// pointer for main menu (for scene selection) 
 class Pointer :public Sprite
 {
 	float inpFreq;
 	int value;
 	Image menuImage;
 
-	void set_pos()
-	{
-		rect.set_center(Vector2(0, value * rect.size.y + value * 40 - 190));
-	}
+	void set_pos() { rect.set_center(Vector2(0, value * rect.size.y + value * 40 - 190)); }
 
 public:
 
@@ -68,25 +65,24 @@ public:
 		Sprite::draw();
 	}
 
-	int get_value() const
-	{
-		return value;
-	}
+	int get_value() const { return value; }
 };
 
+// Menu
 class MainMenu : public Scene
 {
-	Pointer pointer;
-	float inpFreq;
+	Pointer pointer; // gives to selected scene
+	float inpFreq; // for keeping inputs in a certain frequency
 
-	string curScene;
-	SceneManager<3> sceneManager;
+	string curScene; // keeps track of current scene
+	SceneManager<3> sceneManager; // scene manager to change scenes
 public:
 	MainMenu()
 	{
 		name = "Menu";
 
 		float inpFreq = 0;
+		// adding scens to scene manager
 		sceneManager.add(create_level_1_scene());
 		sceneManager.add(create_level_2_scene());
 		sceneManager.add(create_editor_scene());
@@ -112,6 +108,7 @@ public:
 			int ch = pointer.get_value();
 			inpFreq = 0.2f;
 
+			// check for scene change
 			switch (ch)
 			{
 			case 0:curScene = sceneManager.change_scene("Level1Scene");
@@ -129,10 +126,7 @@ public:
 		}
 	}
 
-	void draw()
-	{
-		pointer.draw();
-	}
+	void draw() { pointer.draw(); }
 };
 
 class Game :public App
@@ -154,7 +148,8 @@ public:
 
 int main()
 {
-	DEBUG_MODE = false;
+	// dont enable it (just for debugging)
+	DEBUG_MODE = true;
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	Game app("Vapmire Survival", WIN_SIZE);

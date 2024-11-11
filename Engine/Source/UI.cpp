@@ -37,17 +37,6 @@ void FillBar::set_value(float _val)
 	fill();
 }
 
-void FillBar::set_pos(Vector2 _pos)
-{
-	rect.set_center(_pos);
-}
-
-void FillBar::draw()
-{
-	Engine::Camera::draw(rect, image);
-}
-
-void FillBar::draw_ui()
-{
-	Engine::Camera::draw_ui(rect.get_topleft(), image);
-}
+void FillBar::set_pos(Vector2 _pos) { rect.set_center(_pos); }
+void FillBar::draw() { Engine::Camera::draw(rect, image); }
+void FillBar::draw_ui() { Engine::Camera::draw_ui(rect.get_topleft(), image); }

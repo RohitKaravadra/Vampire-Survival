@@ -9,12 +9,6 @@ void DamageArea::create(float _range, Vector2 _pos)
 	create_circle_outline(image, Color::YELLOW, 2);
 }
 
-void DamageArea::on_collide(Collider& _other)
-{
-	if (_other.compare_tag(HeavyNpcTag))
-		player->on_collide(_other);
-}
-
 Character::Character(std::string _location, Vector2 _pos, float _health, TileMap<32U, 24U>& _level) :level(_level), Sprite(_location, _pos)
 {
 	health = _health;
@@ -37,10 +31,7 @@ Character::Character(std::string _location, Vector2 _pos, float _health, TileMap
 	Collisions::add_collider(*this);
 }
 
-Character::~Character()
-{
-	Collisions::remove_collider(*this);
-}
+Character::~Character() { Collisions::remove_collider(*this); }
 
 void Character::hit(float _val)
 {
@@ -75,10 +66,11 @@ void Character::update(float dt)
 		if (fireRate > 0)
 			fireRate -= dt;
 
-		if (Inputs::key_pressed('E'))
+		// speed control for debugging 
+		/*if (Inputs::key_pressed('E'))
 			speed += 1000 * dt;
 		if (Inputs::key_pressed('Q'))
-			speed -= 1000 * dt;
+			speed -= 1000 * dt;*/
 
 		Vector2 delta = Inputs::get_axis() * dt * speed;
 		move_and_collide(delta);
@@ -86,25 +78,13 @@ void Character::update(float dt)
 		if (dmgArea.isActive)
 			dmgArea.rect.set_center(rect.get_center());
 
-		if (fireRate <= 0 && target.magnitude() > 0)
-		{
-			pPool.add(rect.get_center(), rect.get_center().direction(target));
-			fireRate = 0.2f;
-		}
-		if (cdTimer <= 0 && Inputs::key_pressed(VK_SPACE))
-		{
-			Collisions::circle_cast(dmgArea.rect, [](Collider* col) { col->on_collide(PlayerHeavyTag); });
-			cdTimer = coolDown;
-		}
+		attack();
 	}
 
 	pPool.update(dt);
 }
 
-void Character::move(Vector2 delta)
-{
-	rect.move(delta);
-}
+void Character::move(Vector2 delta) { rect.move(delta); }
 
 void Character::move_and_collide(Vector2 delta)
 {
@@ -121,7 +101,16 @@ void Character::move_and_collide(Vector2 delta)
 
 void Character::attack()
 {
-
+	if (fireRate <= 0 && target.magnitude() > 0)
+	{
+		pPool.add(rect.get_center(), rect.get_center().direction(target));
+		fireRate = 0.2f;
+	}
+	if (cdTimer <= 0 && Inputs::key_pressed(VK_SPACE))
+	{
+		Collisions::circle_cast(dmgArea.rect, [](Collider* col) { col->on_collide(PlayerHeavyTag); });
+		cdTimer = coolDown;
+	}
 }
 
 void Character::draw()
@@ -141,10 +130,7 @@ void Character::draw_ui()
 	healthBar.draw_ui();
 }
 
-bool Character::is_alive() const
-{
-	return isActive;
-}
+bool Character::is_alive() const { return isActive; }
 
 void Character::on_collide(Collider& _other)
 {

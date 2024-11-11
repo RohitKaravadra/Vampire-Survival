@@ -11,9 +11,9 @@ class TileMap
 {
 protected:
 	Image tileSet[_setSize];
-	Image dbgImg;
+	Image dbgImg; // image with outline to debug colliders
 
-	Rect rect;
+	Rect rect; // rect use for collision check
 
 	unsigned int setSize; // total tiles in tile Set
 	unsigned int size; // size of data 

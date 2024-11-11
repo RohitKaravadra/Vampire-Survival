@@ -4,6 +4,8 @@
 
 using namespace Engine;
 
+// simple level class derived from TileMap
+// loads level 
 class Level : public TileMap<32, 24>
 {
 public:

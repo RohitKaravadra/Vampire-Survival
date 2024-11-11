@@ -17,13 +17,13 @@ public:
 
 	void create(unsigned int _number, std::string _tag)
 	{
-		if (_tag == StaticNpcTag)
+		if (_tag == StaticNpcTag) // if static enemy spawn inside camera view
 		{
 			Vector2 _min = Camera::camRect.get_topleft(), _max = Camera::camRect.get_botmright();
 			for (unsigned int i = 0; i < _number; i++)
 				add(Vector2::get_random(_min, _max));
 		}
-		else
+		else // else spawn outside camera view
 		{
 			for (unsigned int i = 0; i < _number; i++)
 				add(get_random_exclude(Camera::camRect, Vector2(100, 100)));
@@ -34,6 +34,7 @@ public:
 
 	void add(Vector2 _pos) { active.add(new T(_pos)); }
 
+	// add npc when load is successful
 	void add(Vector2 _pos, float _health) { active.add(new T(_pos)); active[active.get_size() - 1]->set_health(_health); }
 
 	void update(Vector2 _target, float dt)
@@ -53,6 +54,7 @@ public:
 
 	bool is_active() { return active.get_size() > 0; }
 
+	// returns the nearest position of npc to player
 	Vector2 get_nearest()
 	{
 		Vector2 pos(0, 0);
@@ -67,6 +69,7 @@ public:
 		return pos;
 	}
 
+	// returns current npcs data to save
 	DArray<Pair<Vector2, float>> get_data()
 	{
 		DArray<Pair<Vector2, float>> data;
@@ -127,7 +130,7 @@ public:
 };
 
 
-// Heavy Enemy type (only moves towards enemies, damages on collision)
+// Lite Enemy type (only moves towards enemies, damages on collision)
 class LiteNpc : public NpcBase
 {
 public:
@@ -137,6 +140,7 @@ public:
 	void update(float, Vector2);
 };
 
+// Npc Type Heavy
 class HeavyNpc : public LiteNpc
 {
 public:
@@ -144,6 +148,7 @@ public:
 	HeavyNpc(Vector2);
 };
 
+// Npc Type Static
 class StaticNpc : public ShooterNpcBase
 {
 public:
@@ -153,6 +158,7 @@ public:
 	void update(float, Vector2);
 };
 
+// Npc Type Shooter
 class ShooterNpc : public ShooterNpcBase
 {
 public:
@@ -170,13 +176,20 @@ class NpcManager
 	unsigned int npcIncrease;
 	Sprite* player;
 	unsigned int wave = 0;
+	// check for updating wave
+	void update_wave();
 public:
 	NpcManager();
+	// create and initialize parameters also spawns initial enemies 
 	void create(Sprite&, bool = false);
+	// destroy all npcs
 	void destroy();
-	void update_wave();
+	// update all npcs
 	void update(float);
+	// draw all npcs
 	void draw();
+	// get the nearest npc for the swarm
 	Vector2 get_nearest();
+	// save data of the npcs
 	void save_data();
 };
