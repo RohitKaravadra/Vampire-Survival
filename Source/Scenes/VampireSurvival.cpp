@@ -149,7 +149,7 @@ public:
 int main()
 {
 	// dont enable it (just for debugging)
-	DEBUG_MODE = true;
+	DEBUG_MODE = false;
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	Game app("Vapmire Survival", WIN_SIZE);
