@@ -25,7 +25,7 @@ Character::Character(std::string _location, Vector2 _pos, float _health, TileMap
 	healthBar.create(Vector2(200, 20), Vector2(camSize.x / 2 - 100, camSize.y - 35), Color::GREEN, Color::RED, health / 100);
 	attackCharge.create(Vector2(200, 10), Vector2(camSize.x / 2 - 100, camSize.y - 50), Color::AQUA, Color::WHITE);
 
-	pPool.create(Vector2(10, 10), 300, 300, PlayerProjectileTag, Color::BLACK);
+	pPool.create(Vector2(10, 10), 300, 300, PlayerProjectileTag, Color::MAGENTA);
 	dmgArea.create(range, rect.get_center());
 
 	Collisions::add_collider(*this);

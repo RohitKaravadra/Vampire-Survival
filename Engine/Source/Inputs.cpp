@@ -75,7 +75,7 @@ bool Inputs::ui_accept()
 {
 	if (win == nullptr)
 		return false;
-	return win->keyPressed('F') || win->keyPressed(VK_ACCEPT);
+	return win->keyPressed('F') || win->keyPressed(VK_RETURN);
 }
 
 bool Inputs::ui_back()

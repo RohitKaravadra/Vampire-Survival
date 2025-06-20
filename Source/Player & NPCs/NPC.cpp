@@ -132,7 +132,7 @@ LiteNpc::LiteNpc(Vector2 _pos)
 	range = 30;
 	maxHealth = health = 20;
 
-	load_image(image, "Resources/Rober.png");
+	load_image(image, "Resources/Goon.png");
 
 	rect.set(Vector2(image.width, image.height), _pos);
 	tag = LiteNpcTag;

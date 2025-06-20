@@ -291,7 +291,7 @@ namespace Utilities
 		~Dictionary() { clear(); }
 
 		// returns current size of data
-		unsigned int get_size() { return size; }
+		unsigned int get_size() const { return size; }
 
 		// checks if data has given key or not
 		bool has(T1 _key)

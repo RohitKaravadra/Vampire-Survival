@@ -40,8 +40,13 @@ void load_level(std::string _name, Dictionary<Vector2, Pair<unsigned int, unsign
 				_level.add(pair);
 			}
 		}
+		else
+			std::cout << "ERROR : Loaded level is empty" << std::endl;
+
+		levelFile.close();
 	}
-	levelFile.close();
+	else
+		std::cout << "ERROR : Can't open file " << _name << std::endl;
 }
 
 void save_level(std::string _name, Dictionary<Vector2, Pair<unsigned int, unsigned int>>& _level)
@@ -51,16 +56,25 @@ void save_level(std::string _name, Dictionary<Vector2, Pair<unsigned int, unsign
 	{
 		std::ofstream levelFile(_name);
 
-		levelFile << size << "\n";
-		for (unsigned int i = 0; i < size; i++)
+		if (levelFile)
 		{
-			Pair<Vector2, Pair<unsigned int, unsigned int>> pair = _level[i];
-			levelFile << pair.key.x << ',';
-			levelFile << pair.key.y << ',';
-			levelFile << pair.value.key << ',';
-			levelFile << pair.value.value << "\n";
+			levelFile << size << "\n";
+			for (unsigned int i = 0; i < size; i++)
+			{
+				Pair<Vector2, Pair<unsigned int, unsigned int>> pair = _level[i];
+				levelFile << pair.key.x << ',';
+				levelFile << pair.key.y << ',';
+				levelFile << pair.value.key << ',';
+				levelFile << pair.value.value << "\n";
+			}
+
+			std::cout << "Level Saved in " << _name << std::endl;
 		}
+		else
+			std::cout << "ERROR : Can't open or create file" << std::endl;
 
 		levelFile.close();
 	}
+	else
+		std::cout << "WARNING : Level is empty. Can't save an empty level" << std::endl;
 }

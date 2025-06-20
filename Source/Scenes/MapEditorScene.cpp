@@ -84,7 +84,6 @@ public:
 		}
 		else if (Inputs::key_pressed('P'))
 		{
-			std::cout << "Level Saved" << std::endl;
 			save_level("level.txt", data);
 		}
 		else
